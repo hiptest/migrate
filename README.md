@@ -6,15 +6,18 @@ The only way to retrieve the steps of each test case is to put all of them in a 
 You can do it (bulk) by following these steps :
 
  1. Create a dedicated test cycle (called "All Tests" for example).
+ 
  ![new test cycle](https://downloads.intercomcdn.com/i/o/45686453/9afe54ce6ac75bbb21688f37/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.43.07.png)
  
  2. In the 'Search Test' section, create a search filter ('save as' button at the top of the page) named 'All tests' that only filter the issueType to 'Test': 
  project=<projectId> AND issuetype=Test
+ 
  ![search tests section](https://downloads.intercomcdn.com/i/o/45686750/3a97f8186b4445cf6266c8b4/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.44.21.png)
  
  ![new search filter](https://downloads.intercomcdn.com/i/o/45687223/04593cbd710b0c9ff2df21fc/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.45.43.png)
  
  3. Press the 'All Tests' gear in the test cycle list, select "add tests", then enter the filter name 'All tests' in the 'search filter' pane. Validate.
+ 
  ![test cycle list](https://downloads.intercomcdn.com/i/o/45687596/b80b2fdef6c1ea7f1daf9a37/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.48.30.png)
  
  ![add tests bulk](https://downloads.intercomcdn.com/i/o/45687792/ead8a9b0f53d1f0ac8e2c02d/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.50.38.png)
