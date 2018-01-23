@@ -102,12 +102,12 @@ class Scenario
   
   attr_accessor :id, :name, :project, :description, :steps, :folder, :tags, :folder_id, :api_path
   
-  def initialize(name, description = '')
+  def initialize(name, steps = [], description = '')
     @id = nil
     @folder_id = nil
     @name = name
     @description = description
-    @steps = []
+    @steps = steps
     @tags = []
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
@@ -352,45 +352,45 @@ def help
   puts "Example: HT_ACCESS_TOKEN=xxxxxx HT_CLIENT=xxxxxx HT_UID=xxxxxx HT_PROJECT=xxxx ./migrate_zephyr.rb file1.xml file2.xml"
 end
 
-def parse_files(arguments)
-  files = []
-  arguments.each do |path|
-    if File.file?(path) and path.end_with?('.xml')
-      files << File.open(path) { |f| Nokogiri::XML(f)}
-    end
-  end
-  files
-end
-
-def is_info_file? file_nodes
-  file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
-end
-
-def is_execution_file? file_nodes
-  file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
-end
-
-
-def determinate_info_and_execution_files(files)
-  infos, executions = nil
+def parse_file(path)
+  file = nil
   
-  files.each do |file|
-    if is_info_file? file
-      infos = file
-    end
-    
-    if is_execution_file? file
-      executions = file
-    end
+  if File.file?(path) and path.end_with?('.xml')
+    file = File.open(path) { |f| Nokogiri::XML(f)}
   end
   
-  if infos.nil? or executions.nil?
-    help
-    exit(1)
-  end
-  
-  [infos, executions]
+  file
 end
+
+# def is_info_file? file_nodes
+#   file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
+# end
+# 
+# def is_execution_file? file_nodes
+#   file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
+# end
+#
+#
+# def determinate_info_and_execution_files(files)
+#   infos, executions = nil
+# 
+#   files.each do |file|
+#     if is_info_file? file
+#       infos = file
+#     end
+# 
+#     if is_execution_file? file
+#       executions = file
+#     end
+#   end
+# 
+#   if infos.nil? or executions.nil?
+#     help
+#     exit(1)
+#   end
+# 
+#   [infos, executions]
+# end
 
 
 
@@ -399,35 +399,35 @@ end
 #       PROCESSING        #
 ###########################
 
-def process_infos(infos_nodes)
-  tests_nodes = infos_nodes.xpath('//item')
-  
-  tests_nodes.each do |test_node|
-    sc = {}
-    test_node.children.each do |child| 
-      sc[child.name.to_sym] = child.content.strip
-    end
-    
-    Project.instance.name = sc[:project]
-    scenario = Scenario.new(sc[:summary], sc[:description])
-    
-    TO_TAG_NODES.each do |tag|
-      unless ONLY_KEY_TAGS.include? tag
-        scenario.tags << Tag.new(tag, sc[tag]) unless sc[tag].nil? or sc[tag].empty?
-      else
-        scenario.tags << Tag.new(tag)
-      end
-    end
-    
-    folder = nil
-    if sc[:component]
-      folder = Folder.find_or_create_by_name(sc[:component])
-      folder.scenarios << scenario
-    else
-      Project.instance.scenarios << scenario
-    end
-  end
-end
+# def process_infos(infos_nodes)
+#   tests_nodes = infos_nodes.xpath('//item')
+# 
+#   tests_nodes.each do |test_node|
+#     sc = {}
+#     test_node.children.each do |child| 
+#       sc[child.name.to_sym] = child.content.strip
+#     end
+# 
+#     Project.instance.name = sc[:project]
+#     scenario = Scenario.new(sc[:summary], sc[:description])
+# 
+#     TO_TAG_NODES.each do |tag|
+#       unless ONLY_KEY_TAGS.include? tag
+#         scenario.tags << Tag.new(tag, sc[tag]) unless sc[tag].nil? or sc[tag].empty?
+#       else
+#         scenario.tags << Tag.new(tag)
+#       end
+#     end
+# 
+#     folder = nil
+#     if sc[:component]
+#       folder = Folder.find_or_create_by_name(sc[:component])
+#       folder.scenarios << scenario
+#     else
+#       Project.instance.scenarios << scenario
+#     end
+#   end
+# end
 
 
 def process_executions(executions_nodes)
@@ -436,7 +436,7 @@ def process_executions(executions_nodes)
     execution = {}
     steps = []
     
-    test_node.children.each do |child|
+    test_node.element_children.each do |child|
       if child.name == 'teststeps'
         child.element_children.each do |step_node|
           test_step = {}
@@ -450,8 +450,24 @@ def process_executions(executions_nodes)
       end
     end
     
-    scenario = Scenario.find_by_name(execution[:testSummary])
-    scenario.steps = steps
+    Project.instance.name = execution[:project]
+    scenario = Scenario.new(execution[:testSummary], steps)
+    
+    TO_TAG_NODES.each do |tag|
+      unless ONLY_KEY_TAGS.include? tag
+        scenario.tags << Tag.new(tag, execution[tag]) unless execution[tag].nil? or execution[tag].empty?
+      else
+        scenario.tags << Tag.new(tag)
+      end
+    end
+    
+    folder = nil
+    unless execution[:components].empty?
+      folder = Folder.find_or_create_by_name(execution[:components])
+      folder.scenarios << scenario
+    else
+      Project.instance.scenarios << scenario
+    end
   end
 end
 
@@ -463,10 +479,10 @@ end
 
 if __FILE__ == $0
   check_env_variables
-  if ARGV.count == 2
-    files = parse_files(ARGV)
-    infos, executions = determinate_info_and_execution_files(files)
-    process_infos(infos)
+  if ARGV.count == 1
+    executions = parse_file(ARGV.first)
+    # infos, executions = determinate_info_and_execution_files(files)
+    # process_infos(infos)
     process_executions(executions)
     Project.instance.api_create_or_update
   else
