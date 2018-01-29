@@ -16,9 +16,9 @@ HIPTEST_API_URI = 'https://hiptest.net/api'
 
 class Project
   include Singleton
-  
+
   attr_accessor :name, :description, :folders, :scenarios
-  
+
   def initialize()
     @name = ''
     @description = ''
@@ -26,20 +26,20 @@ class Project
     @scenarios = []
     @root_folder_id = nil
   end
-  
+
   def api_create_or_update
     get_root_folder_id
     @scenarios.each do |scenario|
       scenario.folder_id = @root_folder_id
       scenario.api_create_or_update
     end
-    
+
     @folders.each do |folder|
       folder.parent_id = @root_folder_id
       folder.api_create_or_update
     end
   end
-  
+
   def get_root_folder_id
     uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders")
     res = get(uri)
@@ -52,7 +52,7 @@ end
 
 class Folder
   attr_accessor :id, :name, :scenarios, :parent_id, :api_path
-  
+
   def initialize(name, scenarios = [])
     @id = nil
     @parent_id = nil
@@ -61,17 +61,17 @@ class Folder
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
     Project.instance.folders << self
   end
-  
+
   def self.find_or_create_by_name(name)
     folder = Project.instance.folders.select{ |f| f.name == name }.first
-    
+
     if folder.nil?
       folder = Folder.new(name)
     end
-    
+
     folder
   end
-  
+
   def api_create_or_update
     body = {
       data: {
@@ -79,9 +79,9 @@ class Folder
           name: @name,
           "parent-id": @parent_id
         }
-      } 
+      }
     }
-    
+
     create_or_update(self, body, 'folders')
 
     @scenarios.each do |scenario|
@@ -89,7 +89,7 @@ class Folder
       scenario.api_create_or_update
     end
   end
-  
+
   def api_exists?
     uri = URI(@api_path)
     exists?(self, uri, 'name', @name)
@@ -99,9 +99,9 @@ end
 
 class Scenario
   @@scenarios = []
-  
+
   attr_accessor :id, :name, :project, :description, :steps, :folder, :tags, :folder_id, :api_path
-  
+
   def initialize(name, steps = [], description = '')
     @id = nil
     @folder_id = nil
@@ -112,7 +112,7 @@ class Scenario
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
   end
-  
+
   def definition
     definition = "scenario '#{@name}' do\n"
     @steps.each do |step|
@@ -123,11 +123,11 @@ class Scenario
       end
       definition << "  step {#{action}}\n"
     end
-    
+
     definition << "\nend"
     definition
   end
-  
+
   def api_create_or_update
     body = {
       data: {
@@ -139,23 +139,23 @@ class Scenario
         }
       }
     }
-    
+
     create_or_update(self, body, 'scenarios')
-    
+
     @tags.each do |tag|
       tag.scenario_id = @id
       tag.api_create_or_update
     end
   end
-  
+
   def self.find_by_name(name)
     @@scenarios.select{ |sc| sc.name == name }.first
   end
-  
+
   def self.find(id)
     @@scenarios.select{ |sc| sc.id == id }.first
   end
-  
+
   def api_exists?
     uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios")
     exists?(self, uri, 'name', @name)
@@ -166,7 +166,7 @@ end
 class Tag
   attr_accessor :id, :key, :value, :api_path
   attr_reader :scenario_id
-  
+
   def initialize(key, value = '')
     @id = nil
     @key = key
@@ -174,12 +174,12 @@ class Tag
     @scenario_id = nil
     @api_path = nil
   end
-  
+
   def scenario_id=(scenario_id)
     @scenario_id = scenario_id
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
   end
-  
+
   def api_create_or_update
     # TODO: GET back to work!
     body = {
@@ -190,14 +190,14 @@ class Tag
         }
       }
     }
-    
-    create_or_update(self, body, 'tags') 
+
+    create_or_update(self, body, 'tags')
   end
-  
+
   def api_exists?
     exist = false
     res = get(URI(@api_path))
-    
+
     if res and res['data'].any?
       res['data'].each do |r|
         if r.dig('attributes', 'key') == @key.to_s and r.dig('attributes', 'value') == @value
@@ -206,7 +206,7 @@ class Tag
         end
       end
     end
-    
+
     exist
   end
 end
@@ -225,38 +225,44 @@ end
 def post(uri, body)
   req = Net::HTTP::Post.new(uri.path)
   req.body = body
-  
+
   send_request(uri, req)
 end
 
 def patch(uri, body)
   req = Net::HTTP::Patch.new(uri.path)
   req.body = body
-  
+
   send_request(uri, req)
 end
 
 def send_request(uri, req)
   res = nil
-  
+
   add_auth_header_to_request(req)
   response = Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
     http.request(req)
   end
-  
+
   if response.code == "200"
     res = JSON.parse(response.body)
   else
+    if response.message == 'Too Many Requests'
+      puts "API limit rate exceeded, sleeping for a while"
+      sleep 600
+      puts "Ok, let's start again"
+      return send_request(uri, req)
+    end
     puts response.message
   end
-  
+
   res
 end
 
 def exists?(resource, uri, attribute_name, attribute)
   exist = false
   res = get(uri)
-  
+
   if res and res['data'].any?
     res['data'].each do |r|
       if r.dig('attributes', attribute_name) == attribute
@@ -265,19 +271,19 @@ def exists?(resource, uri, attribute_name, attribute)
       end
     end
   end
-  
+
   exist
 end
 
 def create_or_update(resource, body, resource_type = nil)
   res = nil
-  
+
   if resource.api_exists?
     resource.api_path += "/#{resource.id}"
     uri = URI(api_path)
     body[:data][:type] = resource_type
     body[:data][:id] = resource.id
-    
+
     res = patch(uri, body.to_json)
   else
     uri = URI(resource.api_path)
@@ -303,7 +309,7 @@ def headers
   }
 end
 
-def get_env_variables  
+def get_env_variables
   {
     access_token: ENV['HT_ACCESS_TOKEN'],
     client: ENV['HT_CLIENT'],
@@ -315,14 +321,14 @@ end
 def check_env_variables
   env_var_names = ['HT_ACCESS_TOKEN', 'HT_CLIENT', 'HT_UID', 'HT_PROJECT']
   is_errored = false
-  
+
   env_var_names.each do |env_var|
     if ENV[env_var].nil?
       is_errored = true
       missing_env(env_var)
     end
   end
-  
+
   if is_errored
     puts
     help
@@ -354,18 +360,18 @@ end
 
 def parse_file(path)
   file = nil
-  
+
   if File.file?(path) and path.end_with?('.xml')
     file = File.open(path) { |f| Nokogiri::XML(f)}
   end
-  
+
   file
 end
 
 # def is_info_file? file_nodes
 #   file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
 # end
-# 
+#
 # def is_execution_file? file_nodes
 #   file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
 # end
@@ -373,22 +379,22 @@ end
 #
 # def determinate_info_and_execution_files(files)
 #   infos, executions = nil
-# 
+#
 #   files.each do |file|
 #     if is_info_file? file
 #       infos = file
 #     end
-# 
+#
 #     if is_execution_file? file
 #       executions = file
 #     end
 #   end
-# 
+#
 #   if infos.nil? or executions.nil?
 #     help
 #     exit(1)
 #   end
-# 
+#
 #   [infos, executions]
 # end
 
@@ -401,16 +407,16 @@ end
 
 # def process_infos(infos_nodes)
 #   tests_nodes = infos_nodes.xpath('//item')
-# 
+#
 #   tests_nodes.each do |test_node|
 #     sc = {}
-#     test_node.children.each do |child| 
+#     test_node.children.each do |child|
 #       sc[child.name.to_sym] = child.content.strip
 #     end
-# 
+#
 #     Project.instance.name = sc[:project]
 #     scenario = Scenario.new(sc[:summary], sc[:description])
-# 
+#
 #     TO_TAG_NODES.each do |tag|
 #       unless ONLY_KEY_TAGS.include? tag
 #         scenario.tags << Tag.new(tag, sc[tag]) unless sc[tag].nil? or sc[tag].empty?
@@ -418,7 +424,7 @@ end
 #         scenario.tags << Tag.new(tag)
 #       end
 #     end
-# 
+#
 #     folder = nil
 #     if sc[:component]
 #       folder = Folder.find_or_create_by_name(sc[:component])
@@ -435,7 +441,7 @@ def process_executions(executions_nodes)
   tests_nodes.each do |test_node|
     execution = {}
     steps = []
-    
+
     test_node.element_children.each do |child|
       if child.name == 'teststeps'
         child.element_children.each do |step_node|
@@ -449,10 +455,10 @@ def process_executions(executions_nodes)
         execution[child.name.to_sym] = child.content.strip
       end
     end
-    
+
     Project.instance.name = execution[:project]
     scenario = Scenario.new(execution[:testSummary], steps)
-    
+
     TO_TAG_NODES.each do |tag|
       unless ONLY_KEY_TAGS.include? tag
         scenario.tags << Tag.new(tag, execution[tag]) unless execution[tag].nil? or execution[tag].empty?
@@ -460,7 +466,7 @@ def process_executions(executions_nodes)
         scenario.tags << Tag.new(tag)
       end
     end
-    
+
     folder = nil
     unless execution[:components].empty?
       folder = Folder.find_or_create_by_name(execution[:components])
