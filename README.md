@@ -38,14 +38,12 @@ Finally, to have all test informations (like description, etc), could you please
 
 Migration script needs some variable to push exported project to Hiptest:
 
- 1. HT_ACCESS_TOKEN, HT_CLIENT, HT_UID: can be found in   your Hiptest profile page. Once you have them, export them in your shell session
+ 1. HT_ACCESS_TOKEN, HT_CLIENT, HT_UID: can be found in your Hiptest profile page. Once you have them, export them in your shell session
  
  2. Hiptest can't create a project from API. You will have to create a project from Hiptest application then retrieve your project id in the URL : 'https://hiptest.net/app/projects/&lt;YOUR_PROJECT_ID&gt;/' and export it in the HT_PROJECT variable in your shell session.
 
 Now you could launch the script with: 
 ```shell
-./migrate_zephyr.rb export_file1.xml export_file2.xml
+./migrate_zephyr.rb test_cycle_export.xml
 ```
-
-with export_file1.xml et export_file2.xml the two previously described Zephyr exports.
  
