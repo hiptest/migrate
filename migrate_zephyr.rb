@@ -82,6 +82,7 @@ class Folder
       }
     }
 
+    puts "-- Create/Update folder #{@name}"
     create_or_update(self, body, 'folders')
 
     @scenarios.each do |scenario|
@@ -140,6 +141,7 @@ class Scenario
       }
     }
 
+    puts "-- Create/Update scenario #{@name}"
     create_or_update(self, body, 'scenarios')
 
     @tags.each do |tag|
@@ -191,6 +193,7 @@ class Tag
       }
     }
 
+    puts "-- Create/Update tag #{@key}:#{@value}"
     create_or_update(self, body, 'tags')
   end
 
@@ -358,45 +361,47 @@ def help
   puts "Example: HT_ACCESS_TOKEN=xxxxxx HT_CLIENT=xxxxxx HT_UID=xxxxxx HT_PROJECT=xxxx ./migrate_zephyr.rb file1.xml file2.xml"
 end
 
-def parse_file(path)
-  file = nil
+def parse_files(paths)
+  files = []
 
-  if File.file?(path) and path.end_with?('.xml')
-    file = File.open(path) { |f| Nokogiri::XML(f)}
+  paths.each do |path|
+    if File.file?(path) and path.end_with?('.xml')
+      files << File.open(path) { |f| Nokogiri::XML(f)}
+    end
   end
 
-  file
+  files
 end
 
-# def is_info_file? file_nodes
-#   file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
-# end
-#
-# def is_execution_file? file_nodes
-#   file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
-# end
-#
-#
-# def determinate_info_and_execution_files(files)
-#   infos, executions = nil
-#
-#   files.each do |file|
-#     if is_info_file? file
-#       infos = file
-#     end
-#
-#     if is_execution_file? file
-#       executions = file
-#     end
-#   end
-#
-#   if infos.nil? or executions.nil?
-#     help
-#     exit(1)
-#   end
-#
-#   [infos, executions]
-# end
+def is_info_file? file_nodes
+  file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
+end
+
+def is_execution_file? file_nodes
+  file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
+end
+
+
+def determinate_info_and_execution_files(files)
+  infos, executions = nil
+
+  files.each do |file|
+    if is_info_file? file
+      infos = file
+    end
+
+    if is_execution_file? file
+      executions = file
+    end
+  end
+
+  if infos.nil? or executions.nil?
+    help
+    exit(1)
+  end
+
+  [infos, executions]
+end
 
 
 
@@ -405,35 +410,22 @@ end
 #       PROCESSING        #
 ###########################
 
-# def process_infos(infos_nodes)
-#   tests_nodes = infos_nodes.xpath('//item')
-#
-#   tests_nodes.each do |test_node|
-#     sc = {}
-#     test_node.children.each do |child|
-#       sc[child.name.to_sym] = child.content.strip
-#     end
-#
-#     Project.instance.name = sc[:project]
-#     scenario = Scenario.new(sc[:summary], sc[:description])
-#
-#     TO_TAG_NODES.each do |tag|
-#       unless ONLY_KEY_TAGS.include? tag
-#         scenario.tags << Tag.new(tag, sc[tag]) unless sc[tag].nil? or sc[tag].empty?
-#       else
-#         scenario.tags << Tag.new(tag)
-#       end
-#     end
-#
-#     folder = nil
-#     if sc[:component]
-#       folder = Folder.find_or_create_by_name(sc[:component])
-#       folder.scenarios << scenario
-#     else
-#       Project.instance.scenarios << scenario
-#     end
-#   end
-# end
+def process_infos(infos_nodes)
+  tests_nodes = infos_nodes.xpath('//item')
+
+  tests_nodes.each do |test_node|
+    sc = {}
+    
+    test_node.children.each do |child|
+      sc[child.name.to_sym] = child.content.strip
+    end
+    
+    scenario = Scenario.find_by_name(sc[:summary])
+    if scenario
+      scenario.description= sc[:description]
+    end
+  end
+end
 
 
 def process_executions(executions_nodes)
@@ -485,11 +477,11 @@ end
 
 if __FILE__ == $0
   check_env_variables
-  if ARGV.count == 1
-    executions = parse_file(ARGV.first)
-    # infos, executions = determinate_info_and_execution_files(files)
-    # process_infos(infos)
+  if ARGV.count == 2
+    files = parse_files(ARGV)
+    infos, executions = determinate_info_and_execution_files(files)
     process_executions(executions)
+    process_infos(infos)
     Project.instance.api_create_or_update
   else
     help
