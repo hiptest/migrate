@@ -193,7 +193,7 @@ class Tag
       }
     }
 
-    puts "-- Create/Update tag #{@key}:#{@value}"
+    puts "-- Create tag #{@key}:#{@value}"
     create_or_update(self, body, 'tags')
   end
 
@@ -291,7 +291,9 @@ def create_or_update(resource, body, resource_type = nil)
   else
     uri = URI(resource.api_path)
     res = post(uri, body.to_json)
-    resource.id = res.dig('data', 'id')
+    if res
+      resource.id = res.dig('data', 'id')
+    end
   end
 end
 
