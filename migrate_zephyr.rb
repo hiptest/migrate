@@ -293,6 +293,8 @@ def create_or_update(resource, body, resource_type = nil)
     res = post(uri, body.to_json)
     if res
       resource.id = res.dig('data', 'id')
+    else
+      STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
     end
   end
 end
