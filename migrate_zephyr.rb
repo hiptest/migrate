@@ -109,6 +109,7 @@ class Scenario
     @name = name
     @description = description
     @steps = steps
+    @actionwords = []
     @tags = []
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
@@ -117,12 +118,27 @@ class Scenario
   def definition
     definition = "scenario '#{@name}' do\n"
     @steps.each do |step|
-      unless step.dig(:step).empty?
-        action = "action: \"#{step.dig(:step)}\""
-      else
-        action = "result: \"#{step.dig(:result)}\""
+      steps = ""
+
+      if step.dig(:step)
+        steps << " step { action: \"#{step.dig(:step)}\" }\n"
       end
-      definition << "  step {#{action}}\n"
+      if step.dig(:result)
+        steps << " step { result: \"#{step.dig(:result)}\" }\n"
+      end
+
+      unless step.dig(:data).empty?
+        actionword = ActionWord.find_by_name(step.dig(:step)).first
+
+        if actionword.nil?
+          actionword = ActionWord.new(step.dig(:step), step.dig(:data), step.dig(:result))
+        end
+
+        @actionwords << actionword
+        definition << " call '#{step.dig(:step)}' (p1=\"#{step.dig(:data)}\")"
+      else
+        definition << steps
+      end
     end
 
     definition << "\nend"
@@ -144,6 +160,10 @@ class Scenario
     puts "-- Create/Update scenario #{@name}"
     create_or_update(self, body, 'scenarios')
 
+    @actionwords.each do |aw|
+      aw.api_create_or_update
+    end
+
     @tags.each do |tag|
       tag.scenario_id = @id
       tag.api_create_or_update
@@ -161,6 +181,58 @@ class Scenario
   def api_exists?
     uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios")
     exists?(self, uri, 'name', @name)
+  end
+end
+
+class ActionWord
+  @@actionwords = []
+
+  attr_accessor :id, :name, :description, :api_path
+
+  def initialize(name, parameter, result = '')
+    @id = nil
+    @name = name
+    @parameter = parameter
+    @result = result
+    @description = ''
+    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords"
+    @@actionwords << self
+  end
+
+  def definition
+    definition = "actionword '#{@name}' (p1 = \"#{@parameter}\") do\n"
+
+    unless @result.empty?
+      definition << "step { action: \"#{@name}\" }\n"
+      definition << "step { result: \"#{@result}\" }\n"
+    end
+
+    definition << "\nend"
+    definition
+  end
+
+  def api_create_or_update
+    body = {
+      data: {
+        attributes: {
+          name: @name,
+          description: @description,
+          definition: definition
+        }
+      }
+    }
+
+    puts "-- Create/Update actionword #{@name}"
+    create_or_update(self, body, 'actionwords')
+  end
+
+  def api_exists?
+    uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords")
+    exists?(self, uri, 'name', @name)
+  end
+
+  def self.find_by_name(name)
+    @@actionwords.select{|aw| aw.name == name}
   end
 end
 
@@ -284,6 +356,8 @@ def create_or_update(resource, body, resource_type = nil)
   if resource.api_exists?
     resource.api_path += "/#{resource.id}"
     uri = URI(api_path)
+
+    body[:data][:attributes].delete(:name)
     body[:data][:type] = resource_type
     body[:data][:id] = resource.id
 
@@ -419,11 +493,11 @@ def process_infos(infos_nodes)
 
   tests_nodes.each do |test_node|
     sc = {}
-    
+
     test_node.children.each do |child|
       sc[child.name.to_sym] = child.content.strip
     end
-    
+
     scenario = Scenario.find_by_name(sc[:summary])
     if scenario
       scenario.description= sc[:description]
