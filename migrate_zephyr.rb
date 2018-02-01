@@ -123,7 +123,7 @@ class Scenario
       steps = ""
       parameter = nil
 
-      parameter = Parameter.find_or_create_by_data(self, step.dig(:data)) unless step.dig(:data).empty?
+      parameter = Parameter.find_or_create_by_data(@name, step.dig(:data)) unless step.dig(:data).empty?
 
       if step.dig(:step)
         action = " step { action: \"#{step.dig(:step)}"
@@ -194,14 +194,18 @@ end
 
 class Parameter
   @@parameters = []
-  attr_accessor :id, :name, :data, :scenario, :api_path
+  attr_accessor :id, :name, :data, :scenario_name, :api_path
 
-  def initialize(scenario, data)
+  def initialize(scenario_name, data)
     @id = nil
     @name = nil
-    @data = nil
-    @scenario = scenario
+    @data = data
+    @scenario_name = scenario_name
     @@parameters << self
+  end
+
+  def scenario
+    Scenario.find_by_name(@scenario_name)
   end
 
   def normalized_name
@@ -244,11 +248,12 @@ class Parameter
     exist
   end
 
-  def self.find_or_create_by_data(scenario, data)
-    param = @@parameters.select{|p| p.data == data && p.scenario.name == scenario.name}.first
+  def self.find_or_create_by_data(scenario_name, data)
+    scenario = Scenario.find_by_name(scenario_name)
+    param = @@parameters.select{|p| p.data == data && Scenario.find_by_name(p.scenario_name).name == scenario.name}.first
 
     if param.nil?
-      param = Parameter.new(scenario, data)
+      param = Parameter.new(scenario_name, data)
       scenario.parameters << param
     end
     param
@@ -256,7 +261,13 @@ class Parameter
 end
 
 class Dataset
-  # code
+  @@datasets = []
+  attr_accessor :id, :data, :scenario_id, :api_path
+
+  def initialize(data, scenario_id)
+    @data = data
+    @scenario_id = scenario_id
+  end
 end
 
 class Tag
@@ -374,7 +385,7 @@ def exists?(resource, uri, attribute_name, attribute)
   exist
 end
 
-def create_or_update(resource, body, resource_type = nil)
+def create_or_update(resource, body, resource_type = nil, already_called = false)
   res = nil
 
   if resource.api_exists?
@@ -391,10 +402,15 @@ def create_or_update(resource, body, resource_type = nil)
     res = post(uri, body.to_json)
     if res
       resource.id = res.dig('data', 'id')
+      if resource_type == "scenarios" && !already_called
+        res = create_or_update(resource, body, resource_type, true)
+      end
     else
       STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
     end
   end
+
+  res
 end
 
 def add_auth_header_to_request(request)
