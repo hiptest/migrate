@@ -101,7 +101,7 @@ end
 class Scenario
   @@scenarios = []
 
-  attr_accessor :id, :name, :project, :description, :steps, :folder, :tags, :folder_id, :api_path
+  attr_accessor :id, :name, :project, :description, :steps, :parameters, :folder, :tags, :folder_id, :api_path
 
   def initialize(name, steps = [], description = '')
     @id = nil
@@ -109,7 +109,8 @@ class Scenario
     @name = name
     @description = description
     @steps = steps
-    @actionwords = []
+    @parameters = []
+    @datasets = []
     @tags = []
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
@@ -119,25 +120,21 @@ class Scenario
     definition = "scenario '#{@name}' do\n"
     @steps.each do |step|
       steps = ""
+      parameter = nil
+      
+      parameter = Parameter.find_or_create_by_name(step.dig(:data), self) unless step.dig(:data).empty?
 
       if step.dig(:step)
-        steps << " step { action: \"#{step.dig(:step)}\" }\n"
+        action = " step { action: \"#{step.dig(:step) }"
+        if parameter
+          action << "${#{parameter.normalized_name}}"
+        end
+        action << "\" }\n"
+        
+        steps << action
       end
       if step.dig(:result)
         steps << " step { result: \"#{step.dig(:result)}\" }\n"
-      end
-
-      unless step.dig(:data).empty?
-        actionword = ActionWord.find_by_name(step.dig(:step)).first
-
-        if actionword.nil?
-          actionword = ActionWord.new(step.dig(:step), step.dig(:data), step.dig(:result))
-        end
-
-        @actionwords << actionword
-        definition << " call '#{step.dig(:step)}' (p1=\"#{step.dig(:data)}\")"
-      else
-        definition << steps
       end
     end
 
@@ -159,9 +156,9 @@ class Scenario
 
     puts "-- Create/Update scenario #{@name}"
     create_or_update(self, body, 'scenarios')
-
-    @actionwords.each do |aw|
-      aw.api_create_or_update
+    
+    @parameters.each do |parameter|
+      parameter.api_create_or_update
     end
 
     @tags.each do |tag|
@@ -184,58 +181,54 @@ class Scenario
   end
 end
 
-class ActionWord
-  @@actionwords = []
-
-  attr_accessor :id, :name, :description, :api_path
-
-  def initialize(name, parameter, result = '')
+class Parameter
+  @@parameters = []
+  attr_reader :id, :name, :scenario, :api_path
+  
+  def initialize(name, scenario)
     @id = nil
     @name = name
-    @parameter = parameter
-    @result = result
-    @description = ''
-    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords"
-    @@actionwords << self
+    @scenario = scenario
+    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
+    @@parameters << self
   end
-
-  def definition
-    definition = "actionword '#{@name}' (p1 = \"#{@parameter}\") do\n"
-
-    unless @result.empty?
-      definition << "step { action: \"#{@name}\" }\n"
-      definition << "step { result: \"#{@result}\" }\n"
-    end
-
-    definition << "\nend"
-    definition
+  
+  def normalized_name
+    "p#{scenario.parameters.count}"
   end
-
+  
   def api_create_or_update
     body = {
       data: {
         attributes: {
-          name: @name,
-          description: @description,
-          definition: definition
+          name: normalized_name
         }
       }
     }
-
-    puts "-- Create/Update actionword #{@name}"
-    create_or_update(self, body, 'actionwords')
+    
+    puts "-- Create/Update parameter #{@name}"
+    create_or_update(self, body, 'parameters')
   end
-
+  
   def api_exists?
-    uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords")
+    uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters")
     exists?(self, uri, 'name', @name)
   end
-
-  def self.find_by_name(name)
-    @@actionwords.select{|aw| aw.name == name}
+  
+  def self.find_or_create_by_name(name, scenario)
+    param = @@parameters.select{|p| p.name == name && p.scenario.name == scenario.name}.first
+    
+    if param.nil?
+      param = Parameter.new(name, scenario)
+      scenario.parameters << param
+    end
+    param
   end
 end
 
+class Dataset
+  # code
+end
 
 class Tag
   attr_accessor :id, :key, :value, :api_path
