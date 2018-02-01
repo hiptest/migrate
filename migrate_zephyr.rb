@@ -118,24 +118,34 @@ class Scenario
 
   def definition
     definition = "scenario '#{@name}' do\n"
+
     @steps.each do |step|
       steps = ""
       parameter = nil
-      
-      parameter = Parameter.find_or_create_by_name(step.dig(:data), self) unless step.dig(:data).empty?
+
+      parameter = Parameter.find_or_create_by_data(self, step.dig(:data)) unless step.dig(:data).empty?
 
       if step.dig(:step)
-        action = " step { action: \"#{step.dig(:step) }"
+        action = " step { action: \"#{step.dig(:step)}"
         if parameter
-          action << "${#{parameter.normalized_name}}"
+          action << " ${#{parameter.normalized_name}}"
         end
         action << "\" }\n"
-        
+
         steps << action
       end
+
       if step.dig(:result)
-        steps << " step { result: \"#{step.dig(:result)}\" }\n"
+        result = " step { result: \"#{step.dig(:result)}"
+        if parameter && step.dig(:step).empty?
+          result << " ${#{parameter.normailized_name}}"
+        end
+        result << "\" }\n"
+
+        steps << result
       end
+
+      definition << steps
     end
 
     definition << "\nend"
@@ -156,8 +166,9 @@ class Scenario
 
     puts "-- Create/Update scenario #{@name}"
     create_or_update(self, body, 'scenarios')
-    
+
     @parameters.each do |parameter|
+      parameter.compute_api_path
       parameter.api_create_or_update
     end
 
@@ -183,20 +194,25 @@ end
 
 class Parameter
   @@parameters = []
-  attr_reader :id, :name, :scenario, :api_path
-  
-  def initialize(name, scenario)
+  attr_accessor :id, :name, :data, :scenario, :api_path
+
+  def initialize(scenario, data)
     @id = nil
-    @name = name
+    @name = nil
+    @data = nil
     @scenario = scenario
-    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
     @@parameters << self
   end
-  
+
   def normalized_name
-    "p#{scenario.parameters.count}"
+    @name = "p#{scenario.parameters.count}" if @name.nil?
+    @name
   end
-  
+
+  def compute_api_path
+    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
+  end
+
   def api_create_or_update
     body = {
       data: {
@@ -205,21 +221,34 @@ class Parameter
         }
       }
     }
-    
-    puts "-- Create/Update parameter #{@name}"
+
+    puts "-- Create/Update parameter #{normalized_name}"
     create_or_update(self, body, 'parameters')
   end
-  
+
   def api_exists?
     uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters")
-    exists?(self, uri, 'name', @name)
+
+    exist = false
+    res = get(URI(@api_path))
+
+    if res and res['data'].any?
+      res['data'].each do |r|
+        if r.dig('attributes', 'name') == normalized_name
+          exist = true
+          @id = r.dig('id')
+        end
+      end
+    end
+
+    exist
   end
-  
-  def self.find_or_create_by_name(name, scenario)
-    param = @@parameters.select{|p| p.name == name && p.scenario.name == scenario.name}.first
-    
+
+  def self.find_or_create_by_data(scenario, data)
+    param = @@parameters.select{|p| p.data == data && p.scenario.name == scenario.name}.first
+
     if param.nil?
-      param = Parameter.new(name, scenario)
+      param = Parameter.new(scenario, data)
       scenario.parameters << param
     end
     param
@@ -320,6 +349,8 @@ def send_request(uri, req)
       sleep 600
       puts "Ok, let's start again"
       return send_request(uri, req)
+    else
+      binding.pry
     end
     puts response.message
   end
@@ -350,7 +381,7 @@ def create_or_update(resource, body, resource_type = nil)
     resource.api_path += "/#{resource.id}"
     uri = URI(api_path)
 
-    body[:data][:attributes].delete(:name)
+    body[:data][:attributes].delete(:name) unless resource_type == 'parameters'
     body[:data][:type] = resource_type
     body[:data][:id] = resource.id
 
