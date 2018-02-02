@@ -540,7 +540,14 @@ def process_infos(infos_nodes)
 
     scenario = Scenario.find_by_name(sc[:summary])
     if scenario
-      scenario.description= sc[:description]
+      scenario.description = sc[:description]
+
+      sc[:labels].split("\n").map do |label|
+        label.strip!
+        next if label.empty?
+
+        scenario.tags << Tag.new('label', label)
+      end
     end
   end
 end
