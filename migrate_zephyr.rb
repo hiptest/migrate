@@ -117,7 +117,8 @@ class Scenario
   end
 
   def definition
-    definition = "scenario '#{@name}' do\n"
+    name = @name.gsub("'", %q(\\\'))
+    definition = "scenario '#{name}' do\n"
 
     @steps.each do |step|
       steps = ""
@@ -359,7 +360,7 @@ def send_request(uri, req)
       puts "API limit rate exceeded, sleeping for a while"
       sleep 600
       puts "Ok, let's start again"
-      return send_request(uri, req)
+      return send_request(uri, req)      
     else
       binding.pry
     end
