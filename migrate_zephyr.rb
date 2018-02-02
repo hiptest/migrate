@@ -101,7 +101,7 @@ end
 class Scenario
   @@scenarios = []
 
-  attr_accessor :id, :name, :project, :description, :steps, :parameters, :folder, :tags, :folder_id, :api_path
+  attr_accessor :id, :name, :project, :description, :steps, :parameters, :folder, :tags, :folder_id, :api_path, :jira_id
 
   def initialize(name, steps = [], description = '')
     @id = nil
@@ -113,6 +113,7 @@ class Scenario
     @datasets = []
     @tags = []
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
+    @jira_id = ''
     @@scenarios << self
   end
 
@@ -124,7 +125,7 @@ class Scenario
       steps = ""
       parameter = nil
 
-      parameter = Parameter.find_or_create_by_data(@name, step.dig(:data)) unless step.dig(:data).empty?
+      parameter = Parameter.find_or_create_by_data(self, step.dig(:data)) unless step.dig(:data).empty?
 
       if step.dig(:step)
         action = " step { action: \"#{step.dig(:step)}"
@@ -180,7 +181,11 @@ class Scenario
   end
 
   def self.find_by_name(name)
-    @@scenarios.select{ |sc| sc.name == name }.first
+    @@scenarios.select { |sc| sc.name == name }.first
+  end
+
+  def self.find_by_jira_id(jira_id)
+    @@scenarios.select{ |sc| sc.jira_id == jira_id }.first
   end
 
   def self.find(id)
@@ -195,18 +200,18 @@ end
 
 class Parameter
   @@parameters = []
-  attr_accessor :id, :name, :data, :scenario_name, :api_path
+  attr_accessor :id, :name, :data, :scenario_jira_id, :api_path
 
-  def initialize(scenario_name, data)
+  def initialize(scenario_jira_id, data)
     @id = nil
     @name = nil
     @data = data
-    @scenario_name = scenario_name
+    @scenario_jira_id = scenario_jira_id
     @@parameters << self
   end
 
   def scenario
-    Scenario.find_by_name(@scenario_name)
+    Scenario.find_by_jira_id(@scenario_jira_id)
   end
 
   def normalized_name
@@ -249,12 +254,11 @@ class Parameter
     exist
   end
 
-  def self.find_or_create_by_data(scenario_name, data)
-    scenario = Scenario.find_by_name(scenario_name)
-    param = @@parameters.select{|p| p.data == data && Scenario.find_by_name(p.scenario_name).name == scenario.name}.first
+  def self.find_or_create_by_data(scenario, data)
+    param = @@parameters.select{ |p| p.data == data && p.scenario_jira_id == scenario.jira_id }.first
 
     if param.nil?
-      param = Parameter.new(scenario_name, data)
+      param = Parameter.new(scenario.jira_id, data)
       scenario.parameters << param
     end
     param
@@ -539,7 +543,7 @@ def process_infos(infos_nodes)
       sc[child.name.to_sym] = child.content.strip
     end
 
-    scenario = Scenario.find_by_name(sc[:summary])
+    scenario = Scenario.find_by_jira_id(sc[:key])
     if scenario
       scenario.description = sc[:description]
 
@@ -579,7 +583,10 @@ def process_executions(executions_nodes)
 
     TO_TAG_NODES.each do |tag|
       if tag == :issueKey
-        scenario.tags << Tag.new('JIRA', execution[tag]) unless execution[tag].nil? or execution[tag].empty?
+        next if execution[tag].nil? or execution[tag].empty?
+
+        scenario.jira_id == execution[tag]
+        scenario.tags << Tag.new('JIRA', execution[tag])
         next
       end
 
