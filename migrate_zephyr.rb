@@ -6,7 +6,7 @@ require 'net/http'
 require "uri"
 require "json"
 
-TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issuekey]
+TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
 HIPTEST_API_URI = 'https://hiptest.net/api'
 
@@ -570,6 +570,11 @@ def process_executions(executions_nodes)
     scenario = Scenario.new(execution[:testSummary], steps)
 
     TO_TAG_NODES.each do |tag|
+      if tag == :issueKey
+        scenario.tags << Tag.new('JIRA', execution[tag]) unless execution[tag].nil? or execution[tag].empty?
+        next
+      end
+
       unless ONLY_KEY_TAGS.include? tag
         scenario.tags << Tag.new(tag, execution[tag]) unless execution[tag].nil? or execution[tag].empty?
       else
