@@ -101,7 +101,7 @@ end
 class Scenario
   @@scenarios = []
 
-  attr_accessor :id, :name, :project, :description, :steps, :parameters, :folder, :tags, :folder_id, :api_path
+  attr_accessor :id, :name, :project, :description, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path
 
   def initialize(name, steps = [], description = '')
     @id = nil
@@ -115,38 +115,46 @@ class Scenario
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
   end
+  
+  def compute_datatable(step)
+    steps = ""
+    
+    parameter = nil
+    
+    unless step.dig(:data).empty?
+      parameter = Parameter.find_or_create_by_data(@name, step.dig(:data))
+      Dataset.find_or_create_by_param(@name, parameter.normalized_name, step.dig(:data))
+    end
+    
+    if step.dig(:step)
+      action = " step { action: \"#{step.dig(:step)}"
+      if parameter
+        action << " ${#{parameter.normalized_name}}"
+      end
+      action << "\" }\n"
+
+      steps << action
+    end
+
+    if step.dig(:result)
+      result = " step { result: \"#{step.dig(:result)}"
+      if parameter && step.dig(:step).empty?
+        result << " ${#{parameter.normailized_name}}"
+      end
+      result << "\" }\n"
+
+      steps << result
+    end
+    
+    steps
+  end
 
   def definition
     name = @name.gsub("'", %q(\\\'))
     definition = "scenario '#{name}' do\n"
 
     @steps.each do |step|
-      steps = ""
-      parameter = nil
-
-      parameter = Parameter.find_or_create_by_data(@name, step.dig(:data)) unless step.dig(:data).empty?
-
-      if step.dig(:step)
-        action = " step { action: \"#{step.dig(:step)}"
-        if parameter
-          action << " ${#{parameter.normalized_name}}"
-        end
-        action << "\" }\n"
-
-        steps << action
-      end
-
-      if step.dig(:result)
-        result = " step { result: \"#{step.dig(:result)}"
-        if parameter && step.dig(:step).empty?
-          result << " ${#{parameter.normailized_name}}"
-        end
-        result << "\" }\n"
-
-        steps << result
-      end
-
-      definition << steps
+      definition << compute_datatable(step)
     end
 
     definition << "\nend"
@@ -171,6 +179,11 @@ class Scenario
     @parameters.each do |parameter|
       parameter.compute_api_path
       parameter.api_create_or_update
+    end
+    
+    @datasets.each do |dataset|
+      dataset.compute_api_path
+      dataset.api_create_or_update
     end
 
     @tags.each do |tag|
@@ -232,8 +245,6 @@ class Parameter
   end
 
   def api_exists?
-    uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters")
-
     exist = false
     res = get(URI(@api_path))
 
@@ -263,11 +274,54 @@ end
 
 class Dataset
   @@datasets = []
-  attr_accessor :id, :data, :scenario_id, :api_path
+  attr_accessor :id, :data, :scenario_name, :api_path
 
-  def initialize(data, scenario_id)
+  def initialize(scenario_name)
     @data = data
-    @scenario_id = scenario_id
+    @scenario_name = scenario_name
+    @data = {}
+    @api_path = nil
+    @@datasets << self
+  end
+  
+  def scenario
+    Scenario.find_by_name(@scenario_name)
+  end
+  
+  def compute_api_path
+    @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/datasets"
+  end
+  
+  def api_create_or_update
+    body = {
+      data: {
+        attributes: {
+          name: "",
+          data: @data
+        }
+      }
+    }
+    
+    puts "-- Create/Update dataset #{@data}"
+    create_or_update(self, body, 'datasets')
+  end
+  
+  def api_exists?
+    uri = URI(@api_path)
+    exists?(self, uri, 'data', @data)
+  end
+  
+  def self.find_or_create_by_param(scenario_name, parameter_name, data)
+    scenario = Scenario.find_by_name(scenario_name)
+    dataset = @@datasets.select{|ds| ds.scenario_name == scenario_name }.first
+    
+    unless dataset
+      dataset = Dataset.new(scenario_name)
+      dataset.data[parameter_name.to_sym] = data
+      scenario.datasets << dataset
+    end
+    
+    dataset
   end
 end
 
@@ -289,7 +343,6 @@ class Tag
   end
 
   def api_create_or_update
-    # TODO: GET back to work!
     body = {
       data: {
         attributes: {
