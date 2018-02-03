@@ -115,17 +115,16 @@ class Scenario
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     @@scenarios << self
   end
-  
+
   def compute_datatable(step)
     steps = ""
-    
     parameter = nil
-    
+
     unless step.dig(:data).empty?
       parameter = Parameter.find_or_create_by_data(@name, step.dig(:data))
       Dataset.find_or_create_by_param(@name, parameter.normalized_name, step.dig(:data))
     end
-    
+
     if step.dig(:step)
       action = " step { action: \"#{step.dig(:step)}"
       if parameter
@@ -145,7 +144,7 @@ class Scenario
 
       steps << result
     end
-    
+
     steps
   end
 
@@ -180,7 +179,7 @@ class Scenario
       parameter.compute_api_path
       parameter.api_create_or_update
     end
-    
+
     @datasets.each do |dataset|
       dataset.compute_api_path
       dataset.api_create_or_update
@@ -283,15 +282,15 @@ class Dataset
     @api_path = nil
     @@datasets << self
   end
-  
+
   def scenario
     Scenario.find_by_name(@scenario_name)
   end
-  
+
   def compute_api_path
     @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/datasets"
   end
-  
+
   def api_create_or_update
     body = {
       data: {
@@ -301,26 +300,39 @@ class Dataset
         }
       }
     }
-    
+
     puts "-- Create/Update dataset #{@data}"
     create_or_update(self, body, 'datasets')
   end
-  
+
   def api_exists?
     uri = URI(@api_path)
-    exists?(self, uri, 'data', @data)
+    exist = false
+    res = get(uri)
+
+    if res and res['data'].any?
+      res['data'].each do |r|
+        if r.dig('attributes', 'data').to_json == data.to_json
+          exist = true
+          @id = r.dig('id')
+        end
+      end
+    end
+
+    exist
   end
-  
+
   def self.find_or_create_by_param(scenario_name, parameter_name, data)
     scenario = Scenario.find_by_name(scenario_name)
     dataset = @@datasets.select{|ds| ds.scenario_name == scenario_name }.first
-    
+
     unless dataset
       dataset = Dataset.new(scenario_name)
-      dataset.data[parameter_name.to_sym] = data
       scenario.datasets << dataset
     end
-    
+
+    dataset.data[parameter_name.to_sym] = data
+
     dataset
   end
 end
@@ -413,7 +425,7 @@ def send_request(uri, req)
       puts "API limit rate exceeded, sleeping for a while"
       sleep 600
       puts "Ok, let's start again"
-      return send_request(uri, req)      
+      return send_request(uri, req)
     else
       binding.pry
     end
