@@ -122,8 +122,8 @@ class Scenario
     parameter = nil
 
     unless step.dig(:data).empty?
-      parameter = Parameter.find_or_create_by_data(@name, step.dig(:data))
-      Dataset.find_or_create_by_param(@name, parameter.normalized_name, step.dig(:data))
+      parameter = Parameter.find_or_create_by_data(@jira_id, step.dig(:data))
+      Dataset.find_or_create_by_param(@jira_id, parameter.normalized_name, step.dig(:data))
     end
 
     if step.dig(:step)
@@ -264,7 +264,8 @@ class Parameter
     exist
   end
 
-  def self.find_or_create_by_data(scenario, data)
+  def self.find_or_create_by_data(scenario_jira_id, data)
+    scenario = Scenario.find_by_jira_id(scenario_jira_id)
     param = @@parameters.select{ |p| p.data == data && p.scenario_jira_id == scenario.jira_id }.first
 
     if param.nil?
@@ -277,18 +278,18 @@ end
 
 class Dataset
   @@datasets = []
-  attr_accessor :id, :data, :scenario_name, :api_path
+  attr_accessor :id, :data, :scenario_jira_id, :api_path
 
-  def initialize(scenario_name)
+  def initialize(scenario_jira_id)
     @data = data
-    @scenario_name = scenario_name
+    @scenario_jira_id = scenario_jira_id
     @data = {}
     @api_path = nil
     @@datasets << self
   end
 
   def scenario
-    Scenario.find_by_name(@scenario_name)
+    Scenario.find_by_jira_id(@scenario_jira_id)
   end
 
   def compute_api_path
@@ -326,12 +327,12 @@ class Dataset
     exist
   end
 
-  def self.find_or_create_by_param(scenario_name, parameter_name, data)
-    scenario = Scenario.find_by_name(scenario_name)
-    dataset = @@datasets.select{|ds| ds.scenario_name == scenario_name }.first
+  def self.find_or_create_by_param(scenario_jira_id, parameter_name, data)
+    scenario = Scenario.find_by_jira_id(scenario_jira_id)
+    dataset = @@datasets.select{|ds| ds.scenario_jira_id == scenario.jira_id }.first
 
     unless dataset
-      dataset = Dataset.new(scenario_name)
+      dataset = Dataset.new(scenario_jira_id)
       scenario.datasets << dataset
     end
 
