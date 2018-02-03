@@ -139,7 +139,7 @@ class Scenario
     if step.dig(:result)
       result = " step { result: \"#{step.dig(:result)}"
       if parameter && step.dig(:step).empty?
-        result << " ${#{parameter.normailized_name}}"
+        result << " ${#{parameter.normalized_name}}"
       end
       result << "\" }\n"
 
@@ -428,7 +428,7 @@ def send_request(uri, req)
   else
     if response.message == 'Too Many Requests'
       puts "API limit rate exceeded, sleeping for a while"
-      sleep 600
+      sleep 310
       puts "Ok, let's start again"
       return send_request(uri, req)
     else
