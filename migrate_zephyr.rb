@@ -611,7 +611,7 @@ def process_infos(infos_nodes)
 
     scenario = Scenario.find_by_jira_id(sc[:key])
     if scenario
-      scenario.description = sc[:description]
+      scenario.description = sc[:description].gsub(%r{</?[^>]+?>}, '')
 
       sc[:labels].split("\n").map do |label|
         label.strip!
@@ -651,7 +651,7 @@ def process_executions(executions_nodes)
       if tag == :issueKey
         next if execution[tag].nil? or execution[tag].empty?
 
-        scenario.jira_id == execution[tag]
+        scenario.jira_id = execution[tag]
         scenario.tags << Tag.new('JIRA', execution[tag])
         next
       end
