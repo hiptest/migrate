@@ -136,14 +136,15 @@ class Scenario
       steps << action
     end
 
-    if step.dig(:result)
-      result = " step { result: \"#{step.dig(:result)}"
+    result = step.dig(:result)&.strip
+    if result && !result.empty?
+      result_step = " step { result: \"#{result}"
       if parameter && step.dig(:step).empty?
-        result << " ${#{parameter.normalized_name}}"
+        result_step << " ${#{parameter.normalized_name}}"
       end
-      result << "\" }\n"
+      result_step << "\" }\n"
 
-      steps << result
+      steps << result_step
     end
 
     steps
