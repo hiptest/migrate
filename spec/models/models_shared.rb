@@ -49,15 +49,23 @@ shared_examples "a model" do
     end
 
     xit 'it creates the object on Hiptest if it is unknown' do
-      expect {an_existing_object.save}.to have_contacted(create_url)
+      expect {an_unknown_object.save}.to have_contacted(create_url)
         .with_method('POST')
         .with_data(create_data)
+    end
+
+    xit 'after creation, after_create and after_save are called' do
+      expect {an_unknown_object.save}.to have_called(:after_create, :after_save)
     end
 
     xit 'it updates the object on Hiptest if it exists' do
       expect {an_existing_object.save}.to have_contacted(update_url)
         .with_method('PATCH')
         .with_data(update_data)
+    end
+
+    xit 'after updating the object, after_update and after_save are called' do
+      expect {an_unknown_object.save}.to have_called(:after_update, :after_save)
     end
   end
 end

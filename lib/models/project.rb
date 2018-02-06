@@ -13,16 +13,16 @@ module Models
       @root_folder_id = nil
     end
 
-    def api_create_or_update
+    def save
       get_root_folder_id
       @scenarios.each do |scenario|
         scenario.folder_id = @root_folder_id
-        scenario.api_create_or_update
+        scenario.save
       end
 
       @folders.each do |folder|
         folder.parent_id = @root_folder_id
-        folder.api_create_or_update
+        folder.save
       end
     end
 

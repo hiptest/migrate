@@ -12,6 +12,13 @@ module Models
       Project.instance.folders << self
     end
 
+    def after_save
+      @scenarios.each do |scenario|
+        scenario.folder_id = @id
+        scenario.save
+      end
+    end
+
     def api_path
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
     end

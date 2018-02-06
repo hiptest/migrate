@@ -154,7 +154,7 @@ if __FILE__ == $0
     infos, executions = determinate_info_and_execution_files(files)
     process_executions(executions)
     process_infos(infos)
-    Models::Project.instance.api_create_or_update
+    Models::Project.instance.save
   else
     help
     exit(1)

@@ -11,7 +11,6 @@ module Models
     def api_data
       raise NotImplementedError
     end
-
     alias :api_exists_url :api_path
 
     def api_identical?(result)
@@ -36,17 +35,39 @@ module Models
 
     def save
       if api_exists?
-        patch(URI("#{api_path}/#{id}"), api_data.to_json)
+        update
       else
-        res = post(URI(api_path), api_data.to_json)
-
-        if res
-          resource.id = res.dig('data', 'id')
-        else
-          STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
-        end
-        res
+        create
       end
+
+      after_save
+      res
+    end
+
+    def after_save
+    end
+
+    def create
+      res = post(URI(api_path), api_data.to_json)
+      after_create
+
+      if res
+        resource.id = res.dig('data', 'id')
+      else
+        STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
+      end
+      res
+    end
+
+    def after_create
+    end
+
+    def update
+      res = patch(URI("#{api_path}/#{id}"), api_data.to_json)
+      after_update
+    end
+
+    def after_update
     end
   end
 end

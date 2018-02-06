@@ -36,6 +36,28 @@ module Models
       }
     end
 
+    def after_create
+      # Yep, we save it once again so the definition is updated correctly
+      update
+    end
+
+    def after_save
+      @parameters.each do |parameter|
+        parameter.compute_api_path
+        parameter.save
+      end
+
+      @datasets.each do |dataset|
+        dataset.compute_api_path
+        dataset.save
+      end
+
+      @tags.each do |tag|
+        tag.scenario_id = @id
+        tag.save
+      end
+    end
+
     def compute_datatable(step)
       steps = ""
       parameter = nil
