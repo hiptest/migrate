@@ -1,4 +1,4 @@
-shared_example "a model" do
+shared_examples "a model" do
   let(:an_existing_object ) {}
   let(:an_unknown_object ) {}
 
