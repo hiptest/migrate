@@ -16,6 +16,17 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
     end
 
+    def api_data
+      {
+        data: {
+          attributes: {
+            name: @name,
+            "parent-id": @parent_id
+          }
+        }
+      }
+    end
+
     def self.find_or_create_by_name(name)
       folder = Project.instance.folders.select{ |f| f.name == name }.first
 
@@ -24,30 +35,6 @@ module Models
       end
 
       folder
-    end
-
-    def api_create_or_update
-      body = {
-        data: {
-          attributes: {
-            name: @name,
-            "parent-id": @parent_id
-          }
-        }
-      }
-
-      puts "-- Create/Update folder #{@name}"
-      create_or_update(self, body, 'folders')
-
-      @scenarios.each do |scenario|
-        scenario.folder_id = @id
-        scenario.api_create_or_update
-      end
-    end
-
-    def api_exists?
-      uri = URI(@api_path)
-      exists?(self, uri, 'name', @name)
     end
   end
 end

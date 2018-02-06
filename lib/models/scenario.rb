@@ -23,6 +23,19 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     end
 
+    def api_data
+      {
+        data: {
+          attributes: {
+            name: @name,
+            description: @description,
+            "folder-id": @folder_id,
+            definition: definition
+          }
+        }
+      }
+    end
+
     def compute_datatable(step)
       steps = ""
       parameter = nil
@@ -68,37 +81,6 @@ module Models
       definition
     end
 
-    def api_create_or_update
-      body = {
-        data: {
-          attributes: {
-            name: @name,
-            description: @description,
-            "folder-id": @folder_id,
-            definition: definition
-          }
-        }
-      }
-
-      puts "-- Create/Update scenario #{@name}"
-      create_or_update(self, body, 'scenarios')
-
-      @parameters.each do |parameter|
-        parameter.compute_api_path
-        parameter.api_create_or_update
-      end
-
-      @datasets.each do |dataset|
-        dataset.compute_api_path
-        dataset.api_create_or_update
-      end
-
-      @tags.each do |tag|
-        tag.scenario_id = @id
-        tag.api_create_or_update
-      end
-    end
-
     def self.find_by_name(name)
       @@scenarios.select { |sc| sc.name == name }.first
     end
@@ -109,11 +91,6 @@ module Models
 
     def self.find(id)
       @@scenarios.select{ |sc| sc.id == id }.first
-    end
-
-    def api_exists?
-      uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios")
-      exists?(self, uri, 'name', @name)
     end
   end
 end

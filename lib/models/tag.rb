@@ -21,8 +21,8 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
     end
 
-    def api_create_or_update
-      body = {
+    def api_data
+      {
         data: {
           attributes: {
             key: @key,
@@ -30,9 +30,6 @@ module Models
           }
         }
       }
-
-      puts "-- Create tag #{@key}:#{@value}"
-      create_or_update(self, body, 'tags')
     end
 
     def api_exists?

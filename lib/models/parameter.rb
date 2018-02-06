@@ -17,6 +17,16 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
     end
 
+    def api_data
+      {
+        data: {
+          attributes: {
+            name: normalized_name
+          }
+        }
+      }
+    end
+
     def scenario
       Scenario.find_by_jira_id(@scenario_jira_id)
     end
@@ -26,33 +36,9 @@ module Models
       @name
     end
 
-    def api_create_or_update
-      body = {
-        data: {
-          attributes: {
-            name: normalized_name
-          }
-        }
-      }
 
-      puts "-- Create/Update parameter #{normalized_name}"
-      create_or_update(self, body, 'parameters')
-    end
-
-    def api_exists?
-      exist = false
-      res = get(URI(@api_path))
-
-      if res and res['data'].any?
-        res['data'].each do |r|
-          if r.dig('attributes', 'name') == normalized_name
-            exist = true
-            @id = r.dig('id')
-          end
-        end
-      end
-
-      exist
+    def api_identical?(result)
+      result.dig('attributes', 'name') == normalized_name
     end
 
     def self.find_or_create_by_data(scenario_jira_id, data)
