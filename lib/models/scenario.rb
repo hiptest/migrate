@@ -15,9 +15,12 @@ module Models
       @parameters = []
       @datasets = []
       @tags = []
-      @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
       @jira_id = ''
       @@scenarios << self
+    end
+
+    def api_path
+      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     end
 
     def compute_datatable(step)

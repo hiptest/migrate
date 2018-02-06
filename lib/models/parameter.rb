@@ -13,6 +13,10 @@ module Models
       @@parameters << self
     end
 
+    def api_path
+      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
+    end
+
     def scenario
       Scenario.find_by_jira_id(@scenario_jira_id)
     end
@@ -20,10 +24,6 @@ module Models
     def normalized_name
       @name = "p#{scenario.parameters.count}" if @name.nil?
       @name
-    end
-
-    def compute_api_path
-      @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
     end
 
     def api_create_or_update

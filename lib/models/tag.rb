@@ -15,7 +15,10 @@ module Models
 
     def scenario_id=(scenario_id)
       @scenario_id = scenario_id
-      @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
+    end
+
+    def api_path
+      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
     end
 
     def api_create_or_update

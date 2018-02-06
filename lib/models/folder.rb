@@ -9,8 +9,11 @@ module Models
       @parent_id = nil
       @name = name
       @scenarios = scenarios
-      @api_path = HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
       Project.instance.folders << self
+    end
+
+    def api_path
+      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
     end
 
     def self.find_or_create_by_name(name)
