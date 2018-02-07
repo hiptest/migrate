@@ -32,7 +32,7 @@ def send_request(uri, req)
   if response.code == "200"
     res = JSON.parse(response.body)
   else
-    if response.message == 'Too Many Requests'
+    if response.code == 429
       puts "API limit rate exceeded, sleeping for a while"
       sleep 310
       puts "Ok, let's start again"
