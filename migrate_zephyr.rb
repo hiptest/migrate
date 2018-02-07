@@ -15,7 +15,7 @@ require './lib/models/tag'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
-HIPTEST_API_URI = 'https://hiptest.net/api'
+HIPTEST_API_URI = ENV['HT_URI'] || 'https://hiptest.net/api'
 
 
 def parse_files(paths)

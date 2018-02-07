@@ -23,7 +23,7 @@ def send_request(uri, req)
   res = nil
 
   add_auth_header_to_request(req)
-  response = Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+  response = Net::HTTP.start(uri.host, uri.port, :use_ssl => HIPTEST_API_URI.start_with?('https')) do |http|
     http.request(req)
   end
 
