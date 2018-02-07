@@ -56,8 +56,8 @@ shared_examples "a model" do
     return yield if block_given?
   end
 
-  def have_requested(url)
-    return WebMock::WebMockMatcher.new(:get, url)
+  def have_requested(url, method: :get)
+    return WebMock::WebMockMatcher.new(method, url)
   end
 
   context 'api_exists?' do
@@ -107,22 +107,42 @@ shared_examples "a model" do
       stub_request(:post, create_url).to_return(body: create_result, status: 200)
       stub_request(:patch, update_url).to_return(body: find_results, status: 200)
 
-      expect(an_existing_object.save).to have_requested(create_url)
+      expect(an_existing_object.save).to have_requested(create_url, method: :post)
 
     end
 
-    xit 'after creation, after_create and after_save are called' do
-      expect {an_unknown_object.save}.to have_called(:after_create, :after_save)
+    it 'after creation, after_create and after_save are called' do
+      stub_request(:get, find_url).to_return(body: {data: []}.to_json, status: 200)
+      stub_request(:post, create_url).to_return(body: create_result, status: 200)
+      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
+
+      allow(an_existing_object).to receive(:after_create)
+      allow(an_existing_object).to receive(:after_save)
+
+      an_existing_object.save
+
+      expect(an_existing_object).to have_received(:after_create)
+      expect(an_existing_object).to have_received(:after_save)
     end
 
-    xit 'it updates the object on Hiptest if it exists' do
-      expect {an_existing_object.save}.to have_contacted(update_url)
-        .with_method('PATCH')
-        .with_data(update_data)
+    it 'it updates the object on Hiptest if it exists' do
+      stub_request(:get, find_url).to_return(body: find_results, status: 200)
+      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
+
+      expect(an_existing_object.save).to have_requested(update_url, method: :patch)
     end
 
-    xit 'after updating the object, after_update and after_save are called' do
-      expect {an_unknown_object.save}.to have_called(:after_update, :after_save)
+    it 'after updating the object, after_update and after_save are called' do
+      stub_request(:get, find_url).to_return(body: find_results, status: 200)
+      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
+
+      allow(an_existing_object).to receive(:after_update)
+      allow(an_existing_object).to receive(:after_save)
+
+      an_existing_object.save
+
+      expect(an_existing_object).to have_received(:after_update)
+      expect(an_existing_object).to have_received(:after_save)
     end
   end
 end
