@@ -1,4 +1,6 @@
 require './lib/env'
+require 'net/http'
+require "uri"
 
 def get(uri)
   req = Net::HTTP::Get.new(uri.path)

@@ -1,4 +1,10 @@
+require 'spec_helper'
+
 shared_examples "a model" do
+
+  HIPTEST_API_URI = 'https://hiptest.net/api'
+  ENV['HT_PROJECT'] = "1"
+
   let(:an_existing_object ) {}
   let(:an_unknown_object ) {}
 
@@ -25,9 +31,20 @@ shared_examples "a model" do
     }.to_json
   }
 
+  def with_stubbed_request(url, returned_body = '{"data": []}', &block)
+    stub_request(:any, url).to_return(body: returned_body, status: 200)
+    return yield if block_given?
+  end
+
+  def have_requested(url)
+    return WebMock::WebMockMatcher.new(:get, url)
+  end
+
   context 'api_exists?' do
-    xit 'contacts Hiptest via the APIs to find a matching element' do
-      expect {an_existing_object.api_exists?}.to have_contacted(find_url)
+    it 'contacts Hiptest via the APIs to find a matching element' do
+      with_stubbed_request(find_url) do
+        expect(an_existing_object.api_exists?).to have_requested(find_url)
+      end
     end
 
     xit 'when a matching element is found, it returns true and the id of the element is updated' do

@@ -7,9 +7,9 @@ describe Models::Scenario do
     let(:an_existing_object ) { Models::Scenario.new('My first scenario') }
     let(:an_unknown_object ) { Models::Scenario.new('My second scenario') }
 
-    let(:find_url) {'https://hiptest.net/project/1/scenarios/find_by_tags'}
-    let(:create_url) {'https://hiptest.net/project/1/scenarios'}
-    let(:update_url) {'https://hiptest.net/project/1/scenarios/1664'}
+    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios'}
+    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
+    let(:update_url) {'https://hiptest.net/api/projects/1/scenarios/1664'}
 
     let(:create_data) {
       {
