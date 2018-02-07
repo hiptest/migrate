@@ -1,4 +1,5 @@
 require './lib/models/model.rb'
+require 'singleton'
 
 module Models
   class Project < Model

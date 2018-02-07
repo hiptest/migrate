@@ -1,4 +1,5 @@
 require './lib/models/model.rb'
+require './lib/models/project'
 
 module Models
   class Folder < Model
