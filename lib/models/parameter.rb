@@ -26,6 +26,8 @@ module Models
         }
       }
     end
+    alias :create_data :api_data
+    alias :update_data :api_data
 
     def scenario
       Scenario.find_by_jira_id(@scenario_jira_id)

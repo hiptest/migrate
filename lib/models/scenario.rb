@@ -23,11 +23,22 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     end
 
-    def api_data
+    def create_data
       {
         data: {
           attributes: {
             name: @name,
+            description: @description,
+            "folder-id": @folder_id
+          }
+        }
+      }
+    end
+
+    def update_data
+      {
+        data: {
+          attributes: {
             description: @description,
             "folder-id": @folder_id,
             definition: definition

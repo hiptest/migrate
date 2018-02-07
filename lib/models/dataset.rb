@@ -27,6 +27,9 @@ module Models
         }
       }
     end
+    alias :create_data :api_data
+    alias :update_data :api_data
+
 
     def api_identical?(result)
       result.dig('attributes', 'data').to_json == data.to_json

@@ -33,6 +33,8 @@ module Models
         }
       }
     end
+    alias :create_data :api_data
+    alias :update_data :api_data
 
     def self.find_or_create_by_name(name)
       folder = Project.instance.folders.select{ |f| f.name == name }.first

@@ -8,7 +8,11 @@ module Models
       raise NotImplementedError
     end
 
-    def api_data
+    def create_data
+      raise NotImplementedError
+    end
+
+    def update_data
       raise NotImplementedError
     end
 
@@ -51,7 +55,7 @@ module Models
     end
 
     def create
-      res = post(URI(api_path), api_data.to_json)
+      res = post(URI(api_path), create_data.to_json)
       after_create
 
       if res
@@ -66,7 +70,7 @@ module Models
     end
 
     def update
-      res = patch(URI("#{api_path}/#{id}"), api_data.to_json)
+      res = patch(URI("#{api_path}/#{id}"), update_data.to_json)
       after_update
     end
 
