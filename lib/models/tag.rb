@@ -21,7 +21,7 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
     end
 
-    def api_data
+    def create_data
       {
         data: {
           attributes: {
@@ -32,9 +32,17 @@ module Models
       }
     end
 
+    def data_type
+      'tags'
+    end
+
+    def name
+      "#{@key}:#{value}"
+    end
+
     def api_exists?
       exist = false
-      res = get(URI(@api_path))
+      res = get(URI(api_path))
 
       if res and res['data'].any?
         res['data'].each do |r|

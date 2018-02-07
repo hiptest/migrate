@@ -23,7 +23,7 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders"
     end
 
-    def api_data
+    def create_data
       {
         data: {
           attributes: {
@@ -33,8 +33,10 @@ module Models
         }
       }
     end
-    alias :create_data :api_data
-    alias :update_data :api_data
+
+    def data_type
+      'folders'
+    end
 
     def self.find_or_create_by_name(name)
       folder = Project.instance.folders.select{ |f| f.name == name }.first

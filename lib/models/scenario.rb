@@ -38,6 +38,8 @@ module Models
     def update_data
       {
         data: {
+          id: @id,
+          type: 'scenarios',
           attributes: {
             description: @description,
             "folder-id": @folder_id,
@@ -54,12 +56,10 @@ module Models
 
     def after_save
       @parameters.each do |parameter|
-        parameter.compute_api_path
         parameter.save
       end
 
       @datasets.each do |dataset|
-        dataset.compute_api_path
         dataset.save
       end
 

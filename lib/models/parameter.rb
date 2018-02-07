@@ -17,7 +17,7 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/parameters"
     end
 
-    def api_data
+    def create_data
       {
         data: {
           attributes: {
@@ -26,8 +26,10 @@ module Models
         }
       }
     end
-    alias :create_data :api_data
-    alias :update_data :api_data
+
+    def data_type
+      'parameters'
+    end
 
     def scenario
       Scenario.find_by_jira_id(@scenario_jira_id)

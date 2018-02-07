@@ -17,7 +17,7 @@ module Models
       HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/datasets"
     end
 
-    def api_data
+    def create_data
       {
         data: {
           attributes: {
@@ -27,9 +27,10 @@ module Models
         }
       }
     end
-    alias :create_data :api_data
-    alias :update_data :api_data
 
+    def data_type
+      'datasets'
+    end
 
     def api_identical?(result)
       result.dig('attributes', 'data').to_json == data.to_json

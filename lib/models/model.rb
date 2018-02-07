@@ -13,7 +13,10 @@ module Models
     end
 
     def update_data
-      raise NotImplementedError
+      base = create_data
+      base[:data][:id] = @id
+      base[:data][:type] = data_type
+      base
     end
 
     def api_exists_url
@@ -42,9 +45,9 @@ module Models
 
     def save
       if api_exists?
-        update
+        res = update
       else
-        create
+        res = create
       end
 
       after_save
@@ -55,6 +58,7 @@ module Models
     end
 
     def create
+      puts "-- Creating #{self.class.name.split('::').last} object #{name}"
       res = post(URI(api_path), create_data.to_json)
       after_create
 
@@ -70,6 +74,8 @@ module Models
     end
 
     def update
+      puts "-- Updating #{self.class.name.split('::').last} object #{name}"
+
       res = patch(URI("#{api_path}/#{id}"), update_data.to_json)
       after_update
     end
