@@ -60,7 +60,7 @@ shared_examples "a model" do
       end
     end
 
-    xit 'when a matching element is not found, it returns false and the id of the element is not updated' do
+    it 'when a matching element is not found, it returns false and the id of the element is not updated' do
       expect(an_unknown_object.id).to be nil
 
       with_stubbed_request(find_url, find_results) do
