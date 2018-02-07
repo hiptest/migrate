@@ -31,7 +31,23 @@ shared_examples "a model" do
 
   let(:find_results) {
     {
-      data: find_data
+      'data' => find_data
+    }.to_json
+  }
+
+  let(:created_data) {
+    {
+      'type' => 'object',
+      'id' => '1',
+      'attributes' => {
+        'name' => 'something'
+      }
+    }
+  }
+
+  let(:create_result) {
+    {
+      'data' => created_data
     }.to_json
   }
 
@@ -56,7 +72,7 @@ shared_examples "a model" do
 
       with_stubbed_request(find_url, find_results) do
         expect(an_existing_object.api_exists?).to be true
-        expect(an_existing_object.id).to eq(find_data.first[:id])
+        expect(an_existing_object.id).to eq(find_data.first['id'])
       end
     end
 
@@ -79,14 +95,20 @@ shared_examples "a model" do
   end
 
   context 'save' do
-    xit 'it checks via the APIs if an object exists on Hiptest' do
-      expect {an_existing_object.save}.to have_contacted(find_url)
+    it 'it checks via the APIs if an object exists on Hiptest' do
+      with_stubbed_request(/.*hiptest.net.*/, find_results) do
+        expect(an_existing_object.save).to have_requested(find_url)
+      end
     end
 
-    xit 'it creates the object on Hiptest if it is unknown' do
-      expect {an_unknown_object.save}.to have_contacted(create_url)
-        .with_method('POST')
-        .with_data(create_data)
+    it 'it creates the object on Hiptest if it is unknown' do
+
+      stub_request(:get, find_url).to_return(body: {data: []}.to_json, status: 200)
+      stub_request(:post, create_url).to_return(body: create_result, status: 200)
+      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
+
+      expect(an_existing_object.save).to have_requested(create_url)
+
     end
 
     xit 'after creation, after_create and after_save are called' do

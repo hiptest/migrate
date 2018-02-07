@@ -22,13 +22,23 @@ describe Models::Scenario do
     }
     let(:update_data) { create_data }
 
+    let(:created_data) {
+      {
+        type: 'scenarios',
+        id: '1664',
+        attributes: {
+          name: 'My first scenario'
+        }
+      }
+    }
+
     let(:find_data) {
       [
         {
-          type: 'object',
-          id: '1664',
-          attributes: {
-            name: 'My first scenario'
+          'type' => 'object',
+          'id' => '1664',
+          'attributes' => {
+            'name' => 'My first scenario'
           }
         }
       ]
