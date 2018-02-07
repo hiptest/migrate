@@ -11,7 +11,10 @@ module Models
     def api_data
       raise NotImplementedError
     end
-    alias :api_exists_url :api_path
+
+    def api_exists_url
+      api_path
+    end
 
     def api_identical?(result)
       result.dig('attributes', 'name') == @name
@@ -52,7 +55,7 @@ module Models
       after_create
 
       if res
-        resource.id = res.dig('data', 'id')
+        id = res.dig('data', 'id')
       else
         STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
       end
