@@ -58,13 +58,15 @@ shared_examples "a model" do
         expect(an_existing_object.api_exists?).to be true
         expect(an_existing_object.id).to eq(find_data.first[:id])
       end
-
     end
 
     xit 'when a matching element is not found, it returns false and the id of the element is not updated' do
-      expect(an_existing_object).to be nil
-      expect(an_existing_object.api_exists?).to be false
-      expect(an_existing_object).to be nil
+      expect(an_unknown_object.id).to be nil
+
+      with_stubbed_request(find_url, find_results) do
+        expect(an_unknown_object.api_exists?).to be false
+        expect(an_unknown_object.id).to be nil
+      end
     end
   end
 
