@@ -51,7 +51,7 @@ shared_examples "a model" do
       end
     end
 
-    it 'when a matching element is found, it returns true and the id of the element is updated' do
+    it 'returns true and update the ID of the element when a maching element is found' do
       expect(an_existing_object.id).to be nil
 
       with_stubbed_request(find_url, find_results) do
@@ -62,7 +62,8 @@ shared_examples "a model" do
 
     it 'uses api_identical? to find matching element' do
       with_stubbed_request(find_url, find_results) do
-        an_existing_object.stub(:api_identical? => true)
+        allow(an_existing_object).to receive(:api_identical?)
+        an_existing_object.api_exists?
         expect(an_existing_object).to have_received(:api_identical?)
       end
     end
