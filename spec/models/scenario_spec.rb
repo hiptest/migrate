@@ -22,12 +22,17 @@ describe Models::Scenario do
     }
     let(:update_data) { create_data }
 
-    let(:find_results) {
-      {
-        data: [
-          {type: 'object', id: '1664', attributes: {name: 'My first scenario'}}
-        ]
-      }.to_json
+    let(:find_data) {
+      [
+        {
+          type: 'object',
+          id: '1664',
+          attributes: {
+            name: 'My first scenario'
+          }
+        }
+      ]
     }
+
   end
 end

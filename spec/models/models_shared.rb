@@ -23,11 +23,15 @@ shared_examples "a model" do
   }
   let(:update_data) { create_data }
 
+  let(:find_data) {
+    [
+      {type: 'object', id: '1', attributes: {name: 'Something'}}
+    ]
+  }
+
   let(:find_results) {
     {
-      data: [
-        {type: 'object', id: '1', attributes: {name: 'Something'}}
-      ]
+      data: find_data
     }.to_json
   }
 
@@ -47,10 +51,14 @@ shared_examples "a model" do
       end
     end
 
-    xit 'when a matching element is found, it returns true and the id of the element is updated' do
-      expect(an_existing_object).to be nil
-      expect(an_existing_object.api_exists?).to be true
-      expect(an_existing_object).to be 1664
+    it 'when a matching element is found, it returns true and the id of the element is updated' do
+      expect(an_existing_object.id).to be nil
+
+      with_stubbed_request(find_url, find_results) do
+        expect(an_existing_object.api_exists?).to be true
+        expect(an_existing_object.id).to eq(find_data.first[:id])
+      end
+
     end
 
     xit 'when a matching element is not found, it returns false and the id of the element is not updated' do
