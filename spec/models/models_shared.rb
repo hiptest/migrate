@@ -60,6 +60,13 @@ shared_examples "a model" do
       end
     end
 
+    it 'uses api_identical? to find matching element' do
+      with_stubbed_request(find_url, find_results) do
+        an_existing_object.stub(:api_identical? => true)
+        expect(an_existing_object).to have_received(:api_identical?)
+      end
+    end
+
     it 'when a matching element is not found, it returns false and the id of the element is not updated' do
       expect(an_unknown_object.id).to be nil
 
