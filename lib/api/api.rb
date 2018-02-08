@@ -2,7 +2,7 @@ require './lib/env'
 
 require './lib/api/authentication'
 require './lib/api/configuration'
-require './lib/api/routes'
+require './lib/api/routes/routes'
 
 require 'net/http'
 require 'pry'
@@ -105,12 +105,6 @@ end
 
 
 
-
-
-
-
-
-
 def configure_api_from_env
   env_vars = get_env_variables
   API::Hiptest.configure do |config|
@@ -127,12 +121,12 @@ end
 
 def post(uri, body)
   api = API::Hiptest.new
-  api.post(uri)
+  api.post(uri, body.to_json)
 end
 
 def patch(uri, body)
   api = API::Hiptest.new
-  api.patch(uri)
+  api.patch(uri, body.to_json)
 end
 
 def delete(uri)
