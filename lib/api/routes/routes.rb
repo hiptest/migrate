@@ -53,7 +53,7 @@ module API
       end
       
       raise RuntimeError.new("Resource '#{resource_type}' is not found") if available_routes.nil?
-      raise RuntimeError.new("Route '#{action}' not found for #{subject}") unless available_routes.include?(action.to_sym)
+      raise RuntimeError.new("Route '#{action}' not found for #{subject}") if !available_routes.include?(action.to_sym) && action.to_sym != :get
 
       case action
       when 'get'
