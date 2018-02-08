@@ -43,12 +43,7 @@ module Models
 
     def api_exists?
       res = get(URI(api_exists_url))
-
-      if res and res['data'].any?
-        exist = find_idential_result(res['data'])
-      end
-
-      exist
+      res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
     def save
