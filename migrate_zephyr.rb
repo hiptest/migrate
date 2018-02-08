@@ -12,6 +12,8 @@ require './lib/models/scenario'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
+require './lib/api/api'
+require './lib/env'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
@@ -142,14 +144,14 @@ def process_executions(executions_nodes)
 end
 
 
-
 ###########################
 #           MAIN          #
 ###########################
 
 if __FILE__ == $0
-  check_env_variables
+  check_env_variables 
   if ARGV.count == 2
+    configure_api_from_env
     files = parse_files(ARGV)
     infos, executions = determinate_info_and_execution_files(files)
     process_executions(executions)

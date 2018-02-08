@@ -1,4 +1,5 @@
 .DS_Store
 data*/
-config*
+config*.sh
 envs/*.sh
+results.txt
