@@ -27,17 +27,25 @@ module Models
       result.dig('attributes', 'name') == @name
     end
 
-    def api_exists?
+    def find_idential_result(results)
       exist = false
+
+      results.each do |r|
+        if api_identical?(r)
+          exist = true
+          @id = r.dig('id')
+          break
+        end
+      end
+
+      exist
+    end
+
+    def api_exists?
       res = get(URI(api_exists_url))
 
       if res and res['data'].any?
-        res['data'].each do |r|
-          if api_identical?(r)
-            exist = true
-            @id = r.dig('id')
-          end
-        end
+        exist = find_idential_result(res['data'])
       end
 
       exist

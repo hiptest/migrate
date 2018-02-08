@@ -51,19 +51,10 @@ shared_examples "a model" do
     }.to_json
   }
 
-  def with_stubbed_request(url, returned_body = '{"data": []}', &block)
-    stub_request(:any, url).to_return(body: returned_body, status: 200)
-    return yield if block_given?
-  end
-
-  def have_requested(url, method: :get)
-    return WebMock::WebMockMatcher.new(method, url)
-  end
-
   context 'api_exists?' do
     it 'contacts Hiptest via the APIs to find a matching element' do
       with_stubbed_request(find_url) do
-        expect(an_existing_object.api_exists?).to have_requested(find_url)
+        expect(an_existing_object.api_exists?).to have_requested(:get, find_url)
       end
     end
 
@@ -97,7 +88,7 @@ shared_examples "a model" do
   context 'save' do
     it 'it checks via the APIs if an object exists on Hiptest' do
       with_stubbed_request(/.*hiptest.net.*/, find_results) do
-        expect(an_existing_object.save).to have_requested(find_url)
+        expect(an_existing_object.save).to have_requested(:get, find_url)
       end
     end
 
@@ -107,7 +98,7 @@ shared_examples "a model" do
       stub_request(:post, create_url).to_return(body: create_result, status: 200)
       stub_request(:patch, update_url).to_return(body: find_results, status: 200)
 
-      expect(an_existing_object.save).to have_requested(create_url, method: :post)
+      expect(an_existing_object.save).to have_requested(:post, create_url)
 
     end
 
@@ -129,7 +120,7 @@ shared_examples "a model" do
       stub_request(:get, find_url).to_return(body: find_results, status: 200)
       stub_request(:patch, update_url).to_return(body: find_results, status: 200)
 
-      expect(an_existing_object.save).to have_requested(update_url, method: :patch)
+      expect(an_existing_object.save).to have_requested(:patch, update_url)
     end
 
     it 'after updating the object, after_update and after_save are called' do

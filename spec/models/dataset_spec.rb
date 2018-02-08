@@ -1,5 +1,6 @@
 require './lib/models/dataset'
 require './lib/models/scenario'
+
 require './spec/models/models_shared'
 
 describe Models::Dataset do

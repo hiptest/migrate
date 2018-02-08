@@ -49,6 +49,14 @@ module Models
       }
     end
 
+    def api_exists_url
+      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/find_by_tags?key=JIRA&value=#{@jira_id}"
+    end
+
+    def api_identical?(result)
+      result.dig('attributes', 'name').start_with?(@name)
+    end
+
     def after_create
       # Yep, we save it once again so the definition is updated correctly
       update
