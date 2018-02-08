@@ -61,7 +61,7 @@ module Models
     end
 
     def create
-      puts "-- Creating #{resource_type} object #{name}"
+      output "-- Creating #{resource_type} object #{name}"
       res = post(URI(api_path), create_data)
 
       if res
@@ -77,7 +77,7 @@ module Models
     end
 
     def update
-      puts "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
+      output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
 
       begin
         res = patch(URI("#{api_path}/#{id}"), update_data)
@@ -94,6 +94,12 @@ module Models
 
     def resource_type
       self.class.name.split('::').last
+    end
+
+    private
+
+    def output(str)
+      puts str unless ENV['ZEPHYR_POC_SILENT']
     end
   end
 end

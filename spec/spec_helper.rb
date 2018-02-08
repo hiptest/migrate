@@ -102,6 +102,8 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
+
+  ENV['ZEPHYR_POC_SILENT'] = "1"
 end
 
 def with_stubbed_request(url, returned_body = '{"data": []}', &block)
