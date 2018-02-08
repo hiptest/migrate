@@ -1,4 +1,5 @@
 require './lib/models/model.rb'
+require './lib/models/scenario'
 
 module Models
   class Dataset < Model

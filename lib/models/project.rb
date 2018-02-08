@@ -14,6 +14,10 @@ module Models
       @root_folder_id = nil
     end
 
+    def api_path
+      HIPTEST_API_URI + "/projects"
+    end
+
     def save
       get_root_folder_id
       @scenarios.each do |scenario|
