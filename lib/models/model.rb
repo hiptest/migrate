@@ -61,13 +61,13 @@ module Models
     end
 
     def create
-      puts "-- Creating #{self.class.name.split('::').last} object #{name}"
-      res = post(URI(api_path), create_data.to_json)
+      puts "-- Creating #{resource_type} object #{name}"
+      res = post(URI(api_path), create_data)
 
       if res
         @id = res.dig('data', 'id')
       else
-        STDERR.puts "Error while creating/updating #{resource_type} with : #{body}"
+        STDERR.puts "Error while creating #{resource_type} with : #{create_data}"
       end
       after_create
       res
@@ -79,11 +79,21 @@ module Models
     def update
       puts "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
 
-      res = patch(URI("#{api_path}/#{id}"), update_data.to_json)
+      begin
+        res = patch(URI("#{api_path}/#{id}"), update_data)
+      rescue => error
+        STDERR.puts "Error while updating #{resource_type} with : #{update_data}" unless res
+        raise error
+      end
+
       after_update
     end
 
     def after_update
+    end
+
+    def resource_type
+      self.class.name.split('::').last
     end
   end
 end
