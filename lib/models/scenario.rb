@@ -24,6 +24,8 @@ module Models
     end
 
     def create_data
+      @name = find_unique_name(@name, get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
+
       {
         data: {
           attributes: {
@@ -57,12 +59,12 @@ module Models
       result.dig('attributes', 'name').start_with?(@name)
     end
 
-    def after_create
+    def after_create(data)
       # Yep, we save it once again so the definition is updated correctly
       update
     end
 
-    def after_save
+    def after_save(data)
       @parameters.each do |parameter|
         parameter.save
       end
@@ -132,6 +134,22 @@ module Models
 
     def self.find(id)
       @@scenarios.select{ |sc| sc.id == id }.first
+    end
+
+    def find_unique_name(current, existing)
+      return current unless existing.include?(current)
+
+      postfix = 0
+      new_name = ''
+
+      loop do
+        postfix += 1
+        new_name = "#{current} (#{postfix})"
+
+        break unless existing.include?(new_name)
+      end
+
+      new_name
     end
   end
 end

@@ -53,11 +53,11 @@ module Models
         res = create
       end
 
-      after_save
+      after_save(res)
       res
     end
 
-    def after_save
+    def after_save(data)
     end
 
     def create
@@ -69,11 +69,11 @@ module Models
       else
         STDERR.puts "Error while creating #{resource_type} with : #{create_data}"
       end
-      after_create
+      after_create(res)
       res
     end
 
-    def after_create
+    def after_create(data)
     end
 
     def update
@@ -86,10 +86,10 @@ module Models
         raise error
       end
 
-      after_update
+      after_update(res)
     end
 
-    def after_update
+    def after_update(data)
     end
 
     def resource_type

@@ -13,7 +13,7 @@ module Models
       Project.instance.folders << self
     end
 
-    def after_save
+    def after_save(data)
       @scenarios.each do |scenario|
         scenario.folder_id = @id
         scenario.save
