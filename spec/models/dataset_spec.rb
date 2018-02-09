@@ -5,6 +5,8 @@ require './spec/models/models_shared'
 
 describe Models::Dataset do
   it_behaves_like 'a model' do
+    let(:api){ double("API::Hiptest") }
+    
     let(:an_existing_object ) {
       scenario = Models::Scenario.new('My related scenario')
       scenario.id = 1
@@ -31,12 +33,29 @@ describe Models::Dataset do
       {
         data: {
           attributes: {
-            name: 'My dataset'
+            name: '',
+            data: {
+              'parameter 1' => 'value 1' 
+            }
           }
         }
       }
     }
-    let(:update_data) { create_data }
+    
+    let(:update_data) { 
+      {
+        :data=> {
+          :attributes=> {
+            :name=>"", 
+            :data=> {
+              "parameter 1"=>"value 1"
+            }
+          }, 
+          :id=>"1664", 
+          :type=>"datasets"
+        }
+      }
+    }
 
     let(:created_data) {
       {

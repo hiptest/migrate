@@ -7,7 +7,7 @@ group :development do
 end
 
 group :test do
-  gem 'pry'
+  gem 'pry-byebug'
   gem 'rack-test'
   gem 'rspec'
   gem 'webmock'

@@ -12,7 +12,7 @@ require './lib/models/scenario'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
-require './lib/api/api'
+require './lib/api/hiptest'
 require './lib/env'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]

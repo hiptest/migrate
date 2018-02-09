@@ -1,4 +1,4 @@
-require './lib/api/api'
+require './lib/api/hiptest'
 require 'webmock/rspec'
 
 RSpec.describe API::Hiptest, 'API Scenarios' do

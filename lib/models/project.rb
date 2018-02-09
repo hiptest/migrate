@@ -7,6 +7,7 @@ module Models
     attr_accessor :name, :description, :folders, :scenarios
 
     def initialize()
+      @id = ENV['HT_PROJECT']
       @name = ''
       @description = ''
       @folders = []
@@ -32,8 +33,7 @@ module Models
     end
 
     def get_root_folder_id
-      uri = URI(HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/folders")
-      res = get(uri)
+      res = @@api.get_folders(@id)
       if res
         @root_folder_id = res['data'].select { |folder| folder.dig('attributes', 'parent-id').nil? }.first['id']
       end

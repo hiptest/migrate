@@ -42,7 +42,7 @@ module Models
 
     def api_exists?
       exist = false
-      res = get(URI(api_path))
+      res = @@api.get_scenario_tags(ENV['HT_PROJECT'], @scenario_id)
 
       if res and res['data'].any?
         res['data'].each do |r|

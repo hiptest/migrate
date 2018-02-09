@@ -4,10 +4,8 @@ require './spec/models/models_shared'
 
 describe Models::Scenario do
   it_behaves_like 'a model' do
-    before do
-      stub_request(:get, 'https://hiptest.net/api/projects/1/scenarios').to_return(body: {data: []}.to_json, status: 200)
-    end
-
+    let(:api){ double("API::Hiptest") }
+    
     let(:an_existing_object ) {
       sc = Models::Scenario.new('My first scenario')
       sc.jira_id='PLOP-1'
@@ -19,27 +17,48 @@ describe Models::Scenario do
       sc
     }
 
+    let(:resource_id) { 1664 }
+
     let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/find_by_tags'}
+    
+    let(:query_that_found) { '?key=JIRA&value=PLOP-1' }
+    let(:query_that_not_found) { '?key=JIRA&value=PLOP-2' }
+    
     let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
-    let(:update_url) {'https://hiptest.net/api/projects/1/scenarios/1664'}
+    let(:update_url) { "https://hiptest.net/api/projects/1/scenarios/#{resource_id}" }
 
     let(:create_data) {
       {
         data: {
           attributes: {
-            name: 'My first scenario'
+            name: 'My first scenario',
+            description: "",
+            "folder-id": nil
           }
         }
       }
     }
-    let(:update_data) { create_data }
+    
+    let(:update_data) { 
+      {
+        data: {
+          id: '1664',
+          type: 'scenarios',
+          attributes: {
+            description: "",
+            'folder-id': nil,
+            definition: "scenario '#{an_existing_object.name}' do\n\nend"
+          }
+        }
+      }
+    }
 
     let(:created_data) {
       {
-        type: 'scenarios',
-        id: '1664',
-        attributes: {
-          name: 'My first scenario'
+        'type' => 'scenarios',
+        'id' => '1664',
+        'attributes' => {
+          'name' => 'My first scenario'
         }
       }
     }
@@ -47,7 +66,7 @@ describe Models::Scenario do
     let(:find_data) {
       [
         {
-          'type' => 'object',
+          'type' => 'scenarios',
           'id' => '1664',
           'attributes' => {
             'name' => 'My first scenario'
@@ -58,11 +77,12 @@ describe Models::Scenario do
   end
 
   context 'api_exists?' do
-    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/find_by_tags'}
+    let(:api){ double("API::Hiptest") }
+    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/find_by_tags?key=JIRA&value=PLOP-1'}
     let(:find_results) {
       {
         'data' => find_data
-      }.to_json
+      }
     }
     let(:scenario ) {
       sc = Models::Scenario.new('My first scenario')
@@ -74,7 +94,7 @@ describe Models::Scenario do
       let(:find_data) {
         [
           {
-            'type' => 'object',
+            'type' => 'scenarios',
             'id' => '1664',
             'attributes' => {
               'name' => 'My first scenario (2)'
@@ -84,10 +104,11 @@ describe Models::Scenario do
       }
 
       it 'checks that the scenario name is the beginning of the returned result' do
-        with_stubbed_request(find_url, find_results) do
-          expect(scenario.api_exists?).to be true
-          expect(scenario.id).to eq(find_data.first['id'])
-        end
+        allow(api).to receive(:get).with(URI(find_url)).and_return(find_results)
+        scenario.class.api = api
+        
+        expect(scenario.api_exists?).to be true
+        expect(scenario.id).to eq(find_data.first['id'])
       end
     end
 
@@ -95,21 +116,21 @@ describe Models::Scenario do
       let(:find_data) {
         [
           {
-            'type' => 'object',
+            'type' => 'scenarios',
             'id' => '1664',
             'attributes' => {
               'name' => 'Whatever the name is'
             }
           },
           {
-            'type' => 'object',
+            'type' => 'scenarios',
             'id' => '1665',
             'attributes' => {
               'name' => 'My first scenario (1)'
             }
           },
           {
-            'type' => 'object',
+            'type' => 'scenarios',
             'id' => '1666',
             'attributes' => {
               'name' => 'My first scenario'
@@ -119,10 +140,11 @@ describe Models::Scenario do
       }
 
       it 'uses the first result which name starts with the scenario name' do
-        with_stubbed_request(find_url, find_results) do
-          expect(scenario.api_exists?).to be true
-          expect(scenario.id).to eq(find_data[1]['id'])
-        end
+        allow(api).to receive(:get).with(URI(find_url)).and_return(find_results)
+        scenario.class.api = api
+        
+        expect(scenario.api_exists?).to be true
+        expect(scenario.id).to eq(find_data[1]['id'])
       end
     end
   end

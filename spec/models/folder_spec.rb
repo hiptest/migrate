@@ -4,6 +4,7 @@ require './spec/models/models_shared'
 
 describe Models::Folder do
   it_behaves_like 'a model' do
+    let(:api) { double(API::Hiptest) }
     let(:an_existing_object ) { Models::Folder.new('My number one folder') }
     let(:an_unknown_object ) { Models::Folder.new('My other folder') }
 
@@ -15,12 +16,25 @@ describe Models::Folder do
       {
         data: {
           attributes: {
-            name: 'My number one folder'
+            name: 'My number one folder',
+            'parent-id': nil
           }
         }
       }
     }
-    let(:update_data) { create_data }
+    
+    let(:update_data) { 
+      {
+        :data=> {
+          :attributes=> {
+            :name=>"My number one folder",
+            :"parent-id"=>nil
+          },
+          :id=>"1664", 
+          :type=>"folders", 
+        }
+      }
+    }
 
     let(:created_data) {
       {
@@ -35,7 +49,7 @@ describe Models::Folder do
     let(:find_data) {
       [
         {
-          'type' => 'object',
+          'type' => 'folders',
           'id' => '1664',
           'attributes' => {
             'name' => 'My number one folder'

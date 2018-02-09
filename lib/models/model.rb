@@ -1,7 +1,17 @@
-require './lib/api'
+require './lib/api/hiptest'
 
 module Models
   class Model
+    @@api = API::Hiptest.new
+    
+    def self.api
+      @@api
+    end
+    
+    def self.api= api
+      @@api = api
+    end
+    
     attr_accessor :id, :name
 
     def api_path
@@ -42,7 +52,7 @@ module Models
     end
 
     def api_exists?
-      res = get(URI(api_exists_url))
+      res = @@api.get(URI(api_exists_url))
       res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
@@ -62,7 +72,7 @@ module Models
 
     def create
       output "-- Creating #{resource_type} object #{name}"
-      res = post(URI(api_path), create_data)
+      res = @@api.post(URI(api_path), create_data)
 
       if res
         @id = res.dig('data', 'id')
@@ -80,7 +90,7 @@ module Models
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
 
       begin
-        res = patch(URI("#{api_path}/#{id}"), update_data)
+        res = @@api.patch(URI("#{api_path}/#{id}"), update_data)
       rescue => error
         STDERR.puts "Error while updating #{resource_type} with : #{update_data}" unless res
         raise error

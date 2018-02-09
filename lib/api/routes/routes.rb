@@ -1,6 +1,6 @@
 require 'active_support/inflector'
 
-require './lib/api/api'
+require './lib/api/hiptest'
 require './lib/utils/string'
 require './lib/api/routes/projects'
 

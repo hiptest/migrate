@@ -4,109 +4,102 @@ shared_examples "a model" do
 
   HIPTEST_API_URI = 'https://hiptest.net/api'
   ENV['HT_PROJECT'] = "1"
+  
+  let(:api){ raise NotImplementedError }
 
-  let(:an_existing_object ) {}
-  let(:an_unknown_object ) {}
+  let(:an_existing_object ) { raise NotImplementedError }
+  let(:an_unknown_object ) { raise NotImplementedError }
 
-  let(:find_url) {'https://hiptest.net/project/1/find_stuff'}
-  let(:create_url) {'https://hiptest.net/project/1/object_type'}
-  let(:update_url) {'https://hiptest.net/project/1/object_type/1664'}
+  let(:find_url) { raise NotImplementedError }
+  let(:query_that_found) { '' }
+  let(:query_that_not_found) { '' }
+  let(:create_url) { raise NotImplementedError }
+  let(:update_url) { raise NotImplementedError }
+  
+  let(:resource_id) { raise NotImplementedError }
 
   let(:create_data) {
     {
-      data: {
-        attributes: {
-          name: an_unknown_object.name
+      'data' => {
+        'attributes' => {
+          'name' => an_unknown_object.name,
+          'description' => "",
+          'folder-id' => nil
         }
       }
     }
   }
-  let(:update_data) { create_data }
+  
+  let(:update_data) { raise NotImplementedError }
 
   let(:find_data) {
-    [
-      {type: 'object', id: '1', attributes: {name: 'Something'}}
-    ]
+    raise NotImplementedError
   }
 
   let(:find_results) {
     {
       'data' => find_data
-    }.to_json
+    }
   }
 
   let(:created_data) {
-    {
-      'type' => 'object',
-      'id' => '1',
-      'attributes' => {
-        'name' => 'something'
-      }
-    }
+    raise NotImplementedError
   }
 
   let(:create_result) {
     {
       'data' => created_data
-    }.to_json
+    }
   }
 
-  context 'api_exists?' do
-    it 'contacts Hiptest via the APIs to find a matching element' do
-      with_stubbed_request(find_url) do
-        expect(an_existing_object.api_exists?).to have_requested(:get, find_url)
-      end
+  context 'when calling api_exists?' do
+    before do
+      url = find_url + query_that_found
+      allow(api).to receive(:get).with(URI(url)).and_return(find_results)
+      an_existing_object.class.api = api
     end
-
+    
     it 'returns true and update the ID of the element when a maching element is found' do
       expect(an_existing_object.id).to be nil
-
-      with_stubbed_request(find_url, find_results) do
-        expect(an_existing_object.api_exists?).to be true
-        expect(an_existing_object.id).to eq(find_data.first['id'])
-      end
+      
+      expect(an_existing_object.api_exists?).to be true
+      expect(an_existing_object.id).to eq(find_data.first['id'])
     end
 
     it 'uses api_identical? to find matching element' do
-      with_stubbed_request(find_url, find_results) do
-        allow(an_existing_object).to receive(:api_identical?)
-        an_existing_object.api_exists?
-        expect(an_existing_object).to have_received(:api_identical?)
-      end
+      allow(an_existing_object).to receive(:api_identical?)
+      an_existing_object.api_exists?
+      expect(an_existing_object).to have_received(:api_identical?)
     end
 
     it 'when a matching element is not found, it returns false and the id of the element is not updated' do
+      not_found_url = find_url + query_that_not_found
+      allow(api).to receive(:get).with(URI(not_found_url)).and_return({'data' => []})
+      an_existing_object.class.api = api
+      
       expect(an_unknown_object.id).to be nil
-
-      with_stubbed_request(find_url, find_results) do
-        expect(an_unknown_object.api_exists?).to be false
-        expect(an_unknown_object.id).to be nil
-      end
+      expect(an_unknown_object.api_exists?).to be false
+      expect(an_unknown_object.id).to be nil
     end
   end
 
-  context 'save' do
-    it 'it checks via the APIs if an object exists on Hiptest' do
-      with_stubbed_request(/.*hiptest.net.*/, find_results) do
-        expect(an_existing_object.save).to have_requested(:get, find_url)
-      end
+  context 'when saving' do
+    before do
+      @url = find_url + query_that_found
+      @api = spy(API::Hiptest)
+      allow(@api).to receive(:get).with(URI(create_url)).and_return({'data' => []})
+      allow(@api).to receive(:get).with(URI(@url)).and_return({'data' => []})
+      allow(@api).to receive(:post).with(URI(create_url), create_data).and_return(create_result)
+      allow(@api).to receive(:patch).with(URI(update_url), update_data).and_return(find_results)
+      an_existing_object.class.api = @api
     end
-
+    
     it 'it creates the object on Hiptest if it is unknown' do
-
-      stub_request(:get, find_url).to_return(body: {data: []}.to_json, status: 200)
-      stub_request(:post, create_url).to_return(body: create_result, status: 200)
-      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
-
-      expect(an_existing_object.save).to have_requested(:post, create_url)
-
+      an_existing_object.save
+      expect(@api).to have_received(:post)
     end
 
     it 'after creation, after_create and after_save are called' do
-      stub_request(:get, find_url).to_return(body: {data: []}.to_json, status: 200)
-      stub_request(:post, create_url).to_return(body: create_result, status: 200)
-      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
-
       allow(an_existing_object).to receive(:after_create)
       allow(an_existing_object).to receive(:after_save)
 
@@ -117,16 +110,15 @@ shared_examples "a model" do
     end
 
     it 'it updates the object on Hiptest if it exists' do
-      stub_request(:get, find_url).to_return(body: find_results, status: 200)
-      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
-
-      expect(an_existing_object.save).to have_requested(:patch, update_url)
+      allow(@api).to receive(:get).with(URI(@url)).and_return(find_results)
+      
+      an_existing_object.save
+      expect(@api).to have_received(:patch)
     end
 
     it 'after updating the object, after_update and after_save are called' do
-      stub_request(:get, find_url).to_return(body: find_results, status: 200)
-      stub_request(:patch, update_url).to_return(body: find_results, status: 200)
-
+      allow(@api).to receive(:get).with(URI(@url)).and_return(find_results)
+      
       allow(an_existing_object).to receive(:after_update)
       allow(an_existing_object).to receive(:after_save)
 

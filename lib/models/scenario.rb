@@ -24,7 +24,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
 
       {
         data: {

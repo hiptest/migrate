@@ -1,6 +1,3 @@
-require_relative '../../lib/api/api'
-require 'webmock/rspec'
-
 RSpec.describe API::Hiptest, 'Base' do
   let(:access_token){ "il_se_leve_tot_ken" }
   let(:client){ "cli_a_la_3eme_personnne_du_pluriel" }
