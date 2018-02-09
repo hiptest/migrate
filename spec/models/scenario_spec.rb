@@ -4,6 +4,10 @@ require './spec/models/models_shared'
 
 describe Models::Scenario do
   it_behaves_like 'a model' do
+    before do
+      stub_request(:get, 'https://hiptest.net/api/projects/1/scenarios').to_return(body: {data: []}.to_json, status: 200)
+    end
+
     let(:an_existing_object ) {
       sc = Models::Scenario.new('My first scenario')
       sc.jira_id='PLOP-1'
