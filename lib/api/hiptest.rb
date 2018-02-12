@@ -60,21 +60,21 @@ module API
     end
 
     def post(uri, body)
-      req = Net::HTTP::Post.new(uri.path)
-      req.body = body
+      req = Net::HTTP::Post.new(uri)
+      req.body = body.to_json
 
       send_request(uri, req)
     end
 
     def patch(uri, body)
-      req = Net::HTTP::Patch.new(uri.path)
-      req.body = body
+      req = Net::HTTP::Patch.new(uri)
+      req.body = body.to_json
 
       send_request(uri, req)
     end
     
     def delete(uri)
-      req = Net::HTTP::Delete.new(uri.path)
+      req = Net::HTTP::Delete.new(uri)
       send_request(uri, req)
     end
     
@@ -112,24 +112,4 @@ def configure_api_from_env
     config.client = env_vars[:client]
     config.uid = env_vars[:uid]
   end
-end
-
-def get(uri)
-  api = API::Hiptest.new
-  api.get(uri)
-end
-
-def post(uri, body)
-  api = API::Hiptest.new
-  api.post(uri, body.to_json)
-end
-
-def patch(uri, body)
-  api = API::Hiptest.new
-  api.patch(uri, body.to_json)
-end
-
-def delete(uri)
-  api = API::Hiptest.new
-  api.delete(uri)
 end

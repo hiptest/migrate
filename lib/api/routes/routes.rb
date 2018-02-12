@@ -137,7 +137,7 @@ module API
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
       url += "#{resource_type.pluralize}"
-      post(URI(url), data.to_json)
+      post(URI(url), data)
     end
 
     def update(project_id, resource_id, data, resource_type, parent_id = nil, parent_type = nil)
@@ -146,7 +146,7 @@ module API
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
       url += "#{resource_type.pluralize}/#{resource_id}"
-      patch(URI(url), data.to_json)
+      patch(URI(url), data)
     end
 
     def destroy(project_id, resource_id, resource_type, parent_id = nil, parent_type = nil)
