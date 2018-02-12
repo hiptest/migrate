@@ -1,35 +1,13 @@
-require './lib/api/hiptest'
-require 'webmock/rspec'
+require 'spec_helper'
+require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Scenarios' do
-  let!(:api){
-    API::Hiptest.configure do |config|
-      config.access_token = "access_token"
-      config.client = "client"
-      config.uid = "uid@uid.uid"
-    end
+  it_behaves_like 'an api resource model' do
+    let(:resource_type) { "scenario" }
     
-    API::Hiptest.new
-  }
-  
-  let(:auth_headers) {
-    {
-      "accept": "application/vnd.api+json; version=1",
-      "access-token": API::Hiptest.configuration.access_token,
-      "client": API::Hiptest.configuration.client,
-      "uid": API::Hiptest.configuration.uid
-    }
-  }
-  
-  before do
-    @project_id = 1
-    @scenario_id = 1
-  end
-  
-  it "#GET scenarios" do
-    stub = stub_request(:get, "https://hiptest.net/api/projects/#{@project_id}/scenarios")
-      .with(headers: auth_headers)
-      .to_return(status: 200, body: {
+    let(:index_route){ "https://hiptest.net/api/projects/1/scenarios" }
+    let(:index_response_data){
+      {
         data: [
           {
             type: "scenarios",
@@ -45,17 +23,12 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
             }
           }
         ]
-      }.to_json)
+      }
+    }
     
-    scenarios_data = api.get_scenarios(@project_id)
-    expect(stub).to have_been_requested
-    expect(scenarios_data.dig('data').any?).to be_truthy
-  end
-  
-  it "#GET scenario" do
-    stub = stub_request(:get, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}")
-      .with(headers: auth_headers)
-      .to_return(status: 200, body: {
+    let(:show_route){ "https://hiptest.net/api/projects/1/scenarios/1" }
+    let(:show_response_data){
+      {
         data: {
             type: "scenarios",
             id: "1",
@@ -63,75 +36,40 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
                 name: "I've got the power"
             }
           }
-        }.to_json)
-    
-    scenarios_data = api.get_scenario(@project_id, @scenario_id)
-    expect(stub).to have_been_requested
-    expect(scenarios_data).to eq({
-      "data" => {
-          "type" => "scenarios",
-          "id" => "1",
-          "attributes" => {
-              "name" => "I've got the power"
-          }
         }
-      })
-  end
-  
-  it "#POST scenario" do
-    data = {
-      data: {
-        attributes: {
-          name: "I've got the power"
-        }
-      }
     }
     
-    stub = stub_request(:post, "https://hiptest.net/api/projects/#{@project_id}/scenarios")
-      .with(headers: auth_headers, body: data.to_json)
-      .to_return(status: 200, body: {
+    let(:create_data){
+      {
         data: {
-            type: "scenarios",
-            id: "1",
-            attributes: {
-                name: "I've got the power"
-            }
+          attributes: {
+            name: "I've got the power"
           }
-        }.to_json)
-      
-    scenario_data = api.create_scenario(@project_id, data)
-    
-    expect(stub).to have_been_requested
-    expect(scenario_data.dig('data')).not_to be_empty
-  end
-  
-  it "#PATCH scenario" do
-    data = {
-      data: {
-        type: "scenarios",
-        id: "1",
-        attributes: {
-          name: "I've got the power"
+        }
+      }
+    }
+    let(:create_response_data){
+      {
+        data: {
+          type: "scenarios",
+          id: "1",
+          attributes: {
+              name: "I've got the power"
+          }
         }
       }
     }
     
-    stub = stub_request(:patch, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}")
-      .with(headers: auth_headers, body: data.to_json)
-      .to_return(status: 200, body: data.to_json)
-      
-    scenario_data = api.update_scenario(@project_id, @scenario_id, data)
-    
-    expect(stub).to have_been_requested
-    expect(scenario_data.dig('data')).not_to be_empty
-  end
-  
-  it "#DELETE scenario" do
-    stub = stub_request(:delete, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}")
-      .with(headers: auth_headers)
-      .to_return(status: 200)
-    
-    api.delete_scenario(@project_id, @scenario_id)
-    expect(stub).to have_been_requested
+    let(:update_data){
+      {
+        data: {
+          type: "scenarios",
+          id: "1",
+          attributes: {
+            name: "I've got the power"
+          }
+        }
+      }
+    }
   end
 end

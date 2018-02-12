@@ -1,5 +1,4 @@
-require './lib/api/hiptest'
-require 'webmock/rspec'
+require 'spec_helper'
 
 RSpec.describe API::Hiptest, 'API Tags' do
   let!(:api){
