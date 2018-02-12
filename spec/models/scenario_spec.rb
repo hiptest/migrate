@@ -148,4 +148,51 @@ describe Models::Scenario do
       end
     end
   end
+  
+  context "when saving the first time" do
+    let(:api){ double("API::Hiptest") }
+    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
+    let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
+    
+    let(:scenario ) {
+      sc = Models::Scenario.new('My first scenario')
+      sc.jira_id='PLOP-1'
+      sc
+    }
+    
+    let(:create_data) {
+      {
+        data: {
+          attributes: {
+            name: 'My first scenario',
+            description: "",
+            "folder-id": nil
+          }
+        }
+      }
+    }
+    
+    let(:created_data){
+      {
+        'type' => 'scenarios',
+        'id' => '1664',
+        'attributes' => {
+          'name' => 'My first scenario'
+        }
+      }
+    }
+    
+    it "creates the scenario then updates it with its definition" do
+      allow(api).to receive(:get).with(URI(create_url)).and_return({ 'data' => []})
+      allow(api).to receive(:get).with(URI(find_url)).and_return({ 'data' => []})
+      allow(api).to receive(:post).with(URI(create_url), create_data).and_return(created_data)
+      scenario.class.api = api
+      
+      allow(scenario).to receive(:update)
+      expect(scenario.api_exists?).to be false
+      
+      scenario.save
+      expect(scenario).to have_received(:update)
+    end
+  end
 end

@@ -73,7 +73,6 @@ module Models
     def create
       output "-- Creating #{resource_type} object #{name}"
       res = @@api.post(URI(api_path), create_data)
-
       if res
         @id = res.dig('data', 'id')
       else
@@ -88,7 +87,6 @@ module Models
 
     def update
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
-
       begin
         res = @@api.patch(URI("#{api_path}/#{id}"), update_data)
       rescue => error
