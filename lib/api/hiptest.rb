@@ -9,7 +9,7 @@ require 'pry'
 
 module API
   class Hiptest
-    @base_url = ENV["HT_BASE_URL"] || "https://hiptest.net"
+    @base_url = ENV["HT_URI"] || "https://hiptest.net"
     @use_ssl = @base_url.start_with?('https')
     
     
