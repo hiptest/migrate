@@ -14,6 +14,8 @@ module Models
       @description = description
       @steps = steps
       @actionwords = []
+      @parameters = []
+      @datasets = []
       @tags = []
       @jira_id = ''
       @@scenarios << self
