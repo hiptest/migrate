@@ -1,8 +1,8 @@
 module API::Routing::Routes
   @@routes = {
-    # actionword: {
-    #   only: [:show, :index, :create, :update, :delete]
-    # },
+    actionword: {
+      only: [:show, :index, :create, :update, :delete]
+    },
     
     scenario: {
       only: [:show, :index, :create, :update, :delete],
