@@ -5,6 +5,7 @@ RSpec.describe API::Hiptest, 'Base' do
   
   before do
     API::Hiptest.base_url= "https://hiptest.net"
+    API::Hiptest.use_ssl = true
   end
   
   

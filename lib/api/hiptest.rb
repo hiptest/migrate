@@ -17,8 +17,7 @@ module API
     
     
     class << self
-      attr_accessor :configuration, :base_url
-      attr_reader :use_ssl
+      attr_accessor :configuration, :base_url, :use_ssl
     end
     
     def self.arrange_base_url!
