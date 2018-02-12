@@ -7,7 +7,6 @@ module Models
     attr_accessor :id, :data, :scenario_jira_id, :api_path
 
     def initialize(scenario_jira_id)
-      @data = data
       @scenario_jira_id = scenario_jira_id
       @data = {}
       @api_path = nil
