@@ -1,5 +1,5 @@
 module API
-  module Routes
+  module Routing
     module Projects
       
       def get_projects

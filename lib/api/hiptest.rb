@@ -2,7 +2,7 @@ require './lib/env'
 
 require './lib/api/authentication'
 require './lib/api/configuration'
-require './lib/api/routes/routes'
+require './lib/api/routing/router'
 
 require 'net/http'
 require 'pry'
@@ -49,7 +49,7 @@ module API
     
     
     include API::Authentication
-    include API::Routes
+    include API::Routing
     
     
     # private

@@ -2,34 +2,12 @@ require 'active_support/inflector'
 
 require './lib/api/hiptest'
 require './lib/utils/string'
-require './lib/api/routes/projects'
+require './lib/api/routing/projects'
+require './lib/api/routing/routes'
 
 module API
-  module Routes
-    @@routes = {
-      scenario: {
-        only: [:show, :index, :create, :update, :delete],
-        resources: {
-          parameter: {
-            only: [:show, :index, :create, :update, :delete]
-          },
-          dataset: {
-            only: [:show, :index, :create, :update, :delete]
-          },
-          tag: {
-            only: [:show, :index, :create, :update, :delete]
-          }
-        }
-      },
-      folder: {
-        only: [:show, :index, :create, :update, :delete],
-        resources: {
-          tag: {
-            only: [:index]
-          }
-        }
-      }
-    }
+  module Routing
+    include API::Routing::Routes
 
     def method_missing(name, *args)
       if name.to_s.split('_', 3).length == 2
@@ -67,7 +45,7 @@ module API
       end
     end
     
-    include API::Routes::Projects
+    include API::Routing::Projects
 
     private
     
