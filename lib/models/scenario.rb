@@ -1,10 +1,11 @@
 require './lib/models/model.rb'
+require './lib/models/actionword.rb'
 
 module Models
   class Scenario < Model
     @@scenarios = []
 
-    attr_accessor :id, :name, :project, :description, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path, :jira_id
+    attr_accessor :id, :name, :description, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path, :jira_id
 
     def initialize(name, steps = [], description = '')
       @id = nil
@@ -12,8 +13,7 @@ module Models
       @name = name
       @description = description
       @steps = steps
-      @parameters = []
-      @datasets = []
+      @actionwords = []
       @tags = []
       @jira_id = ''
       @@scenarios << self
@@ -65,12 +65,8 @@ module Models
     end
 
     def after_save(data)
-      @parameters.each do |parameter|
-        parameter.save
-      end
-
-      @datasets.each do |dataset|
-        dataset.save
+      @actionwords.each do |actionword|
+        actionword.save
       end
 
       @tags.each do |tag|
@@ -79,32 +75,33 @@ module Models
       end
     end
 
-    def compute_datatable(step)
+    def compute_actionwords(step)
       steps = ""
       parameter = nil
-
-      unless step.dig(:data).empty?
-        parameter = Parameter.find_or_create_by_data(@jira_id, step.dig(:data))
-        Dataset.find_or_create_by_param(@jira_id, parameter.normalized_name, step.dig(:data))
-      end
+      parameter = step.dig(:data) unless step.dig(:data).empty?
 
       if step.dig(:step)
-        action = " step { action: \"#{step.dig(:step)}"
         if parameter
-          action << " ${#{parameter.normalized_name}}"
+          aw = Actionword.find_or_create_by_name(step.dig(:step))
+          add_unique_actionword(aw)
+          action = " call '#{aw.name}' (__free_text = \"#{parameter}\")\n"
+        else
+          action = " step { action: \"#{step.dig(:step)}\" }\n"
         end
-        action << "\" }\n"
 
         steps << action
       end
 
       result = step.dig(:result)&.strip
       if result && !result.empty?
-        result_step = " step { result: \"#{result}"
-        if parameter && step.dig(:step).empty?
-          result_step << " ${#{parameter.normalized_name}}"
+        
+        if parameter and step.dig(:step).empty?
+          aw = Actionword.find_or_create_by_name(result)
+          add_unique_actionword(aw)
+          result_step = " call '#{aw.name}' (__free_text = '#{parameter}')\n"
+        else
+          result_step = " step { result: \"#{result}\" }\n"
         end
-        result_step << "\" }\n"
 
         steps << result_step
       end
@@ -117,11 +114,15 @@ module Models
       definition = "scenario '#{name}' do\n"
 
       @steps.each do |step|
-        definition << compute_datatable(step)
+        definition << compute_actionwords(step)
       end
 
       definition << "\nend"
       definition
+    end
+    
+    def add_unique_actionword(actionword)
+      @actionwords << actionword unless @actionwords.include?(actionword)
     end
 
     def self.find_by_name(name)
