@@ -25,35 +25,35 @@ https://edukoup.atlassian.net/sr/jira.issueviews:searchrequest-xml/temp/SearchRe
       <title>[JIRA-1] Blopidou test</title>
       <link>https://blopidou.atlassian.net/browse/JIRA-1</link>
       <project id="1" key="JIRA">Blopidou project</project>
-      <description>A super description of this test with &gt;tag&lt;</description>
-        <environment></environment>
-        <key id="119797">JIRA-1</key>
-        <summary>Blopidou test</summary>
-        <type id="1">Test</type>
-        <priority id="1">Minor</priority>
-        <status id="1" description="This is a new issue">New</status>
-        <statusCategory id="2" key="new" colorName="blue-gray"/>
-        <resolution id="-1">Unresolved</resolution>
-        <security id="10310">Anyone</security>
-        <assignee username="-1">Unassigned</assignee>
-        <reporter username="john.arryn">John Arryn</reporter>
-        <labels>
-          <label>SIT</label>
-        </labels>
-        <created>Fri, 5 Jan 2018 12:46:56 +0000</created>
-        <updated>Mon, 8 Jan 2018 12:35:31 +0000</updated>
-        <version>JR-March18</version>
-        <due></due>
-        <issuelinks>
-          <issuelinktype id="10360">
-            <name>Cloners</name>
-            <inwardlinks description="is cloned by">
-              <issuelink>
-                <issuekey>JR-1</issuekey>
-              </issuelink>
-            </inwardlinks>
-          </issuelinktype>
-        </issuelinks>
-      </item>
-    </channel>
-  </rss>
+      <description>A super description of this test with &lt;tag&gt;tag&lt;/tag&gt; in it </description>
+      <environment></environment>
+      <key id="119797">JIRA-1</key>
+      <summary>Blopidou test</summary>
+      <type id="1">Test</type>
+      <priority id="1">Minor</priority>
+      <status id="1" description="This is a new issue">New</status>
+      <statusCategory id="2" key="new" colorName="blue-gray"/>
+      <resolution id="-1">Unresolved</resolution>
+      <security id="10310">Anyone</security>
+      <assignee username="-1">Unassigned</assignee>
+      <reporter username="john.arryn">John Arryn</reporter>
+      <labels>
+        <label>SIT</label>
+      </labels>
+      <created>Fri, 5 Jan 2018 12:46:56 +0000</created>
+      <updated>Mon, 8 Jan 2018 12:35:31 +0000</updated>
+      <version>JR-March18</version>
+      <due></due>
+      <issuelinks>
+        <issuelinktype id="10360">
+          <name>Cloners</name>
+          <inwardlinks description="is cloned by">
+            <issuelink>
+              <issuekey>JR-1</issuekey>
+            </issuelink>
+          </inwardlinks>
+        </issuelinktype>
+      </issuelinks>
+    </item>
+  </channel>
+</rss>

@@ -4,6 +4,7 @@ require 'nokogiri'
 
 require './migrate_zephyr'
 require './lib/models/project'
+require './lib/models/scenario'
 
 describe "Migrate Zephyr script" do
   let(:info_file) {
@@ -14,7 +15,7 @@ describe "Migrate Zephyr script" do
     File.open('./spec/xml_samples/executions.xml') { |f| Nokogiri::XML(f)}
   }
   
-  def reset_project
+  def reset_all
     project = Models::Project.instance
     instance_variable_names = project.instance_variables.map{ |attr| attr.to_s.sub('@', '')}
     
@@ -25,6 +26,8 @@ describe "Migrate Zephyr script" do
         project.send("#{attr}=", nil)
       end
     end
+    
+    Models::Scenario.class_variable_set(:@@scenarios, [])
   end
   
   context '#is_info_file' do
@@ -57,7 +60,7 @@ describe "Migrate Zephyr script" do
   
   context '#process_executions' do
     before do
-      reset_project
+      reset_all
     end
     
     it 'construct project correctly' do
@@ -118,7 +121,26 @@ describe "Migrate Zephyr script" do
       
       expect(actionwords.count).to eq 1
       expect(actionwords.first.name).to eq "Enter name of each Lannister childs. then click \\'Apply\\' button"
+    end
+  end
+  
+  context '#process_infos' do
+    before do
+      reset_all
       
+      process_executions(exec_file)
+      @project = Models::Project.instance
+    end
+    
+    it 'add description to scenarios' do
+      process_infos(info_file)
+      expect(@project.scenarios.first.description).to eq 'A super description of this test with tag in it'
+    end
+    
+    it 'add labels as tags' do
+      process_infos(info_file)
+      labels = @project.scenarios.first.tags.select{ |tag| tag.key == :label }
+      expect(labels.map(&:value)).to eq ["SIT"]
     end
   end
 end

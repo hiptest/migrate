@@ -87,7 +87,7 @@ def process_infos(infos_nodes)
         label.strip!
         next if label.empty?
 
-        scenario.tags << Models::Tag.new('label', label)
+        scenario.tags << Models::Tag.new(:label, label)
       end
     end
   end
