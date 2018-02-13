@@ -21,9 +21,9 @@ describe Models::Parameter do
       Models::Parameter.new('JIRA-2', "Bidibop")
     }
 
-    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/1/parameters'}
-    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios/1/parameters'}
-    let(:update_url) {'https://hiptest.net/api/projects/1/scenarios/1/parameters/1664'}
+    let(:find_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/parameters"}
+    let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/parameters"}
+    let(:update_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/parameters/1664"}
 
     let(:create_data) {
       {

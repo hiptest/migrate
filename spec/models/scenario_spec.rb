@@ -19,13 +19,13 @@ describe Models::Scenario do
 
     let(:resource_id) { 1664 }
 
-    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/find_by_tags'}
+    let(:find_url) {"#{ENV['HT_URI']}/projects/1/scenarios/find_by_tags"}
 
     let(:query_that_found) { '?key=JIRA&value=PLOP-1' }
     let(:query_that_not_found) { '?key=JIRA&value=PLOP-2' }
 
-    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
-    let(:update_url) { "https://hiptest.net/api/projects/1/scenarios/#{resource_id}" }
+    let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios"}
+    let(:update_url) { "#{ENV['HT_URI']}/projects/1/scenarios/#{resource_id}" }
 
     let(:create_data) {
       {
@@ -78,7 +78,7 @@ describe Models::Scenario do
 
   context 'api_exists?' do
     let(:api){ double("API::Hiptest") }
-    let(:find_url) {'https://hiptest.net/api/projects/1/scenarios/find_by_tags?key=JIRA&value=PLOP-1'}
+    let(:find_url) {"#{ENV['HT_URI']}/projects/1/scenarios/find_by_tags?key=JIRA&value=PLOP-1"}
     let(:find_results) {
       {
         'data' => find_data
@@ -151,7 +151,7 @@ describe Models::Scenario do
 
   context "when saving the first time" do
     let(:api){ double("API::Hiptest") }
-    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
+    let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios"}
     let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
 
     let(:scenario ) {
@@ -198,7 +198,7 @@ describe Models::Scenario do
 
   context "scenarios are renamed before saving" do
     let(:api){ double("API::Hiptest") }
-    let(:create_url) {'https://hiptest.net/api/projects/1/scenarios'}
+    let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios"}
     let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
 
     let(:scenario ) {

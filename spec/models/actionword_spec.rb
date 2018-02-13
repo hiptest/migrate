@@ -14,10 +14,10 @@ describe Models::Actionword do
 
     let(:resource_id) { 1664 }
 
-    let(:find_url) {'https://hiptest.net/api/projects/1/actionwords'}
+    let(:find_url) { "#{ENV['HT_URI']}/projects/1/actionwords" }
 
-    let(:create_url) {'https://hiptest.net/api/projects/1/actionwords'}
-    let(:update_url) { "https://hiptest.net/api/projects/1/actionwords/#{resource_id}" }
+    let(:create_url) { "#{ENV['HT_URI']}/projects/1/actionwords" }
+    let(:update_url) { "#{ENV['HT_URI']}/projects/1/actionwords/#{resource_id}" }
 
     let(:create_data) {
       {
@@ -68,7 +68,7 @@ describe Models::Actionword do
 
   context 'api_exists?' do
     let(:api){ double("API::Hiptest") }
-    let(:find_url) {'https://hiptest.net/api/projects/1/actionwords'}
+    let(:find_url) {"#{ENV['HT_URI']}/projects/1/actionwords"}
     let(:find_results) {
       {
         'data' => find_data
@@ -139,7 +139,7 @@ describe Models::Actionword do
 
   context "when saving" do
     let(:api){ double("API::Hiptest") }
-    let(:create_url) {'https://hiptest.net/api/projects/1/actionwords'}
+    let(:create_url) {"#{ENV['HT_URI']}/projects/1/actionwords"}
     let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
 
     let(:actionword ) {

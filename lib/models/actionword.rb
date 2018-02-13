@@ -10,7 +10,6 @@ module Models
       @id = nil
       @name = name.gsub('"', %q(\\\'))
       @description = ''
-      @tags = []
       @@actionwords << self
     end
 
