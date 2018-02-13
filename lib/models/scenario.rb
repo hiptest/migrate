@@ -1,5 +1,6 @@
-require './lib/models/model.rb'
-require './lib/models/actionword.rb'
+require './lib/models/model'
+require './lib/models/actionword'
+require './lib/utils/string'
 
 module Models
   class Scenario < Model
@@ -80,7 +81,7 @@ module Models
     def compute_actionwords(step)
       steps = ""
       parameter = nil
-      parameter = step.dig(:data) unless step.dig(:data).empty?
+      parameter = step.dig(:data).as_enum_lines unless step.dig(:data).empty?
 
       if step.dig(:step)
         if parameter
