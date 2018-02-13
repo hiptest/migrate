@@ -6,6 +6,7 @@ require './lib/api/routing/router'
 
 require 'net/http'
 require 'pry'
+require 'colorize'
 
 module API
   class Hiptest
@@ -89,11 +90,13 @@ module API
         res = JSON.parse(response.body) unless response.body.empty?
       else
         if response.message == 'Too Many Requests'
-          puts "API limit rate exceeded, sleeping for a while"
+          puts "API limit rate exceeded, sleeping for a while".blue
           sleep 310
-          puts "Ok, let's start again"
+          puts "Ok, let's start again".blue
           return send_request(uri, req)
         end
+        
+        puts JSON.parse(response.body).dig('error').red
         raise response.message
       end
 

@@ -4,10 +4,15 @@ ruby '2.3.1'
 
 group :development do
   gem 'activesupport'
+  gem 'colorize'
+end
+
+group :development, :test do
+  gem 'nokogiri'
+  gem 'pry-byebug'
 end
 
 group :test do
-  gem 'pry-byebug'
   gem 'rack-test'
   gem 'rspec'
   gem 'webmock'
