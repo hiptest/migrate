@@ -6,7 +6,7 @@ module Models
   class Scenario < Model
     @@scenarios = []
 
-    attr_accessor :id, :name, :description, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path, :jira_id
+    attr_accessor :id, :name, :description, :actionwords, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path, :jira_id
 
     def initialize(name, steps = [], description = '')
       @id = nil
@@ -81,12 +81,15 @@ module Models
     def compute_actionwords(step)
       steps = ""
       parameter = nil
-      parameter = step.dig(:data).as_enum_lines unless step.dig(:data).empty?
+      
+      unless step.dig(:data).empty?
+        parameter = step.dig(:data).as_enum_lines
+        aw_name = step.dig(:step).empty? ? step.dig(:result) : step.dig(:step)
+        aw = Actionword.find_by_name(aw_name)
+      end
 
       if step.dig(:step)
         if parameter
-          aw = Actionword.find_or_create_by_name(step.dig(:step))
-          add_unique_actionword(aw)
           action = " call '#{aw.name}' (__free_text = \"#{parameter}\")\n"
         else
           action = " step { action: \"#{step.dig(:step)}\" }\n"
@@ -99,8 +102,6 @@ module Models
       if result && !result.empty?
         
         if parameter and step.dig(:step).empty?
-          aw = Actionword.find_or_create_by_name(result)
-          add_unique_actionword(aw)
           result_step = " call '#{aw.name}' (__free_text = '#{parameter}')\n"
         else
           result_step = " step { result: \"#{result}\" }\n"

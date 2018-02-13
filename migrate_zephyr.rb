@@ -116,6 +116,14 @@ def process_executions(executions_nodes)
 
     Models::Project.instance.name = execution[:project]
     scenario = Models::Scenario.new(execution[:testSummary], steps)
+    
+    scenario.steps.each do |stp|
+      unless stp.dig(:data).empty?
+        aw_name = stp.dig(:step).empty? ? stp.dig(:result) : stp.dig(:step)
+        aw = Models::Actionword.find_or_create_by_name(aw_name)
+        scenario.add_unique_actionword(aw)
+      end
+    end
 
     TO_TAG_NODES.each do |tag|
       if tag == :issueKey

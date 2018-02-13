@@ -63,7 +63,7 @@ module Models
     end
     
     def self.find_by_name(name)
-      @@actionwords.select { |sc| sc.name == name }.first
+      @@actionwords.select { |aw| aw.name == name.gsub('"', %q(\\\')) }.first
     end
     
     def self.find_or_create_by_name(name)
