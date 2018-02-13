@@ -84,8 +84,13 @@ module Models
 
     def after_create(data)
     end
+    
+    def before_update
+    end
 
     def update
+      before_update
+      
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
       begin
         res = @@api.patch(URI("#{api_path}/#{id}"), update_data)

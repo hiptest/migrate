@@ -24,6 +24,8 @@ describe Models::Dataset do
       scenario.jira_id = 'JIRA-2'
       Models::Dataset.new('JIRA-2')
     }
+    
+    let(:resource_id) { 1664 }
 
     let(:find_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/datasets"}
     let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/datasets"}

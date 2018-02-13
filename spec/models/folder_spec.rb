@@ -8,6 +8,8 @@ describe Models::Folder do
     let(:an_existing_object ) { Models::Folder.new('My number one folder') }
     let(:an_unknown_object ) { Models::Folder.new('My other folder') }
 
+    let(:resource_id) { 1664 }
+
     let(:find_url) {"#{ENV['HT_URI']}/projects/1/folders"}
     let(:create_url) {"#{ENV['HT_URI']}/projects/1/folders"}
     let(:update_url) {"#{ENV['HT_URI']}/projects/1/folders/1664"}

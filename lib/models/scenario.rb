@@ -66,6 +66,13 @@ module Models
       # Yep, we save it once again so the definition is updated correctly
       update
     end
+    
+    def before_update
+      if api_exists?
+        res = @@api.get_scenario(ENV['HT_PROJECT'], @id)
+        @name = res.dig('data', 'attributes', 'name')
+      end
+    end
 
     def after_save(data)
       @actionwords.each do |actionword|

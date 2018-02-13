@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples "a model" do
 
-  HIPTEST_API_URI = 'https://hiptest.net/api'
+  HIPTEST_API_URI = ENV['HT_URI'] || 'https://hiptest.net/api'
   ENV['HT_PROJECT'] = "1"
   
   let(:api){ raise NotImplementedError }
@@ -91,6 +91,13 @@ shared_examples "a model" do
       allow(@api).to receive(:get).with(URI(@url)).and_return({'data' => []})
       allow(@api).to receive(:post).with(URI(create_url), create_data).and_return(create_result)
       allow(@api).to receive(:patch).with(URI(update_url), update_data).and_return(find_results)
+      allow(@api).to receive(:get_scenario).with("1", "#{resource_id}").and_return({
+        'data' => {
+          'attributes' => {
+            'name' => an_existing_object.name
+          }
+        }
+      })
       an_existing_object.class.api = @api
     end
     
@@ -114,6 +121,16 @@ shared_examples "a model" do
       
       an_existing_object.save
       expect(@api).to have_received(:patch)
+    end
+    
+    it 'before updating the object, before_update is called' do
+      allow(an_existing_object).to receive(:api_exists?).and_return(true)
+      allow(@api).to receive(:patch)
+      allow(an_existing_object).to receive(:before_update)
+      
+      an_existing_object.update
+      
+      expect(an_existing_object).to have_received(:before_update)
     end
 
     it 'after updating the object, after_update and after_save are called' do
