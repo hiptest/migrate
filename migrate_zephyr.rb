@@ -130,7 +130,7 @@ def process_executions(executions_nodes)
         next if execution[tag].nil? or execution[tag].empty?
 
         scenario.jira_id = execution[tag]
-        scenario.tags << Models::Tag.new('JIRA', execution[tag])
+        scenario.tags << Models::Tag.new(:JIRA, execution[tag])
         next
       end
 

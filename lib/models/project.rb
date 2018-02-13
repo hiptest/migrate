@@ -4,7 +4,7 @@ require 'singleton'
 module Models
   class Project < Model
     include Singleton
-    attr_accessor :name, :description, :folders, :scenarios
+    attr_accessor :name, :description, :folders, :scenarios, :root_folder_id
 
     def initialize()
       @id = ENV['HT_PROJECT']

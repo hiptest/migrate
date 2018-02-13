@@ -121,7 +121,7 @@ module Models
         definition << compute_actionwords(step)
       end
 
-      definition << "\nend"
+      definition << "end"
       definition
     end
     

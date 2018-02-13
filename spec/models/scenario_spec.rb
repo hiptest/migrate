@@ -47,7 +47,7 @@ describe Models::Scenario do
           attributes: {
             description: "",
             'folder-id': nil,
-            definition: "scenario '#{an_existing_object.name}' do\n\nend"
+            definition: "scenario '#{an_existing_object.name}' do\nend"
           }
         }
       }
