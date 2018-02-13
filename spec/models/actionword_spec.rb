@@ -1,5 +1,4 @@
 require './lib/models/actionword'
-
 require './spec/models/models_shared'
 
 describe Models::Actionword do
@@ -138,7 +137,7 @@ describe Models::Actionword do
     end
   end
 
-  context "when saving the first time" do
+  context "when saving" do
     let(:api){ double("API::Hiptest") }
     let(:create_url) {'https://hiptest.net/api/projects/1/actionwords'}
     let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
