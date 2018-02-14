@@ -95,11 +95,14 @@ module Models
         aw = Actionword.find_by_name(aw_name)
       end
 
-      if step.dig(:step)
+      action_step = step.dig(:step)&.strip
+      if action_step && !action_step.empty?
+        
         if parameter
           action = " call '#{aw.name}' (__free_text = \"#{parameter}\")\n"
         else
-          action = " step { action: \"#{step.dig(:step)}\" }\n"
+          action_step = action_step.double_quotes_replaced.single_quotes_escaped
+          action = " step { action: \"#{action_step}\" }\n"
         end
 
         steps << action
@@ -111,6 +114,7 @@ module Models
         if parameter and step.dig(:step).empty?
           result_step = " call '#{aw.name}' (__free_text = '#{parameter}')\n"
         else
+          result = result.double_quotes_replaced.single_quotes_escaped
           result_step = " step { result: \"#{result}\" }\n"
         end
 
@@ -121,7 +125,7 @@ module Models
     end
 
     def definition
-      name = @name.gsub("'", %q(\\\'))
+      name = @name.single_quotes_escaped
       definition = "scenario '#{name}' do\n"
 
       @steps.each do |step|
@@ -137,7 +141,7 @@ module Models
     end
 
     def self.find_by_name(name)
-      @@scenarios.select { |sc| sc.name == name }.first
+      @@scenarios.select { |sc| sc.name == name.single_quotes_escaped }.first
     end
 
     def self.find_by_jira_id(jira_id)

@@ -65,6 +65,13 @@ describe Models::Actionword do
       ]
     }
   end
+  
+  context "when create new actionword" do
+    it "single quotes are escaped from actionword name" do
+      aw = Models::Actionword.new("Great actionword with 'single quotes'")
+      expect(aw.name).to eq("Great actionword with \\'single quotes\\'")
+    end
+  end
 
   context 'api_exists?' do
     let(:api){ double("API::Hiptest") }

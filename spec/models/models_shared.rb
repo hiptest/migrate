@@ -91,7 +91,9 @@ shared_examples "a model" do
       allow(@api).to receive(:get).with(URI(@url)).and_return({'data' => []})
       allow(@api).to receive(:post).with(URI(create_url), create_data).and_return(create_result)
       allow(@api).to receive(:patch).with(URI(update_url), update_data).and_return(find_results)
-      allow(@api).to receive(:get_scenario).with("1", "#{resource_id}").and_return({
+      
+      resource_type = an_existing_object.class.to_s.split('::').last.downcase
+      allow(@api).to receive("get_#{resource_type}".intern).with("1", "#{resource_id}").and_return({
         'data' => {
           'attributes' => {
             'name' => an_existing_object.name
