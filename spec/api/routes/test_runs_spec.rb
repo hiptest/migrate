@@ -12,13 +12,33 @@ RSpec.describe API::Hiptest, 'API Test runs' do
           type: "test-runs",
           id: "1",
           attributes: {
-              name: "Stark"
+            name: "Stark",
+            description: "",
+            statuses: {
+              passed: 3,
+              failed: 1,
+              retest: 4,
+              undefined: 1,
+              blocked: 5,
+              skipped: 9,
+              wip: 0
+            }
           }
         }, {
           type: "test-runs",
           id: "2",
           attributes: {
-              name: "Lannister"
+            name: "Lannister",
+            description: "",
+            statuses: {
+              passed: 3,
+              failed: 1,
+              retest: 4,
+              undefined: 1,
+              blocked: 5,
+              skipped: 9,
+              wip: 0
+            }
           }
         }
       ]
@@ -32,7 +52,17 @@ RSpec.describe API::Hiptest, 'API Test runs' do
         type: "test-runs",
         id: "1",
         attributes: {
-          name: "Stark"
+          name: "Stark",
+          description: "",
+          statuses: {
+            passed: 3,
+            failed: 1,
+            retest: 4,
+            undefined: 1,
+            blocked: 5,
+            skipped: 9,
+            wip: 0
+          }
         }
       }
     }
@@ -42,7 +72,8 @@ RSpec.describe API::Hiptest, 'API Test runs' do
     {
       data: {
         attributes: {
-          name: "Stark"
+          name: "Stark",
+          description: ""
         }
       }
     }
@@ -54,7 +85,17 @@ RSpec.describe API::Hiptest, 'API Test runs' do
         type: "test-runs",
         id: "1",
         attributes: {
-            name: "Stark"
+          name: "Stark",
+          description: "",
+          statuses: {
+            passed: 0,
+            failed: 0,
+            retest: 0,
+            undefined: 314,
+            blocked: 0,
+            skipped: 0,
+            wip: 0
+          }
         }
       }
     }
