@@ -31,6 +31,10 @@ module API::Routing::Routes
           only: [:index]
         }
       }
+    },
+    
+    'test-run': {
+      only: [:show, :index, :create]
     }
   }
 end
