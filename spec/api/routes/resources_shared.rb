@@ -78,8 +78,13 @@ shared_examples 'an API readable resource' do
     stub = stub_request(:get, index_route)
       .with(headers: auth_headers)
       .to_return(status: 200, body: index_response_data.to_json)
-      
-    unless resource_nested_level == 1
+    
+    case resource_nested_level
+    when 0
+      resources_data = api.send("get_#{resource_type.pluralize}")
+    when 1
+      resources_data = api.send("get_#{resource_type.pluralize}", 1)
+    when 2
       resources_data = api.send("get_#{resource_type.pluralize}", 1, 1)
     else
       resources_data = api.send("get_#{resource_type.pluralize}", 1)
@@ -94,11 +99,17 @@ shared_examples 'an API readable resource' do
       .with(headers: auth_headers)
       .to_return(status: 200, body: show_response_data.to_json)
     
-    unless resource_nested_level == 1
+    case resource_nested_level
+    when 0
+      api.send("get_#{resource_type.singularize}", 1)
+    when 1
+      api.send("get_#{resource_type.singularize}", 1, 1)
+    when 2
       api.send("get_#{resource_type.singularize}", 1, 1, 1)
     else
       api.send("get_#{resource_type.singularize}", 1, 1)
     end
+    
     expect(stub).to have_been_requested
   end
 end

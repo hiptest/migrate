@@ -1,5 +1,5 @@
-require './lib/api/hiptest'
-require 'webmock/rspec'
+require 'spec_helper'
+require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Projects' do
   let!(:api){
@@ -25,10 +25,13 @@ RSpec.describe API::Hiptest, 'API Projects' do
     @project_id = 1
   end
   
-  it "#GET projects" do
-    stub = stub_request(:get, "https://hiptest.net/api/projects")
-      .with(headers: auth_headers)
-      .to_return(status: 200, body: {
+  it_behaves_like 'an API readable resource' do
+    let(:resource_type) { 'project' }
+    let(:resource_nested_level) { 0 }
+    
+    let(:index_route) { "https://hiptest.net/api/projects" }
+    let(:index_response_data) {
+      {
         data: [
           {
             type: "projects",
@@ -45,17 +48,12 @@ RSpec.describe API::Hiptest, 'API Projects' do
             }
           }
         ]
-      }.to_json)
+      }
+    }
     
-    projects_data = api.get_projects
-    expect(stub).to have_been_requested
-    expect(projects_data.dig('data').any?).to be_truthy
-  end
-  
-  it "#GET project" do
-    stub = stub_request(:get, "https://hiptest.net/api/projects/#{@project_id}")
-      .with(headers: auth_headers)
-      .to_return(status: 200, body: {
+    let(:show_route) { "https://hiptest.net/api/projects/#{@project_id}" }
+    let(:show_response_data) {
+      {
         data: {
           type: "projects",
           id: "1",
@@ -63,11 +61,8 @@ RSpec.describe API::Hiptest, 'API Projects' do
             name: "And the Philosopher's Stone"
           }
         }
-      }.to_json)
-    
-    projects_data = api.get_project(1)
-    expect(stub).to have_been_requested
-    expect(projects_data.dig('data')).not_to be_empty
+      }
+    }
   end
   
   it "#GET root scenarios folder" do
