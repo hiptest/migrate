@@ -235,7 +235,8 @@ describe Models::Scenario do
       }
     }
 
-    it "a unique name is found based on the existing ones" do
+    it "a unique name is found based on the existing ones (case insensitive)" do
+      scenario.name = 'My Scenario'
       allow(api).to receive(:get).with(URI(create_url)).and_return({ 'data' => [
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario'}},
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (1)'}},
@@ -243,14 +244,19 @@ describe Models::Scenario do
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (3)'}},
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (5)'}},
       ]})
+      
+      create_data[:data][:attributes][:name] = 'My Scenario (4)'
+      created_data['attributes']['name'] = 'My Scenario (4)'
+      
       allow(api).to receive(:get).with(URI(find_url)).and_return({ 'data' => []})
       allow(api).to receive(:post).with(URI(create_url), create_data).and_return(created_data)
+      
+      allow(scenario).to receive(:update)
+      
       scenario.class.api = api
 
-      allow(scenario).to receive(:update)
-
       scenario.save
-      expect(scenario.name).to eq('My scenario (4)')
+      expect(scenario.name).to eq('My Scenario (4)')
     end
   end
   

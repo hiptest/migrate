@@ -153,7 +153,8 @@ module Models
     end
 
     def find_unique_name(current, existing)
-      return current unless existing.include?(current)
+      existing = existing.map(&:downcase)
+      return current unless existing.include?(current.downcase)
 
       postfix = 0
       new_name = ''
@@ -162,7 +163,7 @@ module Models
         postfix += 1
         new_name = "#{current} (#{postfix})"
 
-        break unless existing.include?(new_name)
+        break unless existing.include?(new_name.downcase)
       end
 
       new_name
