@@ -2,11 +2,11 @@ require 'spec_helper'
 require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API datasets' do
-  it_behaves_like 'an api resource model' do
-    let(:resource_type) { 'scenario_dataset' }
+  it_behaves_like 'an API CRUD resource' do
+    let(:resource_type_main) { 'scenario_dataset' }
     
-    let(:index_route){ "https://hiptest.net/api/projects/1/scenarios/1/datasets" }
-    let(:index_response_data){
+    let(:index_route_main){ "https://hiptest.net/api/projects/1/scenarios/1/datasets" }
+    let(:index_response_data_main){
       {
         data: [
           {
@@ -26,8 +26,8 @@ RSpec.describe API::Hiptest, 'API datasets' do
       }
     }
     
-    let(:show_route){ "https://hiptest.net/api/projects/1/scenarios/1/datasets/1" }
-    let(:show_response_data){
+    let(:show_route_main){ "https://hiptest.net/api/projects/1/scenarios/1/datasets/1" }
+    let(:show_response_data_main){
       {
         data: {
             type: "datasets",
@@ -39,7 +39,7 @@ RSpec.describe API::Hiptest, 'API datasets' do
         }
     }
     
-    let(:create_data){
+    let(:create_data_main){
       {
         data: {
           attributes: {
@@ -48,7 +48,7 @@ RSpec.describe API::Hiptest, 'API datasets' do
         }
       }
     }
-    let(:create_response_data){
+    let(:create_response_data_main){
       {
         data: {
             type: "datasets",
@@ -60,7 +60,7 @@ RSpec.describe API::Hiptest, 'API datasets' do
         }
     }
     
-    let(:update_data){
+    let(:update_data_main){
       {
        data: {
          type: "datasets",

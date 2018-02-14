@@ -1,4 +1,5 @@
 require 'spec_helper'
+require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Tags' do
   let!(:api){
@@ -23,14 +24,14 @@ RSpec.describe API::Hiptest, 'API Tags' do
   before do
     @project_id = 1
     @actionword_id = 11
-    @scenario_id = 21
+    @scenario_id = 1
     @folder_id = 1211
     @tag_id = 111221
   end
   
   context "about scenarios" do
     it "#GET scenario tags" do
-      stub = stub_request(:get, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags")
+      stub = stub_request(:get, "https://hiptest.net/api/projects/1/scenarios/1/tags")
         .with(headers: auth_headers)
         .to_return(status: 200, body: {
           data: [
@@ -58,19 +59,21 @@ RSpec.describe API::Hiptest, 'API Tags' do
       expect(projects_data.dig('data').any?).to be_truthy
     end
     
-    it "#POST scenario tag" do
-      data = {
-        data: {
-          attributes: {
-            key: "Priority",
-            value: "low"
+    it_behaves_like 'an API creatable resource' do
+      let(:resource_type) { 'scenario_tag' }
+      let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags" }
+      let(:data) {
+        {
+          data: {
+            attributes: {
+              key: "Priority",
+              value: "low"
+            }
           }
         }
       }
-    
-      stub = stub_request(:post, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags")
-        .with(headers: auth_headers, body: data.to_json)
-        .to_return(status: 200, body: {
+      let(:response_data) {
+        {
           data: {
               type: "tags",
               id: "1",
@@ -79,41 +82,31 @@ RSpec.describe API::Hiptest, 'API Tags' do
                 value: "low"
               }
             }
-          }.to_json)
-    
-      scenario_data = api.create_scenario_tag(@project_id, @scenario_id, data)
-      expect(stub).to have_been_requested
-      expect(scenario_data.dig('data')).not_to be_empty
+          }
+      }
     end
     
-    it "#PATCH scenario tag" do
-      data = {
-        data: {
-          type: "tags",
-          id: "1",
-          attributes: {
-            key: "Priority",
-            value: "low"
+    it_behaves_like 'an API updatable resource' do
+      let(:resource_type) { 'scenario_tag' }
+      let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/1" }
+      let(:data) {
+        {
+          data: {
+            type: "tags",
+            id: "1",
+            attributes: {
+              key: "Priority",
+              value: "low"
+            }
           }
         }
       }
-    
-      stub = stub_request(:patch, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/#{@tag_id}")
-        .with(headers: auth_headers, body: data.to_json)
-        .to_return(status: 200, body: data.to_json)
-    
-      scenario_data = api.update_scenario_tag(@project_id, @scenario_id, @tag_id, data)
-      expect(stub).to have_been_requested
-      expect(scenario_data.dig('data')).not_to be_empty
+      let(:response_data) { data }
     end
     
-    it "#DELETE scenario tag" do
-      stub = stub_request(:delete, "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/#{@tag_id}")
-        .with(headers: auth_headers)
-        .to_return(status: 200)
-    
-      api.delete_scenario_tag(@project_id, @scenario_id, @tag_id)
-      expect(stub).to have_been_requested
+    it_behaves_like 'an API deletable resource' do
+      let(:resource_type) { 'scenario_tag' }
+      let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/1" }
     end
   end
   

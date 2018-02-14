@@ -2,11 +2,11 @@ require 'spec_helper'
 require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Folders' do
-  it_behaves_like 'an api resource model' do
-    let(:resource_type) { "folder" }
+  it_behaves_like 'an API CRUD resource' do
+    let(:resource_type_main) { "folder" }
     
-    let(:index_route){ "https://hiptest.net/api/projects/1/folders" }
-    let(:index_response_data){
+    let(:index_route_main){ "https://hiptest.net/api/projects/1/folders" }
+    let(:index_response_data_main){
       {
         data: [
           {
@@ -26,8 +26,8 @@ RSpec.describe API::Hiptest, 'API Folders' do
       }
     }
     
-    let(:show_route){ "https://hiptest.net/api/projects/1/folders/1" }
-    let(:show_response_data){
+    let(:show_route_main){ "https://hiptest.net/api/projects/1/folders/1" }
+    let(:show_response_data_main){
       {
         data: {
             type: "folders",
@@ -39,7 +39,7 @@ RSpec.describe API::Hiptest, 'API Folders' do
         }
     }
     
-    let(:create_data){
+    let(:create_data_main){
       {
         data: {
           attributes: {
@@ -48,7 +48,7 @@ RSpec.describe API::Hiptest, 'API Folders' do
         }
       }
     }
-    let(:create_response_data){
+    let(:create_response_data_main){
       {
         data: {
             type: "folders",
@@ -60,7 +60,7 @@ RSpec.describe API::Hiptest, 'API Folders' do
         }
     }
     
-    let(:update_data){
+    let(:update_data_main){
       {
         data: {
           type: "folders",
