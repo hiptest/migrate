@@ -10,7 +10,7 @@ require 'colorize'
 
 module API
   class Hiptest
-    @base_url = ENV["HT_URI"] || "https://hiptest.net"
+    @base_url = ENV["HT_URI"] || "https://hiptest.net/api"
     @use_ssl = @base_url.start_with?('https')
     
     
@@ -27,13 +27,11 @@ module API
     
     def self.arrange_base_url
       base_url = self.base_url
-      unless base_url.end_with?('/api/')
-        if base_url.end_with?('/api')
-          base_url += '/'
-        elsif base_url.end_with?('/')
-          base_url += 'api/'
+      unless base_url.end_with?('/api')
+        if base_url.end_with?('/')
+          base_url += 'api'
         else
-          base_url += '/api/'
+          base_url += '/api'
         end
       end
       base_url

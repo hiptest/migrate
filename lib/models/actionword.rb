@@ -14,7 +14,7 @@ module Models
     end
 
     def api_path
-      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords"
+      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/actionwords"
     end
 
     def create_data
@@ -50,7 +50,7 @@ module Models
     end
 
     def api_exists_url
-      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/actionwords"
+      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/actionwords"
     end
 
     def api_identical?(result)

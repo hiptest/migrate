@@ -18,7 +18,7 @@ module Models
     end
 
     def api_path
-      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
+      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{@scenario_id}/tags"
     end
 
     def create_data

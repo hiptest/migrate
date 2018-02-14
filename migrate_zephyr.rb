@@ -9,15 +9,14 @@ require "json"
 require './lib/models/project'
 require './lib/models/folder'
 require './lib/models/scenario'
+require './lib/models/actionword'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
-require './lib/api/hiptest'
 require './lib/env'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
-HIPTEST_API_URI = ENV['HT_URI'] || 'https://hiptest.net/api'
 
 
 def parse_files(paths)

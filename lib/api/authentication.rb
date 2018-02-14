@@ -25,7 +25,7 @@ module API
       def authenticate(email, password)
         self.arrange_base_url!
         
-        uri = URI(self.base_url + 'auth/sign_in')
+        uri = URI(self.base_url + '/auth/sign_in')
         
         req = Net::HTTP::Post.new(uri.path)
         req.body = { email: email, password: password }.to_json

@@ -4,7 +4,7 @@ RSpec.describe API::Hiptest, 'Base' do
   let(:uid){ "ken@hiptest.net" }
   
   before do
-    API::Hiptest.base_url= "https://hiptest.net"
+    API::Hiptest.base_url= "https://hiptest.net/api"
     API::Hiptest.use_ssl = true
   end
   
@@ -14,13 +14,13 @@ RSpec.describe API::Hiptest, 'Base' do
     
     
     it "has hiptest.net by default" do
-      expect(API::Hiptest.base_url).to eq "https://hiptest.net"
+      expect(API::Hiptest.base_url).to eq "https://hiptest.net/api"
     end
     
     
     it "can be updated to use another base_url by default" do
-      API::Hiptest.new(base_url: "http://localhost")
-      expect(API::Hiptest.base_url).to eq "http://localhost"
+      API::Hiptest.new(base_url: "http://localhost:3000/api")
+      expect(API::Hiptest.base_url).to eq "http://localhost:3000/api"
     end
     
     

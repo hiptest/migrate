@@ -23,7 +23,7 @@ module Models
     end
 
     def api_path
-      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios"
+      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     end
 
     def create_data
@@ -55,7 +55,7 @@ module Models
     end
 
     def api_exists_url
-      HIPTEST_API_URI + "/projects/#{ENV['HT_PROJECT']}/scenarios/find_by_tags?key=JIRA&value=#{@jira_id}"
+      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios/find_by_tags?key=JIRA&value=#{@jira_id}"
     end
 
     def api_identical?(result)

@@ -16,7 +16,7 @@ module Models
     end
 
     def api_path
-      HIPTEST_API_URI + "/projects"
+      API::Hiptest.base_url + "/projects"
     end
 
     def save

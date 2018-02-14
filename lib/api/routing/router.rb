@@ -92,7 +92,7 @@ module API
     
     
     def index(project_id, resource_type, parent_id = nil, parent_type = nil)
-      url = self.class.base_url + "projects/#{project_id}/"
+      url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
@@ -101,7 +101,7 @@ module API
     end
     
     def show(project_id, resource_id, resource_type, parent_id = nil, parent_type = nil)
-      url = self.class.base_url + "projects/#{project_id}/"
+      url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
@@ -110,7 +110,7 @@ module API
     end
 
     def create(project_id, data, resource_type, parent_id = nil, parent_type = nil)
-      url = self.class.base_url + "projects/#{project_id}/"
+      url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
@@ -119,7 +119,7 @@ module API
     end
 
     def update(project_id, resource_id, data, resource_type, parent_id = nil, parent_type = nil)
-      url = self.class.base_url + "projects/#{project_id}/"
+      url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end
@@ -128,7 +128,7 @@ module API
     end
 
     def destroy(project_id, resource_id, resource_type, parent_id = nil, parent_type = nil)
-      url = self.class.base_url + "projects/#{project_id}/"
+      url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
         url += "#{parent_type.pluralize}/#{parent_id}/"
       end

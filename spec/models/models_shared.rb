@@ -2,7 +2,7 @@ require 'spec_helper'
 
 shared_examples "a model" do
 
-  HIPTEST_API_URI = ENV['HT_URI'] || 'https://hiptest.net/api'
+  ENV['HT_URI'] = 'https://hiptest.net/api'
   ENV['HT_PROJECT'] = "1"
   
   let(:api){ raise NotImplementedError }
