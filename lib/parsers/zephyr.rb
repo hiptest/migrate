@@ -34,12 +34,12 @@ def process_infos(infos_nodes)
     sc = {}
 
     test_node.children.each do |child|
-      sc[child.name.to_sym] = child.content.strip
+      sc[child.name.to_sym] = child.content.strip.safe
     end
 
     scenario = Models::Scenario.find_by_jira_id(sc[:key])
     if scenario
-      scenario.description = sc[:description].tag_escaped
+      scenario.description = sc[:description]
 
       sc[:labels].split("\n").map do |label|
         label.strip!
@@ -63,20 +63,20 @@ def process_executions(executions_nodes)
         child.element_children.each do |step_node|
           test_step = {}
           step_node.element_children.each do |step_attribute|
-            test_step[step_attribute.name.to_sym] = step_attribute.content.strip
+            test_step[step_attribute.name.to_sym] = step_attribute.content.strip.safe
           end
           steps << test_step
         end
       else
-        execution[child.name.to_sym] = child.content.strip
+        execution[child.name.to_sym] = child.content.strip.safe
       end
     end
 
     Models::Project.instance.name = execution[:project]
     Models::TestRun.new(execution[:cycleName])
-    
-    scenario = Models::Scenario.new(execution[:testSummary], steps)
-    
+
+    scenario = Models::Scenario.new(execution[:testSummary].double_quotes_replaced.single_quotes_escaped, steps)
+
     scenario.steps.each do |stp|
       unless stp.dig(:data).empty?
         aw_name = stp.dig(:step).empty? ? stp.dig(:result) : stp.dig(:step)
@@ -84,6 +84,11 @@ def process_executions(executions_nodes)
         scenario.add_unique_actionword(aw)
       end
     end
+
+    data_step_names = scenario.steps.select{|st| !st[:data].empty? }.map{|st| st[:step].safe.single_quotes_escaped}.uniq
+    actionword_names = scenario.actionwords.map(&:name)
+
+    binding.pry unless data_step_names == actionword_names
 
     TO_TAG_NODES.each do |tag|
       if tag == :issueKey

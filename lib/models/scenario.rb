@@ -59,14 +59,16 @@ module Models
     end
 
     def api_identical?(result)
-      result.dig('attributes', 'name').start_with?(@name)
+      result_name = result.dig('attributes', 'name')
+      result_name.sub(/\s\([0-9]+\)$/, '')
+      result_name == @name
     end
 
     def after_create(data)
       # Yep, we save it once again so the definition is updated correctly
       update
     end
-    
+
     def before_update
       if api_exists?
         res = @@api.get_scenario(ENV['HT_PROJECT'], @id)
@@ -88,7 +90,7 @@ module Models
     def compute_actionwords(step)
       steps = ""
       parameter = nil
-      
+
       unless step.dig(:data).empty?
         parameter = step.dig(:data).as_enum_lines
         aw_name = step.dig(:step).empty? ? step.dig(:result) : step.dig(:step)
@@ -97,7 +99,7 @@ module Models
 
       action_step = step.dig(:step)&.strip
       if action_step && !action_step.empty?
-        
+
         if parameter
           action = " call '#{aw.name}' (__free_text = \"#{parameter}\")\n"
         else
@@ -110,7 +112,7 @@ module Models
 
       result = step.dig(:result)&.strip
       if result && !result.empty?
-        
+
         if parameter and step.dig(:step).empty?
           result_step = " call '#{aw.name}' (__free_text = '#{parameter}')\n"
         else
@@ -135,13 +137,13 @@ module Models
       definition << "end"
       definition
     end
-    
+
     def add_unique_actionword(actionword)
-      @actionwords << actionword unless @actionwords.include?(actionword)
+      @actionwords << actionword unless @actionwords.map(&:name).include?(actionword.name)
     end
 
     def self.find_by_name(name)
-      @@scenarios.select { |sc| sc.name == name.single_quotes_escaped }.first
+      @@scenarios.select { |sc| sc.name == name.double_quotes_replaced.single_quotes_escaped }.first
     end
 
     def self.find_by_jira_id(jira_id)

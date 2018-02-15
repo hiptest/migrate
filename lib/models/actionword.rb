@@ -20,7 +20,7 @@ module Models
 
     def create_data
       @name = find_unique_name(@name, @@api.get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
-      
+
       {
         data: {
           attributes: {
@@ -30,7 +30,7 @@ module Models
         }
       }
     end
-    
+
     def update_data
       {
         data: {
@@ -43,18 +43,18 @@ module Models
         }
       }
     end
-    
+
     def definition
       "actionword '#{@name}' (__free_text = \"\") do\nend"
     end
-    
+
     def before_update
       if api_exists?
         res = @@api.get_actionword(ENV['HT_PROJECT'], @id)
-        @name = res.dig('data', 'attributes', 'name').double_quotes_replaced.single_quotes_escaped.safe
+        @name = res.dig('data', 'attributes', 'name').single_quotes_escaped
       end
     end
-    
+
     def after_create(data)
       update
     end
@@ -66,16 +66,15 @@ module Models
     def api_identical?(result)
       result.dig('attributes', 'name').start_with?(@name.gsub('\\', ''))
     end
-    
+
     def self.find_by_name(name)
       @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped.safe }.first
     end
-    
+
     def self.find_or_create_by_name(name)
-      name = name.double_quotes_replaced.single_quotes_escaped.safe
-      self.find_by_name(name) || Actionword.new(name)
+      self.find_by_name(name) || Actionword.new(name.double_quotes_replaced.single_quotes_escaped.safe)
     end
-    
+
     def find_unique_name(current, existing)
       return current unless existing.include?(current)
 
@@ -91,7 +90,7 @@ module Models
 
       new_name
     end
-    
+
     def formated_name
       #code
     end
