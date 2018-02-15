@@ -9,7 +9,7 @@ module Models
 
     def initialize(name)
       @id = nil
-      @name = name.double_quotes_replaced.single_quotes_escaped
+      @name = name
       @description = ''
       @@actionwords << self
     end
@@ -51,7 +51,7 @@ module Models
     def before_update
       if api_exists?
         res = @@api.get_actionword(ENV['HT_PROJECT'], @id)
-        @name = res.dig('data', 'attributes', 'name').double_quotes_replaced.single_quotes_escaped
+        @name = res.dig('data', 'attributes', 'name').double_quotes_replaced.single_quotes_escaped.safe
       end
     end
     
@@ -68,10 +68,11 @@ module Models
     end
     
     def self.find_by_name(name)
-      @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped }.first
+      @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped.safe }.first
     end
     
     def self.find_or_create_by_name(name)
+      name = name.double_quotes_replaced.single_quotes_escaped.safe
       self.find_by_name(name) || Actionword.new(name)
     end
     
