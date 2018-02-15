@@ -1,8 +1,7 @@
 require 'spec_helper'
-
 require 'nokogiri'
 
-require './migrate_zephyr'
+require './lib/parsers/zephyr'
 require './lib/models/project'
 require './lib/models/scenario'
 
@@ -47,14 +46,6 @@ describe "Migrate Zephyr script" do
     
     it "return false if its not an execution xml export" do
       expect(is_execution_file?(info_file)).to be_falsy
-    end
-  end
-  
-  context '#determinate_info_and_execution_files' do
-    it 'return info file first and execution in second' do
-      info, execution = determinate_info_and_execution_files([exec_file, info_file])
-      expect(is_info_file?(info)).to be_truthy
-      expect(is_execution_file?(execution)).to be_truthy
     end
   end
   

@@ -44,5 +44,15 @@ Migration script needs some variable to push exported project to Hiptest:
 
 Now you could launch the script with:
 ```shell
-./migrate_zephyr.rb tests_export.xml test_cycle_export.xml
+ruby migrate.rb --from=zephyr --info=<INFOS_FILE_PATH> --execution=<EXECUTIONS_FILE_PATH>
+```
+
+```shell
+Usage: migrate.rb [options]
+    -v, --verbose                    Display more informations
+    -h, --help                       Display usage and options
+    -f, --from=NAME                  Select source you want to import from (zephyr)
+    -i, --info=INFOS_FILE            Zephyr informations file
+    -e, --execution=EXECUTIONS_FILE  Zephyr executions file
+    -t, --test_run=TEST_RUN_ID       Specify the test-run id if you want to push execution results
 ```

@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 require 'pry'
 require 'nokogiri'
 require 'singleton'
@@ -13,23 +12,9 @@ require './lib/models/actionword'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
-require './lib/env'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
-
-
-def parse_files(paths)
-  files = []
-
-  paths.each do |path|
-    if File.file?(path) and path.end_with?('.xml')
-      files << File.open(path) { |f| Nokogiri::XML(f)}
-    end
-  end
-
-  files
-end
 
 def is_info_file? file_nodes
   file_nodes.xpath('//item').any? and file_nodes.xpath('//item/project').any? and file_nodes.xpath('//item/summary') and file_nodes.xpath('//item/type')[0].text === 'Test'
@@ -38,35 +23,6 @@ end
 def is_execution_file? file_nodes
   file_nodes.xpath('//execution').any? and file_nodes.xpath('//execution/project').any? and file_nodes.xpath('//execution/testSummary').any?
 end
-
-
-def determinate_info_and_execution_files(files)
-  infos, executions = nil
-
-  files.each do |file|
-    if is_info_file? file
-      infos = file
-    end
-
-    if is_execution_file? file
-      executions = file
-    end
-  end
-
-  if infos.nil? or executions.nil?
-    help
-    exit(1)
-  end
-
-  [infos, executions]
-end
-
-
-
-
-###########################
-#       PROCESSING        #
-###########################
 
 def process_infos(infos_nodes)
   tests_nodes = infos_nodes.xpath('//item')
@@ -147,25 +103,5 @@ def process_executions(executions_nodes)
     else
       Models::Project.instance.scenarios << scenario
     end
-  end
-end
-
-
-###########################
-#           MAIN          #
-###########################
-
-if __FILE__ == $0
-  check_env_variables 
-  if ARGV.count == 2
-    configure_api_from_env
-    files = parse_files(ARGV)
-    infos, executions = determinate_info_and_execution_files(files)
-    process_executions(executions)
-    process_infos(infos)
-    Models::Project.instance.save
-  else
-    help
-    exit(1)
   end
 end
