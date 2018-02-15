@@ -12,6 +12,9 @@ require './lib/models/actionword'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
+require './lib/models/test-run'
+
+require './lib/utils/string'
 
 TO_TAG_NODES = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
 ONLY_KEY_TAGS = []
@@ -36,7 +39,7 @@ def process_infos(infos_nodes)
 
     scenario = Models::Scenario.find_by_jira_id(sc[:key])
     if scenario
-      scenario.description = sc[:description].gsub(%r{</?[^>]+?>}, '')
+      scenario.description = sc[:description].tag_escaped
 
       sc[:labels].split("\n").map do |label|
         label.strip!
@@ -70,6 +73,8 @@ def process_executions(executions_nodes)
     end
 
     Models::Project.instance.name = execution[:project]
+    Models::TestRun.new(execution[:cycleName])
+    
     scenario = Models::Scenario.new(execution[:testSummary], steps)
     
     scenario.steps.each do |stp|

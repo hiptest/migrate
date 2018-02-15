@@ -50,9 +50,17 @@ optparse = OptionParser.new do |opts|
     end
   end
   
-  options[:test_run_id] = nil
-  opts.on('-tTEST_RUN_ID', '--test_run=TEST_RUN_ID', 'Specify the test-run id if you want to push execution results') do |test_run_id|
-    options[:test_run_id] = test_run_id
+  options[:only] = nil
+  opts.on('-o', '--only', 'Specify the action you want to be done') do |action_param|
+    case action_param
+    when /import/
+      action = :import
+    when /push_results/
+      action = :push_result
+    else
+      action = nil
+    end
+    options[:only] = action
   end
 end
 
@@ -69,6 +77,10 @@ if __FILE__ == $0
     exit
   end
   
+  puts
+  puts "Hi, #{options[:from]} migration will start in a second.".green
+  puts
+  
   if options[:from] == 'zephyr'
     check_env_variables
     configure_api_from_env(verbose: options[:verbose])
@@ -79,6 +91,30 @@ if __FILE__ == $0
     process_executions(executions)
     process_infos(infos)
     
-    Models::Project.instance.save
+    case options[:only]
+    when :push_results
+      Models::TestRun.push_results
+    when :import
+      Models::Project.instance.save
+    else
+      Models::Project.instance.save
+      puts
+      puts 'Data migration is finished.'.green
+      puts 'Push execution results!'.green
+      puts
+      Models::TestRun.push_results
+    end
+    
+    puts
+    puts "Migration is finished".green
+    
+    link = "https://hiptest.net"
+    unless ENV['HT_URI'].empty?
+      link = ENV['HT_URI']
+    end
+    link += "/projects/#{ENV['HT_PROJECT']}"
+    puts "Go to '".green + link.uncolorize + "' to see imported project".green
+    puts "Enjoy! :)".green
+    puts
   end
 end

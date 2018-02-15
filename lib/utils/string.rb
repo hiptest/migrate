@@ -24,4 +24,16 @@ class String
   def double_quotes_replaced
     self.gsub('"', "'")
   end
+  
+  def html_escaped
+    self.gsub(%r{&#\w[\d]{2};}, '')
+  end
+  
+  def tag_escaped
+    self.gsub(%r{</?[^>]+?>}, '')
+  end
+  
+  def safe
+    self.html_escaped.tag_escaped
+  end
 end
