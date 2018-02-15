@@ -104,6 +104,10 @@ module Models
 
     def after_update(data)
     end
+    
+    def data_type
+      resource_type.downcase.pluralize
+    end
 
     def resource_type
       self.class.name.split('::').last

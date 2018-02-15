@@ -32,10 +32,6 @@ module Models
       }
     end
 
-    def data_type
-      'tags'
-    end
-
     def name
       "#{@key}:#{value}"
     end

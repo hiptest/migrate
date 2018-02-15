@@ -28,10 +28,6 @@ module Models
       }
     end
 
-    def data_type
-      'datasets'
-    end
-
     def api_identical?(result)
       result.dig('attributes', 'data').to_json == data.to_json
     end

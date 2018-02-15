@@ -67,10 +67,6 @@ module Models
       result.dig('attributes', 'name').start_with?(@name.gsub('\\', ''))
     end
     
-    def data_type
-      'actionwords'
-    end
-    
     def self.find_by_name(name)
       @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped }.first
     end

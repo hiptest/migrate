@@ -27,10 +27,6 @@ module Models
       }
     end
 
-    def data_type
-      'parameters'
-    end
-
     def scenario
       Scenario.find_by_jira_id(@scenario_jira_id)
     end

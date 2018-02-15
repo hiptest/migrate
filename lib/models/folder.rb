@@ -35,10 +35,6 @@ module Models
       }
     end
 
-    def data_type
-      'folders'
-    end
-
     def self.find_or_create_by_name(name)
       folder = Project.instance.folders.select{ |f| f.name == name }.first
 
