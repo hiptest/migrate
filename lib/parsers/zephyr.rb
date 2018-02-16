@@ -33,7 +33,7 @@ def process_infos(infos_nodes)
   tests_nodes.each do |test_node|
     sc = {}
 
-    test_node.children.each do |child|
+    test_node.element_children.each do |child|
       sc[child.name.to_sym] = child.content.strip.safe
     end
 
@@ -65,7 +65,7 @@ def process_executions(executions_nodes)
           step_node.element_children.each do |step_attribute|
             test_step[step_attribute.name.to_sym] = step_attribute.content.strip.safe
           end
-          steps << test_step
+          steps << test_step unless test_step[:step].empty? && test_step[:result].empty?
         end
       else
         execution[child.name.to_sym] = child.content.strip.safe
