@@ -85,11 +85,6 @@ def process_executions(executions_nodes)
       end
     end
 
-    data_step_names = scenario.steps.select{|st| !st[:data].empty? }.map{|st| st[:step].safe.single_quotes_escaped}.uniq
-    actionword_names = scenario.actionwords.map(&:name)
-
-    binding.pry unless data_step_names == actionword_names
-
     TO_TAG_NODES.each do |tag|
       if tag == :issueKey
         next if execution[tag].nil? or execution[tag].empty?

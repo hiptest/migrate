@@ -64,7 +64,7 @@ module Models
     end
 
     def api_identical?(result)
-      result.dig('attributes', 'name').start_with?(@name.gsub('\\', ''))
+        result.dig('attributes', 'name') == @name.gsub('\\', '')
     end
 
     def self.find_by_name(name)

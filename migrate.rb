@@ -109,7 +109,7 @@ if __FILE__ == $0
     puts "Migration is finished".green
     
     link = "https://hiptest.net"
-    unless ENV['HT_URI'].empty?
+    if ENV['HT_URI']
       link = ENV['HT_URI']
     end
     link += "/projects/#{ENV['HT_PROJECT']}"

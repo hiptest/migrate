@@ -68,7 +68,7 @@ describe Models::Actionword do
   
   context "when create new actionword" do
     it "single quotes are escaped from actionword name" do
-      aw = Models::Actionword.new("Great actionword with 'single quotes'")
+      aw = Models::Actionword.find_or_create_by_name("Great actionword with 'single quotes'")
       expect(aw.name).to eq("Great actionword with \\'single quotes\\'")
     end
   end
@@ -84,28 +84,6 @@ describe Models::Actionword do
     let(:actionword ) {
       Models::Actionword.new('My first actionword')
     }
-
-    context 'when only one result is returned' do
-      let(:find_data) {
-        [
-          {
-            'type' => 'actionwords',
-            'id' => '1664',
-            'attributes' => {
-              'name' => 'My first actionword (2)'
-            }
-          }
-        ]
-      }
-
-      it 'checks that the actionword name is the beginning of the returned result' do
-        allow(api).to receive(:get).with(URI(find_url)).and_return(find_results)
-        actionword.class.api = api
-
-        expect(actionword.api_exists?).to be true
-        expect(actionword.id).to eq(find_data.first['id'])
-      end
-    end
 
     context 'when multiple results are returned' do
       let(:find_data) {
@@ -134,12 +112,12 @@ describe Models::Actionword do
         ]
       }
 
-      it 'uses the first result which name starts with the actionword name' do
+      it 'uses the result that exaclty match the actionword name' do
         allow(api).to receive(:get).with(URI(find_url)).and_return(find_results)
         actionword.class.api = api
 
         expect(actionword.api_exists?).to be true
-        expect(actionword.id).to eq(find_data[1]['id'])
+        expect(actionword.id).to eq(find_data[2]['id'])
       end
     end
   end

@@ -52,6 +52,7 @@ module Models
     end
 
     def api_exists?
+      return true if @id
       res = @@api.get(URI(api_exists_url))
       res and res['data'].any? ? find_idential_result(res['data']) : false
     end

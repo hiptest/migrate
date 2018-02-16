@@ -59,9 +59,7 @@ module Models
     end
 
     def api_identical?(result)
-      result_name = result.dig('attributes', 'name')
-      result_name.sub(/\s\([0-9]+\)$/, '')
-      result_name == @name
+      result.dig('attributes', 'name').start_with?(@name)
     end
 
     def after_create(data)
