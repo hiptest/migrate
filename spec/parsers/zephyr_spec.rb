@@ -7,11 +7,15 @@ require './lib/models/scenario'
 
 describe "Migrate Zephyr script" do
   let(:info_file) {
-    File.open('./spec/xml_samples/infos.xml') { |f| Nokogiri::XML(f)}
+    Nokogiri::XML(File.open('./spec/xml_samples/infos.xml')) do |config|
+      config.noent
+    end
   }
 
   let(:exec_file) {
-    File.open('./spec/xml_samples/executions.xml') { |f| Nokogiri::XML(f)}
+    Nokogiri::XML(File.open('./spec/xml_samples/executions.xml')) do |config|
+      config.noent
+    end
   }
   
   def reset_all
@@ -54,14 +58,14 @@ describe "Migrate Zephyr script" do
       reset_all
     end
     
-    it 'construct project correctly' do
+    it 'construct project correctly and remove unsafe chars from name' do
       process_executions(exec_file)
       
       project = Models::Project.instance
-      expect(project.name).to eq 'Blopidou project'
+      expect(project.name).to eq "Blopidou 'pidiboup' lksdf"
     end
     
-    it 'construct scenarios correctly' do
+    it 'construct scenarios correctly and remove unsafe chars from name' do
       process_executions(exec_file)
       
       project = Models::Project.instance
@@ -125,7 +129,7 @@ describe "Migrate Zephyr script" do
     
     it 'add description to scenarios' do
       process_infos(info_file)
-      expect(@project.scenarios.first.description).to eq 'A super description of this test with tag in it'
+      expect(@project.scenarios.first.description).to eq 'A super description of this test with tagtag/tag in it'
     end
     
     it 'add labels as tags' do

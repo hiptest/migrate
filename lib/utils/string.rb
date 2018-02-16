@@ -26,14 +26,14 @@ class String
   end
   
   def html_escaped
-    self.gsub(%r{&#\w[\d]{2};}, '')
+    self.gsub(%r{&#\w[\d]+;}, '')
   end
   
   def tag_escaped
-    self.gsub(%r{</?[^>]+?>}, '')
+    self.gsub(%r{</?[^>]+?>}, '').gsub(%r{&lt;/?[^(&gt;)]+?&gt;}, '')
   end
   
   def safe
-    self.html_escaped.tag_escaped
+    self.tag_escaped.html_escaped
   end
 end

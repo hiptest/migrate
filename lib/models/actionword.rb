@@ -68,11 +68,11 @@ module Models
     end
 
     def self.find_by_name(name)
-      @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped.safe }.first
+      @@actionwords.select { |aw| aw.name == name.double_quotes_replaced.single_quotes_escaped }.first
     end
 
     def self.find_or_create_by_name(name)
-      self.find_by_name(name) || Actionword.new(name.double_quotes_replaced.single_quotes_escaped.safe)
+      self.find_by_name(name) || Actionword.new(name.double_quotes_replaced.single_quotes_escaped)
     end
 
     def find_unique_name(current, existing)

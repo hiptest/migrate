@@ -9,7 +9,9 @@ require './lib/env'
 def parse_file(path)
   file = nil
   if File.file?(path) and path.end_with?('.xml')
-    file = File.open(path) { |f| Nokogiri::XML(f)}
+    file = Nokogiri::XML(File.open(path)) do |config|
+      config.noent
+    end
   end
   file
 end

@@ -9,7 +9,7 @@ module Models
 
     def initialize(name, description = '')
       @id = nil
-      @name = name.tag_escaped
+      @name = name
       @description = description
       @tests = []
       @@test_runs << self unless @@test_runs.map(&:name).include?(@name)
@@ -26,15 +26,14 @@ module Models
         data: {
           attributes: {
             name: @name,
-            description: @description,
-            "folder-id": @folder_id
+            description: @description
           }
         }
       }
     end
 
     def api_identical?(result)
-      result.dig('attributes', 'name').tag_escaped.start_with?(@name)
+      result.dig('attributes', 'name') == (@name)
     end
     
     def save

@@ -11,7 +11,7 @@ https://edukoup.atlassian.net/sr/jira.issueviews:searchrequest-xml/temp/SearchRe
 -->
 <rss version="0.92">
   <channel>
-    <title>Blopidou</title>
+    <title>Blopidou 'pidiboup' &x23;lksdf&gt;</title>
     <link>https://blopidou.atlassian.net/issues/?jql=project%sfgzjljkmj+AND+issuetype%3DTest</link>
     <description>An XML representation of a search request</description>
     <language>en-uk</language>
@@ -22,13 +22,13 @@ https://edukoup.atlassian.net/sr/jira.issueviews:searchrequest-xml/temp/SearchRe
       <build-date>23-01-2018</build-date>
     </build-info>
     <item>
-      <title>[JIRA-1] Blopidou test</title>
+      <title>[JIRA-1] Blopidou &x23;test&gt;</title>
       <link>https://blopidou.atlassian.net/browse/JIRA-1</link>
-      <project id="1" key="JIRA">Blopidou project</project>
+      <project id="1" key="JIRA">Blopidou 'pidiboup' &x23;lksdf&gt;</project>
       <description>A super description of this test with &lt;tag&gt;tag&lt;/tag&gt; in it </description>
       <environment></environment>
       <key id="119797">JIRA-1</key>
-      <summary>Blopidou test</summary>
+      <summary>Blopidou &x23;test&gt;</summary>
       <type id="1">Test</type>
       <priority id="1">Minor</priority>
       <status id="1" description="This is a new issue">New</status>

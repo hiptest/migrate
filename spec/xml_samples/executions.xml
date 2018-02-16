@@ -5,8 +5,8 @@
     <cycleName>All Tests</cycleName>
     <folderName></folderName>
     <issueKey>JIRA-1</issueKey>
-    <testSummary>Blopidou test</testSummary>
-    <project>Blopidou project</project>
+    <testSummary>Blopidou &x23;test&gt;</testSummary>
+    <project>Blopidou 'pidiboup' &x23;lksdf&gt;</project>
     <versions>Unscheduled</versions>
     <components></components>
     <priority>Minor</priority>
@@ -39,7 +39,7 @@
       
       <teststep>
         <orderId>3</orderId>
-        <step>Enter name of each Lannister childs. then click &quot;Apply&quot; button</step>
+        <step>Enter name of each Lannister childs. then click 'Apply' button</step>
         <data>01.Jamie - Lannister  02. Cersei - Lannister 03. Tyrion - Lannister 04.Joffrey - Baratheon 05.Myrcella - Baratheon 06. Tommen - Baratheon</data>
         <result>Every child should be listed</result>
         <stepStatus>UNEXECUTED</stepStatus>
