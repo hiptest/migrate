@@ -53,12 +53,12 @@ optparse = OptionParser.new do |opts|
   end
   
   options[:only] = nil
-  opts.on('-o', '--only', 'Specify the action you want to be done') do |action_param|
+  opts.on('-oACTION', '--only=ACTION', 'Specify the action you want to be done: (import, push_results)') do |action_param|
     case action_param
     when /import/
       action = :import
-    when /push_results/
-      action = :push_result
+    when /push_result/
+      action = :push_results
     else
       action = nil
     end
