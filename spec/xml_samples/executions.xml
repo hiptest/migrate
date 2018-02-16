@@ -46,6 +46,15 @@
         <stepComment></stepComment>
       </teststep>
       
+      <teststep>
+        <orderId>4</orderId>
+        <step></step>
+        <data>Jorah Mormont</data>
+        <result></result>
+        <stepStatus>UNEXECUTED</stepStatus>
+        <stepComment></stepComment>
+      </teststep>
+      
     </teststeps>
     
   </execution>
