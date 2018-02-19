@@ -100,7 +100,7 @@ describe Models::TestRun do
       expect(tr.id).to eq "1664"
     end
     
-    it "don't create if test run doesn't already exist" do
+    it "do nothing if test run doesn't already exist" do
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
       allow(api).to receive(:post)
       
@@ -110,7 +110,23 @@ describe Models::TestRun do
     end
   end
   
-  context "structure" do
-    it "contain every test snapshots"
+  context "after saving" do
+    it "fetch tests" do
+      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
+      allow(tr).to receive(:fetch_tests)
+      
+      tr.save
+      
+      expect(tr).to have_received(:fetch_tests)
+    end
+    
+    it "push results" do
+      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
+      allow(tr).to receive(:push_results)
+      
+      tr.save
+      
+      expect(tr).to have_received(:push_results)
+    end
   end
 end

@@ -48,7 +48,12 @@ module Models
     end
     
     def after_save(data)
+      fetch_tests
       push_results
+    end
+    
+    def fetch_tests
+      #code
     end
     
     def push_results
