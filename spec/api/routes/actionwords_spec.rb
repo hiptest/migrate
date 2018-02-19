@@ -1,7 +1,7 @@
 require 'spec_helper'
 require './spec/api/routes/resources_shared'
 
-RSpec.describe API::Hiptest, 'API Scenarios' do
+RSpec.describe API::Hiptest, 'API Actionwords' do
   it_behaves_like 'an API CRUD resource' do
     let(:resource_type_main) { "actionword" }
     

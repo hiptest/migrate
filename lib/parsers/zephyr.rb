@@ -12,7 +12,7 @@ require './lib/models/actionword'
 require './lib/models/parameter'
 require './lib/models/dataset'
 require './lib/models/tag'
-require './lib/models/test-run'
+require './lib/models/test_run'
 
 require './lib/utils/string'
 
