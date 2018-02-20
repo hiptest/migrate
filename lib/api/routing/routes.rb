@@ -37,7 +37,7 @@ module API::Routing::Routes
       only: [:show, :index, :create],
       resources: {
         'test-snapshot': {
-          only: [:show, :index, :create, :update]
+          only: [:show, :index]
         }
       }
     }
