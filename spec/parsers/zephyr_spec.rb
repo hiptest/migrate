@@ -70,7 +70,7 @@ describe "Migrate Zephyr script" do
       
       project = Models::Project.instance
       
-      expect(project.scenarios.count).to eq 1
+      expect(project.scenarios.count).to eq 2
       scenario = project.scenarios.first
       
       expect(scenario.name).to eq 'Blopidou test'

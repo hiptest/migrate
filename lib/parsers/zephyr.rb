@@ -73,10 +73,15 @@ def process_executions(executions_nodes)
     end
 
     Models::Project.instance.name = execution[:project]
-    Models::TestRun.new(execution[:cycleName])
-
+    
+    tr = Models::TestRun.find_or_create_by_name(execution[:cycleName])
+    
     scenario = Models::Scenario.new(execution[:testSummary].double_quotes_replaced.single_quotes_escaped, steps)
+    
+    author = execution[:executedBy].empty? ? "Migration script" : execution[:executedBy]
 
+    tr.add_status_to_cache(scenario: scenario, status: execution[:executedStatus].downcase, author: author, description: "")
+    
     scenario.steps.each do |stp|
       unless stp.dig(:data).empty?
         aw_name = stp.dig(:step).empty? ? stp.dig(:result) : stp.dig(:step)

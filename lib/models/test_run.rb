@@ -1,17 +1,19 @@
 require './lib/models/model'
+require './lib/models/test_snapshot'
 require './lib/utils/string'
 
 module Models
   class TestRun < Model
     @@test_runs = []
 
-    attr_accessor :id, :name, :description, :tests, :api_path
+    attr_accessor :id, :name, :description, :test_snapshots, :api_path
 
     def initialize(name, description = '')
       @id = nil
       @name = name
       @description = description
-      @tests = []
+      @test_snapshots = []
+      @cache = {}
       @@test_runs << self unless @@test_runs.map(&:name).include?(@name)
     end
 
@@ -53,25 +55,49 @@ module Models
     end
     
     def fetch_tests
-      #code
+      res = @@api.get(URI(API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/test_runs/#{@id}/test_snapshots"))
+      if res and res.dig('data').any?
+        res.dig('data').each do |ts|
+          @test_snapshots << Models::TestSnapshot.new(
+            id: ts.dig('id'), 
+            name: ts.dig('attributes', 'name'), 
+            status: ts.dig('attributes', 'status'), 
+            test_run_id: @id,
+            folder_snapshot_id: ts.dig('attributes', 'folder-snapshot-id')
+          )
+        end
+      end
     end
     
     def push_results
-      #code
-    end
-
-    def self.find_by_name(name)
-      @@scenarios.select { |sc| sc.name == name.single_quotes_escaped }.first
-    end
-
-    def self.find(id)
-      @@scenarios.select{ |sc| sc.id == id }.first
+      @test_snapshots.each do |ts|
+        scenario = ts.related_scenario
+        
+        status = @cache[scenario.object_id][:status]
+        author = @cache[scenario.object_id][:author]
+        description = @cache[scenario.object_id][:description]
+        
+        ts.status = status
+        ts.push_results(status, author, description)
+      end
     end
     
     def self.push_results
       @@test_runs.each do |test_run|
         test_run.save
       end
+    end
+    
+    def add_status_to_cache(scenario:, status:, author:, description: "")
+      @cache[scenario.object_id] = {
+        status: status,
+        author: author,
+        description: description
+      }
+    end
+    
+    def self.find_or_create_by_name(name)
+      @@test_runs.select{ |tr| tr.name == name}.first || TestRun.new(name)
     end
 
     def find_unique_name(current, existing)

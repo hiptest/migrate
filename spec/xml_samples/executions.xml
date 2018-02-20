@@ -58,4 +58,24 @@
     </teststeps>
     
   </execution>
+  <execution>
+    <executionId>79868795678967-765bk809-0002</executionId>
+    <cycleName>All Tests</cycleName>
+    <folderName></folderName>
+    <issueKey>JIRA-1</issueKey>
+    <testSummary>Blopidou</testSummary>
+    <project>Blopidou 'pidiboup' &x23;lksdf&gt;</project>
+    <versions>Unscheduled</versions>
+    <components></components>
+    <priority>Minor</priority>
+    <executedBy></executedBy>
+    <executedOn></executedOn>
+    <executedStatus>FAILED</executedStatus>
+    <executionDefects></executionDefects>
+    <creationDate>Tue Jan 23 07:50:56 PST 2018</creationDate>
+    <assignedTo></assignedTo>
+    <teststeps>      
+    </teststeps>
+    
+  </execution>
 </executions>
