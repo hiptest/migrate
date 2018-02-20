@@ -141,7 +141,7 @@ module Models
     end
 
     def self.find_by_name(name)
-      @@scenarios.select { |sc| sc.name == name.double_quotes_replaced.single_quotes_escaped }.first
+      @@scenarios.select { |sc| sc.name.downcase == name.double_quotes_replaced.single_quotes_escaped.downcase }.first
     end
 
     def self.find_by_jira_id(jira_id)
