@@ -83,7 +83,38 @@ describe Models::TestSnapshot do
   
   before do
     ENV['HT_PROJECT'] = "1"
+    Models::TestSnapshot.class_variable_set(:@@results_path, './spec/test_snapshots_results.txt')
+    Models::TestSnapshot.class_variable_set(:@@pushed_results, [])
     Models::TestSnapshot.api = api
+  end
+  
+  after do
+    if File.exists?('./spec/test_snapshots_results.txt')
+      File.delete('./spec/test_snapshots_results.txt')
+    end
+  end
+  
+  context "#is_already_pushed" do
+    it 'returns true if test_snapshot id is in the result file' do
+      Models::TestSnapshot.class_variable_set(:@@pushed_results, [test_snapshot.id])
+      expect(test_snapshot.is_already_pushed).to be_truthy
+    end
+  end
+  
+  context "TestSnapshot#process_results" do
+    it "fills pushed_results with test_snapshot ids that are already pushed" do
+      File.open(Models::TestSnapshot.class_variable_get(:@@results_path), "w") do |f|
+        f.puts(test_snapshot.id)
+      end
+      
+      expect{ 
+        Models::TestSnapshot.process_results
+      }.to change{ 
+        Models::TestSnapshot.class_variable_get(:@@pushed_results).count
+      }.by 1
+      
+      expect(Models::TestSnapshot.class_variable_get(:@@pushed_results)).to eq ["#{test_snapshot.id}"]
+    end
   end
   
   context "when pushes results" do

@@ -3,6 +3,9 @@ require 'colorize'
 
 module Models
   class TestSnapshot < Model
+    @@results_path = "./results.txt"
+    @@pushed_results = []
+    
     attr_accessor :id, :name, :status, :test_run_id, :folder_snapshot_id
     
     def initialize(id:, name:, status:, test_run_id:, folder_snapshot_id: nil)
@@ -81,7 +84,26 @@ module Models
       end
       
       output("-- #{@name} => " + status.send(color))
-      @@api.post(URI("#{api_path}/#{@id}/test_results"), result_data(status, author, description))
+      begin
+        @@api.post(URI("#{api_path}/#{@id}/test_results"), result_data(status, author, description))
+        File.open(@@results_path, "a") do |line|
+          line.puts @id
+        end
+      rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError,
+       Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+        puts 'Something bad happened'.red
+        puts e
+      end
+    end
+    
+    def is_already_pushed
+      @@pushed_results.select{ |ts_id| ts_id == @id}.any?
+    end
+    
+    def self.process_results
+      File.open(@@results_path, 'r').each do |line|
+        @@pushed_results << line.sub("\n", '')
+      end
     end
   end
 end

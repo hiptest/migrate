@@ -70,7 +70,9 @@ module Models
     end
     
     def push_results
+      Models::TestSnapshot.process_results
       @test_snapshots.each do |ts|
+        next if ts.is_already_pushed
         scenario = ts.related_scenario
         
         status = @cache[scenario.object_id][:status]
