@@ -14,7 +14,7 @@ class String
   end
   
   def camelize
-    self.split("_").each.with_index {|s, i| s.capitalize! if i > 0 }.join("")
+    self.split("_").each {|s| s.capitalize! }.join("").uncapitalize
   end
   
   def underscore

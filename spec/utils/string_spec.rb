@@ -47,4 +47,24 @@ describe String do
       expect(%Q(Say "hello").double_quotes_replaced).to eq %Q(Say 'hello')
     end
   end
+  
+  context '#uncapitalize' do
+    it "transforms the first letter into downcase" do
+      expect('coucou'.uncapitalize).to eq('coucou')
+      expect('Coucou'.uncapitalize).to eq('coucou')
+    end
+  end
+  
+  context '#camelize' do
+    it "transforms any string into its camelcase form" do
+      expect('nous_sommes_mercredi'.camelize).to eq('nousSommesMercredi')
+      expect('NOUS_sOMmes_mercreDI'.camelize).to eq('nousSommesMercredi')
+    end
+  end
+  
+  context '#underscore' do
+    it "transforms any string into its snakecase form" do
+      expect('nousSommesMercredi'.underscore).to eq('nous_sommes_mercredi')
+    end
+  end
 end
