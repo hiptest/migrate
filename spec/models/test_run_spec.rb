@@ -12,18 +12,18 @@ describe Models::TestRun do
     project.name = "Game of thrones"
     project
   }
-  
+
   let(:scenario) {
     sc = Models::Scenario.new('Introduction')
     sc.jira_id = 'INTRO-1'
     project.scenarios << sc
     sc
   }
-  
+
   let(:tr) {
     Models::TestRun.new('GOT run')
   }
-  
+
   let(:tr_index_response) {
     {
       "data" => [
@@ -40,9 +40,9 @@ describe Models::TestRun do
               "undefined" => 1,
               "blocked" => 5,
               "skipped" => 9,
-              "wip" => 0
-            }
-          }
+              "wip" => 0,
+            },
+          },
         }, {
           "type" => "test-runs",
           "id" => "2",
@@ -56,25 +56,25 @@ describe Models::TestRun do
               "undefined" => 1,
               "blocked" => 5,
               "skipped" => 9,
-              "wip" => 0
-            }
-          }
-        }
-      ]
+              "wip" => 0,
+            },
+          },
+        },
+      ],
     }
   }
-  
+
   let(:tr_create_data) {
     {
       data: {
         attributes: {
           name: tr.name,
-          description: ""
-        }
-      }
+          description: "",
+        },
+      },
     }
   }
-  
+
   let(:tr_create_response) {
     {
       "data" => {
@@ -82,12 +82,12 @@ describe Models::TestRun do
         "type" => "",
         "attributes" => {
           "name" => tr.name,
-          "description" => ""
-        }
-      }
+          "description" => "",
+        },
+      },
     }
   }
-  
+
   let(:ts_response) {
     {
       "data" => [
@@ -101,17 +101,17 @@ describe Models::TestRun do
               "folder_snapshot_id" => 1,
               "steps" => [
                 {
-                  "action" => "The mountain cruches Oberyn eyes"
+                  "action" => "The mountain cruches Oberyn eyes",
                 },
                 {
-                  "result" => "Then Oberyn doesn't see anymore"
+                  "result" => "Then Oberyn doesn't see anymore",
                 },
               ],
-              "index" => 0
+              "index" => 0,
             },
             "status" => "failed",
-            "folder-snapshot-id" => 2
-          }
+            "folder-snapshot-id" => 2,
+          },
         },
         {
           "type" => "test-snapshots",
@@ -123,93 +123,94 @@ describe Models::TestRun do
               "folder_snapshot_id" => 2,
               "steps" => [
                 {
-                  "action" => "Thomas killed the ritals"
+                  "action" => "Thomas killed the ritals",
                 },
                 {
-                  "result" => "Then Thomas won"
-                }
+                  "result" => "Then Thomas won",
+                },
               ],
-              "index" => 0
+              "index" => 0,
             },
             "status" => "success",
-            "folder-snapshot-id" => 5
-          }
-        }
-      ]
+            "folder-snapshot-id" => 5,
+          },
+        },
+      ],
     }
   }
-  
+
   before do
     ENV['HT_PROJECT'] = "1"
     tr.class.api = api
   end
-  
+
   context "when saving" do
     before do
       allow(tr).to receive(:after_save)
     end
-    
+
     it "creates a new test run" do
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return({ "data" => [] })
+      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return({"data" => []})
       allow(api).to receive(:post).with(URI("https://hiptest.net/api/projects/1/test_runs"), tr_create_data).and_return(tr_create_response)
-      
+
       expect(tr.api_exists?).not_to be_truthy
-      
+
       tr.save
-      
+
       expect(api).to have_received(:post)
       expect(tr.id).to eq "1664"
     end
-    
+
     it "does nothing if test run doesn't already exist" do
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
       allow(api).to receive(:post)
-      
+
       tr.save
-      
+
       expect(api).not_to have_received(:post)
     end
   end
-  
+
   context "after saving" do
     it "fetches tests" do
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots")).and_return(ts_response)
       allow(tr).to receive(:push_results)
-      
+
       tr.save
-      
+
       expect(api).to have_received(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots"))
       expect(tr.test_snapshots.count).to eq 2
     end
-    
+
     it "assigns correct status to test snapshots" do
       ts = Models::TestSnapshot.new(
-        id: 1, 
-        name: scenario.name, 
-        status: "UNEXECUTED", 
+        id: 1,
+        name: scenario.name,
+        status: "UNEXECUTED",
         test_run_id: tr.id,
-        folder_snapshot_id: nil
+        folder_snapshot_id: nil,
       )
       tr.id = 2
       tr.add_status_to_cache(scenario: scenario, status: "passed", author: "mike myers", description: "Yeah baby yeah!")
       tr.test_snapshots << ts
-      
+
       allow(ts).to receive(:related_scenario).and_return(scenario)
+      allow(Models::TestSnapshot).to receive(:process_results)
       allow(ts).to receive(:push_results)
-      
+
       tr.push_results
-      
+
       expect(ts.status).to eq "passed"
     end
-    
+
     it "pushes results" do
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
       allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots")).and_return(ts_response)
       allow(tr).to receive(:push_results)
-      
+
       tr.save
-      
+
       expect(tr).to have_received(:push_results)
     end
   end
