@@ -6,94 +6,132 @@ require 'pry'
 require './lib/parsers/zephyr'
 require './lib/env'
 
-def parse_file(path)
-  file = nil
-  if File.file?(path) and path.end_with?('.xml')
-    file = Nokogiri::XML(File.open(path)) do |config|
-      config.noent
+class Migration
+  attr_reader :parser, :options
+
+  Version = '1.0.0'
+
+  IMPORTERS = %w[zephyr]
+
+  class ScriptOptions
+    attr_accessor :from, :zephyr_info_file, :zephyr_execution_file,
+                  :only, :verbose
+
+    def initialize
+      self.from = 'zephyr'
+      self.zephyr_info_file = ''
+      self.zephyr_execution_file = ''
+      self.only = ''
+      self.verbose = false
+    end
+
+    def define_options(parser)
+      parser.banner = "Usage: migrate.rb [options]"
+      parser.separator ""
+      parser.separator "Global options:"
+
+      from_option(parser)
+      only_option(parser)
+      verbose_option(parser)
+
+      parser.separator ""
+      parser.separator "Specific options:"
+      parser.separator ""
+      parser.separator "  From Zephyr:"
+
+      zephyr_info_file_option(parser)
+      zephyr_execution_file_option(parser)
+
+      parser.separator ""
+      parser.separator "Common options:"
+
+      parser.on_tail("-h", "--help", "Show this message") do
+        puts parser
+        exit
+      end
+
+      parser.on_tail("--version", "Show version") do
+        puts Version
+        exit
+      end
+    end
+
+    def from_option(parser)
+      from_list = IMPORTERS.join(', ')
+      parser.on("-f", "--from FROM", IMPORTERS, "Select importer", "(#{from_list})") do |from|
+        self.from = from.downcase
+      end
+    end
+
+    def only_option(parser)
+      parser.on("-o", "--only [ACTION]", [:import, :push_results], "Specify what to do (import, push_results)", "import: import scenarios", "push_results: import test execution results") do |only|
+        self.only = only
+      end
+    end
+
+    def zephyr_info_file_option(parser)
+      parser.on("-i", "--info FILE", "Zephyr information xml file") do |info_file|
+        self.zephyr_info_file = info_file
+      end
+    end
+
+    def zephyr_execution_file_option(parser)
+      parser.on("-e", "--execution FILE", "Zephyr execution xml file") do |execution_file|
+        self.zephyr_execution_file = execution_file
+      end
+    end
+
+    def verbose_option(parser)
+      parser.on("-v", "--[no-]verbose", "Run verbosely") do |verbose|
+        self.verbose = verbose
+      end
     end
   end
-  file
-end
 
-options = {}
-
-optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: migrate.rb [options]"
-  
-  options[:verbose] = false
-  opts.on('-v', '--verbose', 'Display more informations') do
-    options[:verbose] = true
-  end
-  
-  opts.on('-h', '--help', 'Display usage and options') do
-    puts opts
-    exit
-  end
-  
-  options[:from] = 'zephyr'
-  opts.on('-fNAME', '--from=NAME', 'Select source you want to import from (zephyr)') do |from|
-    source = from.singularize
-    case source
-    when /zephyr/
-      options[:from] = 'zephyr'
-    else
-      puts 'You can only choose between: zephyr'
+  def parse_options(args)
+    @options = ScriptOptions.new
+    @parser = OptionParser.new do |parser|
+      @options.define_options(parser)
     end
+    @args = @parser.parse!(args)
+    @options
   end
-  
-  if options[:from] == 'zephyr'
-    opts.on('-iINFOS_FILE', '--info=INFOS_FILE', 'Zephyr informations file') do |infos_file|
-      options[:infos_file] = infos_file
-    end
-    
-    opts.on('-eEXECUTIONS_FILE', '--execution=EXECUTIONS_FILE', 'Zephyr executions file') do |executions_file|
-      options[:executions_file] = executions_file
-    end
-  end
-  
-  options[:only] = nil
-  opts.on('-oACTION', '--only=ACTION', 'Specify the action you want to be done: (import, push_results)') do |action_param|
-    case action_param
-    when /import/
-      action = :import
-    when /push_result/
-      action = :push_results
-    else
-      action = nil
-    end
-    options[:only] = action
-  end
-end
 
-
-###########################
-#           MAIN          #
-###########################
-
-if __FILE__ == $0
-  optparse.parse!
-  
-  if options[:infos_file].nil? && !options[:infos_file].empty? && options[:executions_file].nil? && !options[:executions_file].empty?
-    puts "For zephyr migration, you must specify both '--info' and '-execution' options"
-    exit
+  def check_options
+    check_zephyr_options
   end
-  
-  puts
-  puts "Hi, #{options[:from]} migration will start in a second.".green
-  puts
-  
-  if options[:from] == 'zephyr'
+
+  def migrate
     check_env_variables
-    configure_api_from_env(verbose: options[:verbose])
-    
-    infos = parse_file(options[:infos_file])
-    executions = parse_file(options[:executions_file])
-    
+    configure_api_from_env(verbose: @options.verbose)
+
+    parse_zephyr_files if @options.from = 'zephyr'
+
+    migrate_xml
+  end
+
+  private
+
+  def check_zephyr_options
+    return if @options.from != 'zephyr'
+    if @options.zephyr_info_file.empty?
+      raise "Zephyr import requires an information xml file"
+    end
+    if @options.zephyr_execution_file.empty?
+      raise "Zephyr import requires an execution xml file"
+    end
+  end
+
+  def parse_zephyr_files
+    infos = parse_xml_file(@options.zephyr_info_file)
+    executions = parse_xml_file(@options.zephyr_execution_file)
+
     process_executions(executions)
     process_infos(infos)
-    
-    case options[:only]
+  end
+
+  def migrate_xml
+    case @options.only
     when :push_results
       Models::TestRun.push_results
     when :import
@@ -106,10 +144,10 @@ if __FILE__ == $0
       puts
       Models::TestRun.push_results
     end
-    
+
     puts
     puts "Migration is finished".green
-    
+
     link = "https://hiptest.net"
     if ENV['HT_URI']
       link = ENV['HT_URI']
@@ -118,5 +156,30 @@ if __FILE__ == $0
     puts "Go to '".green + link.uncolorize + "' to see imported project".green
     puts "Enjoy! :)".green
     puts
+  end
+
+  def parse_xml_file(path)
+    xml = nil
+    if File.file?(path) and path.end_with?('.xml')
+      xml = Nokogiri::XML(File.open(path)) do |config|
+        config.noent
+      end
+    end
+    xml
+  end
+end
+
+if __FILE__ == $0
+  begin
+    migration = Migration.new
+    migration.parse_options(ARGV)
+    migration.check_options
+    migration.migrate
+  rescue OptionParser::InvalidOption => error
+    puts error.message.red
+    puts migration.parser.help
+  rescue => error
+    puts error.message.red
+    puts migration.parser.banner
   end
 end
