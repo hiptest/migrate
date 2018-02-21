@@ -13,20 +13,18 @@ module API
     @base_url = ENV["HT_URI"] || "https://hiptest.net/api"
     @use_ssl = @base_url.start_with?('https')
     @verbose = false
-    
-    
+
     include API::Configuration
-    
-    
+
     class << self
       attr_accessor :configuration, :base_url, :use_ssl, :verbose
       alias :verbose? :verbose
     end
-    
+
     def self.arrange_base_url!
       self.base_url = self.arrange_base_url
     end
-    
+
     def self.arrange_base_url
       base_url = self.base_url
       unless base_url.end_with?('/api')
@@ -38,8 +36,7 @@ module API
       end
       base_url
     end
-    
-    
+
     def initialize(access_token: nil, client: nil, uid: nil, base_url: nil, verbose: nil)
       self.class.configuration.access_token = access_token if access_token
       self.class.configuration.client = client if client
@@ -47,28 +44,26 @@ module API
       self.class.base_url = base_url if base_url
       self.class.verbose = verbose if verbose
     end
-    
-    
+
     include API::Authentication
     include API::Routing
-    
-    
+
     # private
-    
+
     def get(uri)
       req = Net::HTTP::Get.new(uri)
-      
+
       leveled_display("GET #{uri}", color: :blue, prefix: ' =>')
-      
+
       send_request(uri, req)
     end
 
     def post(uri, body)
       req = Net::HTTP::Post.new(uri)
       req.body = body.to_json
-      
+
       leveled_display("POST #{body} to #{uri}", color: :blue, prefix: ' =>')
-      
+
       send_request(uri, req)
     end
 
@@ -80,15 +75,15 @@ module API
 
       send_request(uri, req)
     end
-    
+
     def delete(uri)
       req = Net::HTTP::Delete.new(uri)
-      
+
       leveled_display("DELETE #{uri}", color: :blue, prefix: ' =>')
-      
+
       send_request(uri, req)
     end
-    
+
     def send_request(uri, req)
       res = nil
 
@@ -102,7 +97,7 @@ module API
         sleep 30
         return send_request(uri, req)
       end
-      if response.code == "200"
+      if response.code.start_with? "20"
         leveled_display(response.message, color: :green, prefix: "   ")
         res = JSON.parse(response.body) unless response.body.empty?
       else
@@ -114,21 +109,19 @@ module API
           puts
           return send_request(uri, req)
         end
-        
+
         leveled_display("Error: #{JSON.parse(response.body).dig('error')}", color: :red, prefix: "   ")
         raise response.message
       end
 
       res
     end
-    
+
     def leveled_display(message, color: :uncolorized, prefix: '')
       puts "#{prefix} #{message.send(color)}" if API::Hiptest.verbose?
     end
   end
 end
-
-
 
 def configure_api_from_env(verbose: false)
   env_vars = get_env_variables
