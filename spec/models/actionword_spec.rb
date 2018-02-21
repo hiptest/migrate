@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require './lib/models/actionword'
 require './spec/models/models_shared'
 
@@ -13,11 +15,6 @@ describe Models::Actionword do
     }
 
     let(:resource_id) { 1664 }
-
-    let(:find_url) { "#{ENV['HT_URI']}/projects/1/actionwords" }
-
-    let(:create_url) { "#{ENV['HT_URI']}/projects/1/actionwords" }
-    let(:update_url) { "#{ENV['HT_URI']}/projects/1/actionwords/#{resource_id}" }
 
     let(:create_data) {
       {
@@ -75,7 +72,6 @@ describe Models::Actionword do
 
   context 'api_exists?' do
     let(:api){ double("API::Hiptest") }
-    let(:find_url) {"#{ENV['HT_URI']}/projects/1/actionwords"}
     let(:find_results) {
       {
         'data' => find_data
@@ -113,7 +109,7 @@ describe Models::Actionword do
       }
 
       it 'uses the result that exaclty match the actionword name' do
-        allow(api).to receive(:get).with(URI(find_url)).and_return(find_results)
+        allow(api).to receive(:get_actionwords).and_return(find_results)
         actionword.class.api = api
 
         expect(actionword.api_exists?).to be true
@@ -124,8 +120,6 @@ describe Models::Actionword do
 
   context "when saving" do
     let(:api){ double("API::Hiptest") }
-    let(:create_url) {"#{ENV['HT_URI']}/projects/1/actionwords"}
-    let(:find_url) { "#{create_url}/find_by_tags?key=JIRA&value=PLOP-1" }
 
     let(:actionword ) {
       Models::Actionword.new('My first actionword')
@@ -153,9 +147,8 @@ describe Models::Actionword do
     }
 
     it "creates the actionword then updates it with its definition" do
-      allow(api).to receive(:get).with(URI(create_url)).and_return({ 'data' => []})
-      allow(api).to receive(:get).with(URI(find_url)).and_return({ 'data' => []})
-      allow(api).to receive(:post).with(URI(create_url), create_data).and_return(created_data)
+      allow(api).to receive(:get_actionwords).and_return({ 'data' => []})
+      allow(api).to receive(:create_actionword)
       actionword.class.api = api
 
       allow(actionword).to receive(:update)

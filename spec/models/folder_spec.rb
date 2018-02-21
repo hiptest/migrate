@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require './lib/models/folder'
 
 require './spec/models/models_shared'
@@ -9,10 +11,6 @@ describe Models::Folder do
     let(:an_unknown_object ) { Models::Folder.new('My other folder') }
 
     let(:resource_id) { 1664 }
-
-    let(:find_url) {"#{ENV['HT_URI']}/projects/1/folders"}
-    let(:create_url) {"#{ENV['HT_URI']}/projects/1/folders"}
-    let(:update_url) {"#{ENV['HT_URI']}/projects/1/folders/1664"}
 
     let(:create_data) {
       {

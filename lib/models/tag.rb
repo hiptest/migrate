@@ -12,6 +12,14 @@ module Models
       @scenario_id = nil
       @api_path = nil
     end
+    
+    def api_method
+      "scenario_tag"
+    end
+    
+    def api_arguments
+      [ENV['HT_PROJECT'], @scenario_id.to_s, @id.to_s]
+    end
 
     def scenario_id=(scenario_id)
       @scenario_id = scenario_id

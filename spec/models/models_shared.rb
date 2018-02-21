@@ -2,19 +2,12 @@ require 'spec_helper'
 
 shared_examples "a model" do
 
-  ENV['HT_URI'] = 'https://hiptest.net/api'
   ENV['HT_PROJECT'] = "1"
   
   let(:api){ raise NotImplementedError }
 
   let(:an_existing_object ) { raise NotImplementedError }
   let(:an_unknown_object ) { raise NotImplementedError }
-
-  let(:find_url) { raise NotImplementedError }
-  let(:query_that_found) { '' }
-  let(:query_that_not_found) { '' }
-  let(:create_url) { raise NotImplementedError }
-  let(:update_url) { raise NotImplementedError }
   
   let(:resource_id) { raise NotImplementedError }
 
@@ -54,8 +47,9 @@ shared_examples "a model" do
 
   context 'when calling api_exists?' do
     before do
-      url = find_url + query_that_found
-      allow(api).to receive(:get).with(URI(url)).and_return(find_results)
+      allow(api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return(find_results)
+      allow(api).to receive("find_scenario_by_jira_id").and_return(find_results)
+      
       an_existing_object.class.api = api
     end
     
@@ -73,8 +67,7 @@ shared_examples "a model" do
     end
 
     it 'when a matching element is not found, it returns false and the id of the element is not updated' do
-      not_found_url = find_url + query_that_not_found
-      allow(api).to receive(:get).with(URI(not_found_url)).and_return({'data' => []})
+      allow(api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return({'data' => []})
       an_existing_object.class.api = api
       
       expect(an_unknown_object.id).to be nil
@@ -85,27 +78,28 @@ shared_examples "a model" do
 
   context 'when saving' do
     before do
-      @url = find_url + query_that_found
       @api = spy(API::Hiptest)
-      allow(@api).to receive(:get).with(URI(create_url)).and_return({'data' => []})
-      allow(@api).to receive(:get).with(URI(@url)).and_return({'data' => []})
-      allow(@api).to receive(:post).with(URI(create_url), create_data).and_return(create_result)
-      allow(@api).to receive(:patch).with(URI(update_url), update_data).and_return(find_results)
       
-      resource_type = an_existing_object.class.to_s.split('::').last.downcase
-      allow(@api).to receive("get_#{resource_type}".intern).with("1", "#{resource_id}").and_return({
+      allow(@api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return({'data' => []})
+      allow(@api).to receive("get_#{an_existing_object.api_method}").with("1", "#{resource_id}").and_return({
         'data' => {
           'attributes' => {
             'name' => an_existing_object.name
           }
         }
       })
+      
+      allow(@api).to receive("create_#{an_existing_object.api_method}").and_return(create_result)
+      allow(@api).to receive("update_#{an_existing_object.api_method}").and_return(find_results)
+      
+      allow(@api).to receive("find_scenario_by_jira_id").and_return({'data' => []})
+      
       an_existing_object.class.api = @api
     end
     
     it 'it creates the object on Hiptest if it is unknown' do
       an_existing_object.save
-      expect(@api).to have_received(:post)
+      expect(@api).to have_received("create_#{an_existing_object.api_method}")
     end
 
     it 'after creation, after_create and after_save are called' do
@@ -119,15 +113,14 @@ shared_examples "a model" do
     end
 
     it 'it updates the object on Hiptest if it exists' do
-      allow(@api).to receive(:get).with(URI(@url)).and_return(find_results)
+      allow(@api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return(find_results)
       
       an_existing_object.save
-      expect(@api).to have_received(:patch)
+      expect(@api).to have_received("update_#{an_existing_object.api_method}")
     end
     
     it 'before updating the object, before_update is called' do
       allow(an_existing_object).to receive(:api_exists?).and_return(true)
-      allow(@api).to receive(:patch)
       allow(an_existing_object).to receive(:before_update)
       
       an_existing_object.update
@@ -136,7 +129,7 @@ shared_examples "a model" do
     end
 
     it 'after updating the object, after_update and after_save are called' do
-      allow(@api).to receive(:get).with(URI(@url)).and_return(find_results)
+      allow(@api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return(find_results)
       
       allow(an_existing_object).to receive(:after_update)
       allow(an_existing_object).to receive(:after_save)

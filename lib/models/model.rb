@@ -4,6 +4,14 @@ module Models
   class Model
     @@api = API::Hiptest.new
     
+    def api_method
+      resource_type.downcase
+    end
+    
+    def api_arguments
+      [ENV['HT_PROJECT'], @id.to_s]
+    end
+    
     def self.api
       @@api
     end
@@ -29,10 +37,6 @@ module Models
       base
     end
 
-    def api_exists_url
-      api_path
-    end
-
     def api_identical?(result)
       result.dig('attributes', 'name') == @name
     end
@@ -53,7 +57,7 @@ module Models
 
     def api_exists?
       return true if @id
-      res = @@api.get(URI(api_exists_url))
+      res = @@api.send("get_#{api_method.pluralize}", *api_arguments[0...-1])
       res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
@@ -73,7 +77,8 @@ module Models
 
     def create
       output "-- Creating #{resource_type} object #{name}"
-      res = @@api.post(URI(api_path), create_data)
+      res = @@api.send("create_#{api_method.singularize}", *api_arguments[0...-1], create_data)
+      # res = @@api.post(URI(api_path), create_data)
       if res
         @id = res.dig('data', 'id')
       else
@@ -94,7 +99,7 @@ module Models
       
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
       begin
-        res = @@api.patch(URI("#{api_path}/#{id}"), update_data)
+        res = @@api.send("update_#{api_method.singularize}", *api_arguments, update_data)
       rescue => error
         STDERR.puts "Error while updating #{resource_type} with : #{update_data}" unless res
         raise error

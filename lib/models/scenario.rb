@@ -27,7 +27,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_scenarios(ENV['HT_PROJECT'])['data'].map {|sc| sc.dig('attributes', 'name')})
 
       {
         data: {
@@ -54,12 +54,14 @@ module Models
       }
     end
 
-    def api_exists_url
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios/find_by_tags?key=JIRA&value=#{@jira_id}"
-    end
-
     def api_identical?(result)
       result.dig('attributes', 'name').start_with?(@name)
+    end
+    
+    def api_exists?
+      return true if @id
+      res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], scenario_id: @id, jira_id: @jira_id)
+      res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
     def after_create(data)

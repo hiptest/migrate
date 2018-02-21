@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 require './lib/models/dataset'
 require './lib/models/scenario'
 
@@ -26,10 +28,6 @@ describe Models::Dataset do
     }
     
     let(:resource_id) { 1664 }
-
-    let(:find_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/datasets"}
-    let(:create_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/datasets"}
-    let(:update_url) {"#{ENV['HT_URI']}/projects/1/scenarios/1/datasets/1664"}
 
     let(:create_data) {
       {

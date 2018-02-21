@@ -19,7 +19,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get(URI(api_path))['data'].map {|sc| sc.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_actionwords(ENV['HT_PROJECT'])['data'].map {|sc| sc.dig('attributes', 'name')})
 
       {
         data: {
@@ -57,10 +57,6 @@ module Models
 
     def after_create(data)
       update
-    end
-
-    def api_exists_url
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/actionwords"
     end
 
     def api_identical?(result)

@@ -150,36 +150,37 @@ describe Models::TestRun do
     end
 
     it "creates a new test run" do
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return({"data" => []})
-      allow(api).to receive(:post).with(URI("https://hiptest.net/api/projects/1/test_runs"), tr_create_data).and_return(tr_create_response)
+      allow(api).to receive(:get_testruns).and_return({"data" => []})
+      allow(api).to receive(:create_testrun).and_return(tr_create_response)
 
       expect(tr.api_exists?).not_to be_truthy
 
       tr.save
 
-      expect(api).to have_received(:post)
+      
+      expect(api).to have_received(:create_testrun)
       expect(tr.id).to eq "1664"
     end
 
     it "does nothing if test run doesn't already exist" do
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
-      allow(api).to receive(:post)
+      allow(api).to receive(:get_testruns).and_return(tr_index_response)
+      allow(api).to receive(:create_testrun)
 
       tr.save
 
-      expect(api).not_to have_received(:post)
+      expect(api).not_to have_received(:create_testrun)
     end
   end
 
   context "after saving" do
     it "fetches tests" do
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots")).and_return(ts_response)
+      allow(api).to receive(:get_testruns).and_return(tr_index_response)
+      allow(api).to receive(:get_testrun_testsnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save
 
-      expect(api).to have_received(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots"))
+      expect(api).to have_received(:get_testrun_testsnapshots)
       expect(tr.test_snapshots.count).to eq 2
     end
 
@@ -205,8 +206,8 @@ describe Models::TestRun do
     end
 
     it "pushes results" do
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs")).and_return(tr_index_response)
-      allow(api).to receive(:get).with(URI("https://hiptest.net/api/projects/1/test_runs/2/test_snapshots")).and_return(ts_response)
+      allow(api).to receive(:get_testruns).and_return(tr_index_response)
+      allow(api).to receive(:get_testrun_testsnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save

@@ -17,6 +17,14 @@ module Models
       @related_scenario_jira_id = nil
     end
     
+    def api_method
+      "testrun_testsnapshot"
+    end
+    
+    def api_arguments
+      [ENV['HT_PROJECT'], @test_run_id.to_s, @id.to_s]
+    end
+    
     def api_path
       API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/test_runs/#{@test_run_id}/test_snapshots"
     end
