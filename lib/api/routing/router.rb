@@ -4,6 +4,7 @@ require './lib/api/hiptest'
 require './lib/utils/string'
 require './lib/api/routing/projects'
 require './lib/api/routing/scenarios'
+require './lib/api/routing/test_snapshots'
 require './lib/api/routing/routes'
 
 module API
@@ -48,6 +49,7 @@ module API
     
     include API::Routing::Projects
     include API::Routing::Scenarios
+    include API::Routing::TestSnapshots
 
     private
     
