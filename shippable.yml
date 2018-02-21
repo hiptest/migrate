@@ -1,6 +1,6 @@
 language: ruby
 rvm:
-  - 2.3.1
+  - 2.3
 
 branches:
   only:
@@ -12,5 +12,5 @@ build:
     - $SHIPPABLE_BUILD_DIR/vendor/bundle
 
   ci:
-    - bundle install
+    - bundle install --no-cache --deployment --with test production --retry=3
     - bundle exec rspec --format RspecJunitFormatter --out shippable/testresults/rspec-tests.xml
