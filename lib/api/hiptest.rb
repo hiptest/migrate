@@ -97,7 +97,11 @@ module API
         sleep 30
         return send_request(uri, req)
       end
+<<<<<<< HEAD
       if response.code.start_with? "20"
+=======
+      if response.code.start_with?("20")
+>>>>>>> [ API ] response now succeed if the response code is "2XX"
         leveled_display(response.message, color: :green, prefix: "   ")
         res = JSON.parse(response.body) unless response.body.empty?
       else
