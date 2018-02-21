@@ -22,7 +22,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get_testruns(ENV['HT_PROJECT'])['data'].map {|tr| tr.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_testRuns(ENV['HT_PROJECT'])['data'].map {|tr| tr.dig('attributes', 'name')})
 
       {
         data: {
@@ -55,7 +55,7 @@ module Models
     end
     
     def fetch_tests
-      res = @@api.get_testrun_testsnapshots(ENV['HT_PROJECT'], @id)
+      res = @@api.get_testRun_testSnapshots(ENV['HT_PROJECT'], @id)
       if res and res.dig('data').any?
         res.dig('data').each do |ts|
           @test_snapshots << Models::TestSnapshot.new(

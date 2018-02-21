@@ -33,10 +33,10 @@ module API::Routing::Routes
       }
     },
     
-    'test-run': {
+    testRun: {
       only: [:show, :index, :create],
       resources: {
-        'test-snapshot': {
+        testSnapshot: {
           only: [:show, :index]
         }
       }

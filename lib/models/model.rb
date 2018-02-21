@@ -1,11 +1,12 @@
 require './lib/api/hiptest'
+require './lib/utils/string'
 
 module Models
   class Model
     @@api = API::Hiptest.new
     
     def api_method
-      resource_type.downcase
+      resource_type.uncapitalize
     end
     
     def api_arguments
@@ -112,7 +113,7 @@ module Models
     end
     
     def data_type
-      resource_type.downcase.pluralize
+      resource_type.pluralize.underscore.gsub('_', '-')
     end
 
     def resource_type

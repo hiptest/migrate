@@ -109,5 +109,6 @@ RSpec.configure do |config|
 
   ENV['ZEPHYR_POC_SILENT'] = "1"
   ENV['HT_URI'] = "https://hiptest.net/api"
-  API::Hiptest.base_url = ENV['HT_URI']
+  API::Hiptest.base_url = "https://hiptest.net/api"
+  API::Hiptest.use_ssl = true
 end

@@ -8,6 +8,22 @@ class String
   def as_enum_lines
     self.gsub(/\s([\d]{2,}\.[\D])/, "\n\\1")
   end
+  
+  def uncapitalize 
+    self[0, 1].downcase + self[1..-1]
+  end
+  
+  def camelize
+    self.split("_").each.with_index {|s, i| s.capitalize! if i > 0 }.join("")
+  end
+  
+  def underscore
+    self.gsub(/::/, '/')
+      .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+      .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+      .tr("-", "_")
+      .downcase
+  end
 
   def single_quotes_escaped
     self.gsub("'", %q(\\\')).gsub('&#x27;', %q(\\\'))

@@ -150,37 +150,37 @@ describe Models::TestRun do
     end
 
     it "creates a new test run" do
-      allow(api).to receive(:get_testruns).and_return({"data" => []})
-      allow(api).to receive(:create_testrun).and_return(tr_create_response)
+      allow(api).to receive(:get_testRuns).and_return({"data" => []})
+      allow(api).to receive(:create_testRun).and_return(tr_create_response)
 
       expect(tr.api_exists?).not_to be_truthy
 
       tr.save
 
       
-      expect(api).to have_received(:create_testrun)
+      expect(api).to have_received(:create_testRun)
       expect(tr.id).to eq "1664"
     end
 
     it "does nothing if test run doesn't already exist" do
-      allow(api).to receive(:get_testruns).and_return(tr_index_response)
-      allow(api).to receive(:create_testrun)
+      allow(api).to receive(:get_testRuns).and_return(tr_index_response)
+      allow(api).to receive(:create_testRun)
 
       tr.save
 
-      expect(api).not_to have_received(:create_testrun)
+      expect(api).not_to have_received(:create_testRun)
     end
   end
 
   context "after saving" do
     it "fetches tests" do
-      allow(api).to receive(:get_testruns).and_return(tr_index_response)
-      allow(api).to receive(:get_testrun_testsnapshots).and_return(ts_response)
+      allow(api).to receive(:get_testRuns).and_return(tr_index_response)
+      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save
 
-      expect(api).to have_received(:get_testrun_testsnapshots)
+      expect(api).to have_received(:get_testRun_testSnapshots)
       expect(tr.test_snapshots.count).to eq 2
     end
 
@@ -206,8 +206,8 @@ describe Models::TestRun do
     end
 
     it "pushes results" do
-      allow(api).to receive(:get_testruns).and_return(tr_index_response)
-      allow(api).to receive(:get_testrun_testsnapshots).and_return(ts_response)
+      allow(api).to receive(:get_testRuns).and_return(tr_index_response)
+      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save

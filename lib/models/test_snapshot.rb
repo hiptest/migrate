@@ -18,7 +18,7 @@ module Models
     end
     
     def api_method
-      "testrun_testsnapshot"
+      "testRun_testSnapshot"
     end
     
     def api_arguments
@@ -31,11 +31,10 @@ module Models
     
     def related_scenario
       unless @related_scenario_jira_id
-        scenario_res = @@api.get(URI("#{api_path}/#{@id}?include=scenario"))
+        scenario_res = @@api.get_testSnapshot_including_scenario(project_id: ENV['HT_PROJECT'], test_run_id: @test_run_id, test_snapshot_id: @id)
         related_scenario_id = scenario_res.dig('included').first.dig('id')
         
         tags_res = @@api.get_scenario_tags(ENV['HT_PROJECT'], related_scenario_id)
-        binding.pry if tags_res.dig('data').select{|tag| tag.dig('attributes', 'key') == 'JIRA'}.first.nil?
         @related_scenario_jira_id = tags_res.dig('data').select{|tag| tag.dig('attributes', 'key') == 'JIRA'}.first.dig('attributes', 'value')
       end
       
@@ -109,8 +108,10 @@ module Models
     end
     
     def self.process_results
-      File.open(@@results_path, 'r').each do |line|
-        @@pushed_results << line.sub("\n", '')
+      if File.exist?(@@results_path)
+        File.open(@@results_path, 'r').each do |line|
+          @@pushed_results << line.sub("\n", '')
+        end
       end
     end
   end

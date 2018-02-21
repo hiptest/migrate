@@ -96,45 +96,45 @@ module API
     def index(project_id, resource_type, parent_id = nil, parent_type = nil)
       url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
-        url += "#{parent_type.pluralize}/#{parent_id}/"
+        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.pluralize}"
+      url += "#{resource_type.underscore.pluralize}"
       get(URI(url))
     end
     
     def show(project_id, resource_id, resource_type, parent_id = nil, parent_type = nil)
       url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
-        url += "#{parent_type.pluralize}/#{parent_id}/"
+        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.pluralize}/#{resource_id}"
+      url += "#{resource_type.underscore.pluralize}/#{resource_id}"
       get(URI(url))
     end
 
     def create(project_id, data, resource_type, parent_id = nil, parent_type = nil)
       url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
-        url += "#{parent_type.pluralize}/#{parent_id}/"
+        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.pluralize}"
+      url += "#{resource_type.underscore.pluralize}"
       post(URI(url), data)
     end
 
     def update(project_id, resource_id, data, resource_type, parent_id = nil, parent_type = nil)
       url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
-        url += "#{parent_type.pluralize}/#{parent_id}/"
+        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.pluralize}/#{resource_id}"
+      url += "#{resource_type.underscore.pluralize}/#{resource_id}"
       patch(URI(url), data)
     end
 
     def destroy(project_id, resource_id, resource_type, parent_id = nil, parent_type = nil)
       url = self.class.base_url + "/projects/#{project_id}/"
       if parent_id && parent_type
-        url += "#{parent_type.pluralize}/#{parent_id}/"
+        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.pluralize}/#{resource_id}"
+      url += "#{resource_type.underscore.pluralize}/#{resource_id}"
       delete(URI(url))
     end
   end
