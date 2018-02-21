@@ -1,0 +1,16 @@
+language: ruby
+rvm:
+  - 2.3.1
+
+branches:
+  only:
+    - master
+
+build:
+  cache: true
+  cache_dir_list:
+    - $SHIPPABLE_BUILD_DIR/vendor/bundle
+
+  ci:
+    - bundle install
+    - bundle exec rspec
