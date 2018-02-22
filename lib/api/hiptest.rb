@@ -48,7 +48,7 @@ module API
     include API::Authentication
     include API::Routing
 
-    # private
+    private
 
     def get(uri)
       req = Net::HTTP::Get.new(uri)

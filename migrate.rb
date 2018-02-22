@@ -132,6 +132,8 @@ class Migration
   end
 
   def migrate_xml
+    puts
+    
     case @options.only
     when :push_results
       Models::TestRun.push_results

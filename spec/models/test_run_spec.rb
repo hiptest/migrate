@@ -193,7 +193,7 @@ describe Models::TestRun do
         folder_snapshot_id: nil,
       )
       tr.id = 2
-      tr.add_status_to_cache(scenario: scenario, status: "passed", author: "mike myers", description: "Yeah baby yeah!")
+      tr.add_status_to_cache(scenario: scenario, status: "passed", author: "Austin Power", description: "Yeah baby yeah!")
       tr.test_snapshots << ts
 
       allow(ts).to receive(:related_scenario).and_return(scenario)
@@ -213,6 +213,26 @@ describe Models::TestRun do
       tr.save
 
       expect(tr).to have_received(:push_results)
+    end
+    
+    it "does not call #push_results on test snapshots that are not in cache" do
+      ts = Models::TestSnapshot.new(
+        id: 1,
+        name: scenario.name,
+        status: "UNEXECUTED",
+        test_run_id: tr.id,
+        folder_snapshot_id: nil,
+      )
+      tr.id = 2
+      tr.test_snapshots << ts
+
+      allow(ts).to receive(:related_scenario).and_return(scenario)
+      allow(Models::TestSnapshot).to receive(:process_results)
+      allow(ts).to receive(:push_results)
+      
+      tr.push_results
+
+      expect(ts).not_to have_received(:push_results)
     end
   end
 end

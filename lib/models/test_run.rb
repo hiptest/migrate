@@ -75,12 +75,14 @@ module Models
         next if ts.is_already_pushed
         scenario = ts.related_scenario
         
-        status = @cache[scenario.object_id][:status]
-        author = @cache[scenario.object_id][:author]
-        description = @cache[scenario.object_id][:description]
-        
-        ts.status = status
-        ts.push_results(status, author, description)
+        unless @cache[scenario.object_id].nil?
+          status = @cache[scenario.object_id][:status]
+          author = @cache[scenario.object_id][:author]
+          description = @cache[scenario.object_id][:description]
+          
+          ts.status = status
+          ts.push_results(status, author, description)
+        end
       end
     end
     
