@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 require 'optparse'
 require 'active_support/inflector'
 require 'pry'
@@ -37,7 +38,7 @@ class Migration
       parser.separator ""
       parser.separator "Specific options:"
       parser.separator ""
-      parser.separator "  From Zephyr:"
+      parser.separator "  Zephyr:"
 
       zephyr_info_file_option(parser)
       zephyr_execution_file_option(parser)
