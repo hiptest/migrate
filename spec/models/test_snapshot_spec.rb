@@ -127,13 +127,11 @@ describe Models::TestSnapshot do
     end
     
     it 'sends the test result to hiptest' do
-      # allow(api).to receive(:create_testRun_testSnapshot_testResult)
-      allow(api).to receive(:post).with(URI("https://hiptest.net/api/projects/1/test_runs/1/test_snapshots/1/test_results"), create_result_data)
+      allow(api).to receive(:create_testRun_testSnapshot_testResult)
       
       test_snapshot.push_results("passed", "Tintin", "Roux")
       
-      # expect(api).to have_received(:create_testRun_testSnapshot_testResult)
-      expect(api).to have_received(:post).with(URI("https://hiptest.net/api/projects/1/test_runs/1/test_snapshots/1/test_results"), create_result_data)
+      expect(api).to have_received(:create_testRun_testSnapshot_testResult)
     end
   end
 end

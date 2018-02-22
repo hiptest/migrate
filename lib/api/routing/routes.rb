@@ -37,7 +37,12 @@ module API::Routing::Routes
       only: [:show, :index, :create],
       resources: {
         testSnapshot: {
-          only: [:show, :index]
+          only: [:show, :index],
+          resources: {
+            testResult: {
+              only: [:create]
+            }
+          }
         }
       }
     }

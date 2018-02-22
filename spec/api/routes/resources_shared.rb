@@ -86,6 +86,8 @@ shared_examples 'an API readable resource' do
       resources_data = api.send("get_#{resource_type.pluralize}", 1)
     when 2
       resources_data = api.send("get_#{resource_type.pluralize}", 1, 1)
+    when 3
+      resources_data = api.send("get_#{resource_type.pluralize}", 1, 1, 1)
     else
       resources_data = api.send("get_#{resource_type.pluralize}", 1)
     end
@@ -106,6 +108,8 @@ shared_examples 'an API readable resource' do
       api.send("get_#{resource_type.singularize}", 1, 1)
     when 2
       api.send("get_#{resource_type.singularize}", 1, 1, 1)
+    when 3
+      api.send("get_#{resource_type.singularize}", 1, 1, 1, 1)
     else
       api.send("get_#{resource_type.singularize}", 1, 1)
     end
@@ -147,10 +151,14 @@ shared_examples 'an API creatable resource' do
       .with(headers: auth_headers, body: data.to_json)
       .to_return(status: 200, body: response_data.to_json)
       
-    unless resource_nested_level == 1
-      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, data)
-    else
+    
+    case resource_nested_level
+    when 1
       resource_data = api.send("create_#{resource_type.singularize}", 1, data)
+    when 2
+      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, data)
+    when 3
+      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, 1, data)
     end
     
     expect(stub).to have_been_requested
@@ -191,11 +199,14 @@ shared_examples 'an API updatable resource' do
       .with(headers: auth_headers, body: data.to_json)
       .to_return(status: 200, body: response_data.to_json)
       
-    unless resource_nested_level == 1
-      resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, data)
-    else
-      resource_data = api.send("update_#{resource_type.singularize}", 1, 1, data)
-    end
+      case resource_nested_level
+      when 1
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, data)
+      when 2
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, data)
+      when 3
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, 1, data)
+      end
     
     expect(stub).to have_been_requested
     expect(resource_data.dig('data')).not_to be_empty
@@ -232,11 +243,16 @@ shared_examples 'an API deletable resource' do
       .with(headers: auth_headers)
       .to_return(status: 200)
     
-    unless resource_nested_level == 1 
-      api.send("delete_#{resource_type.singularize}", 1, 1, 1)
-    else
-      api.send("delete_#{resource_type.singularize}", 1, 1)
-    end
+      case resource_nested_level
+      when 1
+        api.send("delete_#{resource_type.singularize}", 1, 1)
+      when 2
+        api.send("delete_#{resource_type.singularize}", 1, 1, 1)
+      when 3
+        api.send("delete_#{resource_type.singularize}", 1, 1, 1, 1)
+      else
+        api.send("delete_#{resource_type.singularize}", 1, 1)
+      end
     
     expect(stub).to have_been_requested
   end

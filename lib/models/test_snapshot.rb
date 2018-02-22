@@ -92,7 +92,7 @@ module Models
       
       output("-- #{@name} => " + status.send(color))
       begin
-        @@api.post(URI("#{api_path}/#{@id}/test_results"), result_data(status, author, description))
+        @@api.create_testRun_testSnapshot_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
         File.open(@@results_path, "a") do |line|
           line.puts @id
         end
