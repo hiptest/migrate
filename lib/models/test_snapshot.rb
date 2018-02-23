@@ -108,6 +108,7 @@ module Models
     end
 
     def self.process_results
+      @@pushed_results = []
       if File.exist?(@@results_path)
         File.open(@@results_path, 'r').each do |line|
           @@pushed_results << line.sub("\n", '')

@@ -94,7 +94,12 @@ module Models
         end
       end
 
-      Models::TestSnapshot.clear_pushed_results unless @test_snapshots.map(&:is_already_pushed?).include?(false)
+      Models::TestSnapshot.clear_pushed_results if test_snapshots_are_all_pushed?
+    end
+
+    def test_snapshots_are_all_pushed?
+      Models::TestSnapshot.process_results
+      !@test_snapshots.map(&:is_already_pushed?).include?(false)
     end
 
     def self.push_results
