@@ -1,5 +1,6 @@
 .DS_Store
+results.txt
 data*/
 config*.sh
 envs/*.sh
-results.txt
+tmp/*

@@ -103,6 +103,7 @@ class Migration
   end
 
   def migrate
+    create_temp_dir
     check_env_variables
     configure_api_from_env(verbose: @options.verbose)
 
@@ -112,6 +113,10 @@ class Migration
   end
 
   private
+
+  def create_temp_dir
+    Dir.mkdir('./tmp') unless File.exist?('./tmp')
+  end
 
   def check_zephyr_options
     return if @options.from != 'zephyr'
@@ -133,7 +138,7 @@ class Migration
 
   def migrate_xml
     puts
-    
+
     case @options.only
     when :push_results
       Models::TestRun.push_results

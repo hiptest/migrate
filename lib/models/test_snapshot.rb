@@ -3,7 +3,7 @@ require 'colorize'
 
 module Models
   class TestSnapshot < Model
-    @@results_path = "./results.txt"
+    @@results_path = ""
     @@pushed_results = []
 
     attr_accessor :id, :name, :status, :test_run_id, :folder_snapshot_id
@@ -13,6 +13,7 @@ module Models
       @name = name
       @status = status
       @test_run_id = test_run_id
+      @@results_path = "./tmp/#{test_run_id}_results"
       @folder_snapshot_id = folder_snapshot_id
       @related_scenario_jira_id = nil
     end
