@@ -21,7 +21,9 @@ describe Models::TestRun do
   }
 
   let(:tr) {
-    Models::TestRun.new('GOT run')
+    tr = Models::TestRun.new('GOT run')
+    allow(tr).to receive(:wait_for_test_run) ## Important
+    tr
   }
 
   let(:tr_index_response) {
@@ -146,6 +148,7 @@ describe Models::TestRun do
 
   context "when saving" do
     before do
+      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:after_save)
     end
 
@@ -157,7 +160,7 @@ describe Models::TestRun do
 
       tr.save
 
-      
+
       expect(api).to have_received(:create_testRun)
       expect(tr.id).to eq "1664"
     end
@@ -180,7 +183,7 @@ describe Models::TestRun do
 
       tr.save
 
-      expect(api).to have_received(:get_testRun_testSnapshots)
+      expect(api).to have_received(:get_testRun_testSnapshots).at_least(:once)
       expect(tr.test_snapshots.count).to eq 2
     end
 
@@ -214,7 +217,7 @@ describe Models::TestRun do
 
       expect(tr).to have_received(:push_results)
     end
-    
+
     it "does not call #push_results on test snapshots that are not in cache" do
       ts = Models::TestSnapshot.new(
         id: 1,
@@ -229,7 +232,7 @@ describe Models::TestRun do
       allow(ts).to receive(:related_scenario).and_return(scenario)
       allow(Models::TestSnapshot).to receive(:process_results)
       allow(ts).to receive(:push_results)
-      
+
       tr.push_results
 
       expect(ts).not_to have_received(:push_results)

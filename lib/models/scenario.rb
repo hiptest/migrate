@@ -57,7 +57,7 @@ module Models
     def api_identical?(result)
       result.dig('attributes', 'name').start_with?(@name)
     end
-    
+
     def api_exists?
       return true if @id
       res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], scenario_id: @id, jira_id: @jira_id)
@@ -152,6 +152,10 @@ module Models
 
     def self.find(id)
       @@scenarios.select{ |sc| sc.id == id }.first
+    end
+
+    def self.count
+      @@scenarios.count
     end
 
     def find_unique_name(current, existing)

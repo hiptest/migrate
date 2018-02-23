@@ -37,61 +37,72 @@ module Models
     def api_identical?(result)
       result.dig('attributes', 'name') == (@name)
     end
-    
+
     def save
       unless api_exists?
         res = create
       else
         output("-- Test run #{@name} already exists (id: #{@id}).")
       end
-      
+
+      wait_for_test_run
+
       after_save(res)
       res
     end
-    
+
     def after_save(data)
       fetch_tests
       push_results
     end
-    
+
+    def wait_for_test_run
+      loop do
+        break unless @@api.get_testRun_testSnapshots(ENV['HT_PROJECT'], @id).dig('data').count < Models::Scenario.count
+        sleep 10
+      end
+    end
+
     def fetch_tests
       res = @@api.get_testRun_testSnapshots(ENV['HT_PROJECT'], @id)
       if res and res.dig('data').any?
         res.dig('data').each do |ts|
           @test_snapshots << Models::TestSnapshot.new(
-            id: ts.dig('id'), 
-            name: ts.dig('attributes', 'name'), 
-            status: ts.dig('attributes', 'status'), 
+            id: ts.dig('id'),
+            name: ts.dig('attributes', 'name'),
+            status: ts.dig('attributes', 'status'),
             test_run_id: @id,
             folder_snapshot_id: ts.dig('attributes', 'folder-snapshot-id')
           )
         end
       end
     end
-    
+
     def push_results
       Models::TestSnapshot.process_results
       @test_snapshots.each do |ts|
-        next if ts.is_already_pushed
+        next if ts.is_already_pushed?
         scenario = ts.related_scenario
-        
+
         unless @cache[scenario.object_id].nil?
           status = @cache[scenario.object_id][:status]
           author = @cache[scenario.object_id][:author]
           description = @cache[scenario.object_id][:description]
-          
+
           ts.status = status
           ts.push_results(status, author, description)
         end
       end
+
+      Models::TestSnapshot.clear_pushed_results unless @test_snapshots.map(&:is_already_pushed?).include?(false)
     end
-    
+
     def self.push_results
       @@test_runs.each do |test_run|
         test_run.save
       end
     end
-    
+
     def add_status_to_cache(scenario:, status:, author:, description: "")
       @cache[scenario.object_id] = {
         status: status,
@@ -99,7 +110,7 @@ module Models
         description: description
       }
     end
-    
+
     def self.find_or_create_by_name(name)
       @@test_runs.select{ |tr| tr.name == name}.first || TestRun.new(name)
     end
