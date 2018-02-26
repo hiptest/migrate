@@ -55,7 +55,7 @@ module Models
     end
 
     def api_identical?(result)
-      result.dig('attributes', 'name').start_with?(@name)
+      result.dig('attributes', 'name').double_quotes_replaced.single_quotes_escaped.start_with?(@name)
     end
 
     def api_exists?

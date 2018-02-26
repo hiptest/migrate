@@ -69,6 +69,24 @@ describe Models::Actionword do
       expect(aw.name).to eq("Great actionword with \\'single quotes\\'")
     end
   end
+  
+  context "api_identical?" do
+    let(:find_data) {
+      {
+        'type' => 'actionwords',
+        'id' => '1664',
+        'attributes' => {
+          'name' => "Great actionword with 'single quotes'"
+        }
+      }
+    }
+    
+    
+    it "compare names with single quotes equivalency" do
+      aw = Models::Actionword.find_or_create_by_name("Great actionword with 'single quotes'")
+      expect(aw.api_identical?(find_data)).to be_truthy
+    end
+  end
 
   context 'api_exists?' do
     let(:api){ double("API::Hiptest") }

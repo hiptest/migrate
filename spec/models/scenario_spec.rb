@@ -74,6 +74,23 @@ describe Models::Scenario do
     api = double(API::Hiptest)
     Models::Scenario.class_variable_set(:@@api, api)
   end
+  
+  context 'api_identical?' do
+    let(:scenario){ Models::Scenario.new("Tim's first scenario".double_quotes_replaced.single_quotes_escaped) }
+    let(:find_data) {
+      {
+        'type' => 'scenarios',
+        'id' => '1664',
+        'attributes' => {
+          'name' => "Tim's first scenario"
+        }
+      }
+    }
+    
+    it "compare name with single_quotes equivalency" do
+      expect(scenario.api_identical?(find_data)).to be_truthy
+    end
+  end
 
   context 'api_exists?' do
     let(:api){ Models::Scenario.class_variable_get(:@@api) }

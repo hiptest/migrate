@@ -51,7 +51,7 @@ module Models
     def before_update
       if api_exists?
         res = @@api.get_actionword(ENV['HT_PROJECT'], @id)
-        @name = res.dig('data', 'attributes', 'name').single_quotes_escaped
+        @name = res.dig('data', 'attributes', 'name').double_quotes_replaced.single_quotes_escaped
       end
     end
 
@@ -60,7 +60,7 @@ module Models
     end
 
     def api_identical?(result)
-        result.dig('attributes', 'name') == @name.gsub('\\', '')
+        result.dig('attributes', 'name').double_quotes_replaced.single_quotes_escaped == @name
     end
 
     def self.find_by_name(name)
