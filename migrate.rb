@@ -120,20 +120,26 @@ class Migration
 
   def check_zephyr_options
     return if @options.from != 'zephyr'
-    if @options.zephyr_info_file.empty?
-      raise "Zephyr import requires an information xml file"
-    end
+    
     if @options.zephyr_execution_file.empty?
       raise "Zephyr import requires an execution xml file"
+    end
+    
+    unless @options.only == :push_results
+      if @options.zephyr_info_file.empty?
+        raise "Zephyr import requires an information xml file"
+      end
     end
   end
 
   def parse_zephyr_files
-    infos = parse_xml_file(@options.zephyr_info_file)
     executions = parse_xml_file(@options.zephyr_execution_file)
-
     process_executions(executions)
-    process_infos(infos)
+    
+    if @options.only != :push_results
+      infos = parse_xml_file(@options.zephyr_info_file)
+      process_infos(infos)
+    end
   end
 
   def migrate_xml
@@ -141,10 +147,16 @@ class Migration
 
     case @options.only
     when :push_results
+      puts 'Push execution results!'.green
+      puts
       Models::TestRun.push_results
     when :import
+      puts 'Import data in Hiptest'
+      puts
       Models::Project.instance.save
     else
+      puts 'Import data in Hiptest'
+      puts
       Models::Project.instance.save
       puts
       puts 'Data migration is finished.'.green
