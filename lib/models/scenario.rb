@@ -60,7 +60,7 @@ module Models
 
     def api_exists?
       return true if @id
-      res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], scenario_id: @id, jira_id: @jira_id)
+      res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], jira_id: @jira_id)
       res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
