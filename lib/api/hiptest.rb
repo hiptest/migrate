@@ -29,9 +29,9 @@ module API
       base_url = self.base_url
       unless base_url.end_with?('/api')
         if base_url.end_with?('/')
-          base_url += 'api'
+          base_url << 'api'
         else
-          base_url += '/api'
+          base_url << '/api'
         end
       end
       base_url

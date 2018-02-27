@@ -36,7 +36,7 @@ module Models
     end
 
     def self.find_or_create_by_name(name)
-      folder = Project.instance.folders.select{ |f| f.name == name }.first
+      folder = Project.instance.folders.find { |f| f.name == name }
 
       if folder.nil?
         folder = Folder.new(name)

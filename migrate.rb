@@ -174,7 +174,7 @@ class Migration
     if ENV['HT_URI']
       link = ENV['HT_URI']
     end
-    link += "/projects/#{ENV['HT_PROJECT']}"
+    link << "/projects/#{ENV['HT_PROJECT']}"
     puts "Go to '".green + link.uncolorize + "' to see imported project".green
     puts "Enjoy! :)".green
     puts

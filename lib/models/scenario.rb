@@ -143,24 +143,24 @@ module Models
     end
 
     def self.find_by_name(name)
-      @@scenarios.select { |sc| sc.name.downcase == name.double_quotes_replaced.single_quotes_escaped.downcase }.first
+      @@scenarios.find { |sc| sc.name.downcase == name.double_quotes_replaced.single_quotes_escaped.downcase }
     end
 
     def self.find_by_jira_id(jira_id)
-      @@scenarios.select{ |sc| sc.jira_id == jira_id }.first
+      @@scenarios.find { |sc| sc.jira_id == jira_id }
     end
 
     def self.find(id)
-      @@scenarios.select{ |sc| sc.id == id }.first
+      @@scenarios.find { |sc| sc.id == id }
     end
 
     def self.count
       @@scenarios.count
     end
 
-    def find_unique_name(current, existing)
-      existing = existing.map(&:downcase)
-      return current unless existing.include?(current.downcase)
+    def find_unique_name(current, existings)
+      existings = existings.map(&:downcase)
+      return current unless existings.include?(current.downcase)
 
       postfix = 0
       new_name = ''
@@ -169,7 +169,7 @@ module Models
         postfix += 1
         new_name = "#{current} (#{postfix})"
 
-        break unless existing.include?(new_name.downcase)
+        break unless existings.include?(new_name.downcase)
       end
 
       new_name

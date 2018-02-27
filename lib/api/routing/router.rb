@@ -61,10 +61,6 @@ module API
     include API::Routing::Projects
     include API::Routing::Scenarios
     include API::Routing::TestSnapshots
-    
-    def dependencies_of(resource_type)
-      @@dependencies_graph.dig(resource_type.singularize.to_sym)
-    end
 
     private
     
@@ -102,7 +98,7 @@ module API
           resource_id = args[1]
         end
         
-        url += "/#{resource_id}"
+        url << "/#{resource_id}"
         
         get(URI(url))
       end
@@ -202,12 +198,12 @@ module API
       url = self.class.base_url + "/projects/#{project_id}/"
       
       if grand_parent_id && grand_parent_type
-        url += "#{grand_parent_type.underscore.pluralize}/#{grand_parent_id}/"
+        url << "#{grand_parent_type.underscore.pluralize}/#{grand_parent_id}/"
       end
       if parent_id && parent_type
-        url += "#{parent_type.underscore.pluralize}/#{parent_id}/"
+        url << "#{parent_type.underscore.pluralize}/#{parent_id}/"
       end
-      url += "#{resource_type.underscore.pluralize}"
+      url << "#{resource_type.underscore.pluralize}"
       
       url
     end
