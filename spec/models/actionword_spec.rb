@@ -62,14 +62,14 @@ describe Models::Actionword do
       ]
     }
   end
-  
+
   context "when create new actionword" do
     it "single quotes are escaped from actionword name" do
       aw = Models::Actionword.find_or_create_by_name("Great actionword with 'single quotes'")
       expect(aw.name).to eq("Great actionword with \\'single quotes\\'")
     end
   end
-  
+
   context "api_identical?" do
     let(:find_data) {
       {
@@ -80,8 +80,8 @@ describe Models::Actionword do
         }
       }
     }
-    
-    
+
+
     it "compare names with single quotes equivalency" do
       aw = Models::Actionword.find_or_create_by_name("Great actionword with 'single quotes'")
       expect(aw.api_identical?(find_data)).to be_truthy
@@ -172,8 +172,10 @@ describe Models::Actionword do
       allow(actionword).to receive(:update)
       expect(actionword.api_exists?).to be false
 
+      allow(STDERR).to receive(:puts)
       actionword.save
       expect(actionword).to have_received(:update)
+      expect(STDERR).to have_received(:puts).with(/Error while creating Actionword/)
     end
   end
 end
