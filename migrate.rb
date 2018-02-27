@@ -99,15 +99,17 @@ class Migration
   end
 
   def check_options
-    check_zephyr_options
+    check_zephyr_options if @options.from = 'zephyr'
   end
 
   def migrate
     create_temp_dir
     check_env_variables
     configure_api_from_env(verbose: @options.verbose)
-
-    parse_zephyr_files if @options.from = 'zephyr'
+    case @options.from
+    when 'zephyr'
+      process_zephyr
+    end
 
     migrate_xml
   end
@@ -131,14 +133,14 @@ class Migration
       end
     end
   end
-
-  def parse_zephyr_files
-    executions = parse_xml_file(@options.zephyr_execution_file)
-    process_executions(executions)
+  
+  def process_zephyr
+    zephyr_parser = Parser::Zephyr.new(execution: parse_xml_file(@options.zephyr_execution_file))
+    zephyr_parser.process_executions
     
-    if @options.only != :push_results
-      infos = parse_xml_file(@options.zephyr_info_file)
-      process_infos(infos)
+    if options.only != :push_results
+      zephyr_parser.info = parse_xml_file(@options.zephyr_info_file)
+      zephyr_parser.process_infos
     end
   end
 

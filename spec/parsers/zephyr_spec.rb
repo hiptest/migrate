@@ -6,6 +6,7 @@ require './lib/models/project'
 require './lib/models/scenario'
 
 describe "Migrate Zephyr script" do
+  
   let(:info_file) {
     Nokogiri::XML(File.open('./spec/xml_samples/infos.xml')) do |config|
       config.noent
@@ -16,6 +17,10 @@ describe "Migrate Zephyr script" do
     Nokogiri::XML(File.open('./spec/xml_samples/executions.xml')) do |config|
       config.noent
     end
+  }
+  
+  let(:parser) {
+    Parser::Zephyr.new(execution: exec_file, info: info_file)
   }
   
   def reset_all
@@ -35,21 +40,21 @@ describe "Migrate Zephyr script" do
   
   context '#is_info_file' do
     it "return true if its an info xml export" do
-      expect(is_info_file?(info_file)).to be_truthy
+      expect(Parser::Zephyr.is_info_file?(info_file)).to be_truthy
     end
     
     it "return false if its not an info xml export" do
-      expect(is_info_file?(exec_file)).to be_falsy
+      expect(Parser::Zephyr.is_info_file?(exec_file)).to be_falsy
     end
   end
   
   context '#is_execution_file' do
     it "return true if its an execution xml export" do
-      expect(is_execution_file?(exec_file)).to be_truthy
+      expect(Parser::Zephyr.is_execution_file?(exec_file)).to be_truthy
     end
     
     it "return false if its not an execution xml export" do
-      expect(is_execution_file?(info_file)).to be_falsy
+      expect(Parser::Zephyr.is_execution_file?(info_file)).to be_falsy
     end
   end
   
@@ -59,14 +64,14 @@ describe "Migrate Zephyr script" do
     end
     
     it 'construct project correctly and remove unsafe chars from name' do
-      process_executions(exec_file)
+      parser.process_executions
       
       project = Models::Project.instance
       expect(project.name).to eq "Blopidou 'pidiboup' lksdf"
     end
     
     it 'construct scenarios correctly and remove unsafe chars from name' do
-      process_executions(exec_file)
+      parser.process_executions
       
       project = Models::Project.instance
       
@@ -78,7 +83,7 @@ describe "Migrate Zephyr script" do
     end
     
     it 'produce correct scenario definition' do
-      process_executions(exec_file)
+      parser.process_executions
       
       scenario = Models::Project.instance.scenarios.first
       
@@ -100,7 +105,7 @@ describe "Migrate Zephyr script" do
     end
     
     it 'add tags to scenarios' do
-      process_executions(exec_file)
+      parser.process_executions
       
       tags = Models::Project.instance.scenarios.first.tags
       
@@ -110,7 +115,7 @@ describe "Migrate Zephyr script" do
     end
     
     it 'construct actionwords correctly' do
-      process_executions(exec_file)
+      parser.process_executions
       
       actionwords = Models::Project.instance.scenarios.first.actionwords
       
@@ -123,17 +128,17 @@ describe "Migrate Zephyr script" do
     before do
       reset_all
       
-      process_executions(exec_file)
+      parser.process_executions
       @project = Models::Project.instance
     end
     
     it 'add description to scenarios' do
-      process_infos(info_file)
+      parser.process_infos
       expect(@project.scenarios.first.description).to eq 'A super description of this test with tagtag/tag in it'
     end
     
     it 'add labels as tags' do
-      process_infos(info_file)
+      parser.process_infos
       labels = @project.scenarios.first.tags.select{ |tag| tag.key == :label }
       expect(labels.map(&:value)).to eq ["SIT"]
     end
