@@ -6,7 +6,7 @@ module Models
   class Scenario < Model
     @@scenarios = []
 
-    attr_accessor :id, :name, :description, :actionwords, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :api_path, :jira_id
+    attr_accessor :id, :name, :description, :actionwords, :steps, :parameters, :datasets, :folder, :tags, :folder_id, :jira_id
 
     def initialize(name, steps = [], description = '')
       @id = nil
@@ -20,10 +20,6 @@ module Models
       @tags = []
       @jira_id = ''
       @@scenarios << self
-    end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios"
     end
 
     def create_data

@@ -8,10 +8,10 @@ RSpec.describe API::Hiptest, 'API Tags' do
       config.client = "client"
       config.uid = "uid@uid.uid"
     end
-    
+
     API::Hiptest.new
   }
-  
+
   let(:auth_headers) {
     {
       "accept": "application/vnd.api+json; version=1",
@@ -20,7 +20,7 @@ RSpec.describe API::Hiptest, 'API Tags' do
       "uid": API::Hiptest.configuration.uid
     }
   }
-  
+
   before do
     @project_id = 1
     @actionword_id = 11
@@ -28,7 +28,7 @@ RSpec.describe API::Hiptest, 'API Tags' do
     @folder_id = 1211
     @tag_id = 111221
   end
-  
+
   context "about scenarios" do
     it "#GET scenario tags" do
       stub = stub_request(:get, "https://hiptest.net/api/projects/1/scenarios/1/tags")
@@ -53,14 +53,14 @@ RSpec.describe API::Hiptest, 'API Tags' do
             }
           ]
         }.to_json)
-      
-      projects_data = api.get_scenario_tags(@project_id, @scenario_id)
+
+      projects_data = api.get_scenarioTags(@project_id, @scenario_id)
       expect(stub).to have_been_requested
       expect(projects_data.dig('data').any?).to be_truthy
     end
-    
+
     it_behaves_like 'an API creatable resource' do
-      let(:resource_type) { 'scenario_tag' }
+      let(:resource_type) { 'scenarioTag' }
       let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags" }
       let(:data) {
         {
@@ -85,9 +85,9 @@ RSpec.describe API::Hiptest, 'API Tags' do
           }
       }
     end
-    
+
     it_behaves_like 'an API updatable resource' do
-      let(:resource_type) { 'scenario_tag' }
+      let(:resource_type) { 'scenarioTag' }
       let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/1" }
       let(:data) {
         {
@@ -103,13 +103,13 @@ RSpec.describe API::Hiptest, 'API Tags' do
       }
       let(:response_data) { data }
     end
-    
+
     it_behaves_like 'an API deletable resource' do
-      let(:resource_type) { 'scenario_tag' }
+      let(:resource_type) { 'scenarioTag' }
       let(:route) { "https://hiptest.net/api/projects/#{@project_id}/scenarios/#{@scenario_id}/tags/1" }
     end
   end
-  
+
   context "about folders" do
     it "#GET folder tags" do
       stub = stub_request(:get, "https://hiptest.net/api/projects/#{@project_id}/folders/#{@folder_id}/tags")
@@ -134,8 +134,8 @@ RSpec.describe API::Hiptest, 'API Tags' do
             }
           ]
         }.to_json)
-      
-      projects_data = api.get_folder_tags(@project_id, @folder_id)
+
+      projects_data = api.get_folderTags(@project_id, @folder_id)
       expect(stub).to have_been_requested
       expect(projects_data.dig('data').any?).to be_truthy
     end

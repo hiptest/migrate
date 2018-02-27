@@ -6,7 +6,7 @@ module Models
   class TestRun < Model
     @@test_runs = []
 
-    attr_accessor :id, :name, :description, :test_snapshots, :api_path
+    attr_accessor :id, :name, :description, :test_snapshots
 
     def initialize(name, description = '')
       @id = nil
@@ -16,20 +16,16 @@ module Models
       @cache = {}
       @@test_runs << self unless @@test_runs.map(&:name).include?(@name)
     end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/test_runs"
-    end
     
     def scenario_ids
       scenario_ids = []
-      
+
       scenario_jira_ids = Models::Scenario.class_variable_get(:@@scenarios).map(&:jira_id)
       scenario_jira_ids.each do |jira_id|
         res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], jira_id: jira_id)
         scenario_ids << res['data'].first['id']
       end
-      
+
       scenario_ids
     end
 

@@ -3,7 +3,7 @@ require './lib/models/project'
 
 module Models
   class Folder < Model
-    attr_accessor :id, :name, :scenarios, :parent_id, :api_path
+    attr_accessor :id, :name, :scenarios, :parent_id
 
     def initialize(name, scenarios = [])
       @id = nil
@@ -18,10 +18,6 @@ module Models
         scenario.folder_id = @id
         scenario.save
       end
-    end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/folders"
     end
 
     def create_data

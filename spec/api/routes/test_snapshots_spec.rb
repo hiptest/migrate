@@ -2,10 +2,10 @@ require 'spec_helper'
 require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API TestSnapshots' do
-  let(:resource_type_main) { "testRun_testSnapshot" }
+  let(:resource_type_main) { "testSnapshot" }
   let(:index_route_main) { "https://hiptest.net/api/projects/1/test_runs/1/test_snapshots" }
   let(:show_route_main) { "https://hiptest.net/api/projects/1/test_runs/1/test_snapshots/1" }
-  
+
   it_behaves_like 'an API readable resource' do
     let(:resource_type) { resource_type_main }
     let(:index_route){ index_route_main }
@@ -59,7 +59,7 @@ RSpec.describe API::Hiptest, 'API TestSnapshots' do
         ]
       }
     }
-    
+
     let(:show_route){ show_route_main }
     let(:show_response_data){
       {

@@ -5,17 +5,13 @@ module Models
   class Actionword < Model
     @@actionwords = []
 
-    attr_accessor :id, :name, :description, :api_path
+    attr_accessor :id, :name, :description
 
     def initialize(name)
       @id = nil
       @name = name
       @description = ''
       @@actionwords << self
-    end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/actionwords"
     end
 
     def create_data

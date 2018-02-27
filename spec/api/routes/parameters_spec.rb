@@ -3,8 +3,8 @@ require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Parameters' do
   it_behaves_like 'an API CRUD resource' do
-    let(:resource_type_main) { "scenario_parameter" }
-    
+    let(:resource_type_main) { "parameter" }
+
     let(:index_route_main){ "https://hiptest.net/api/projects/1/scenarios/1/parameters" }
     let(:index_response_data_main){
       {
@@ -25,7 +25,7 @@ RSpec.describe API::Hiptest, 'API Parameters' do
         ]
       }
     }
-    
+
     let(:show_route_main){ "https://hiptest.net/api/projects/1/scenarios/1/parameters/1" }
     let(:show_response_data_main){
       {
@@ -38,7 +38,7 @@ RSpec.describe API::Hiptest, 'API Parameters' do
           }
         }
     }
-    
+
     let(:create_data_main){
       {
         data: {
@@ -59,7 +59,7 @@ RSpec.describe API::Hiptest, 'API Parameters' do
           }
         }
     }
-    
+
     let(:update_data_main){
       {
         data: {

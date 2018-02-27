@@ -4,25 +4,16 @@ require './lib/models/scenario'
 module Models
   class Dataset < Model
     @@datasets = []
-    attr_accessor :id, :data, :scenario_jira_id, :api_path
+    attr_accessor :id, :data, :scenario_jira_id
 
     def initialize(scenario_jira_id)
       @scenario_jira_id = scenario_jira_id
       @data = {}
-      @api_path = nil
       @@datasets << self
     end
-    
-    def api_method
-      "scenario_dataset"
-    end
-    
+
     def api_arguments
       [ENV['HT_PROJECT'], Models::Scenario.find_by_jira_id(@scenario_jira_id).id.to_s, @id.to_s]
-    end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/scenarios/#{scenario.id}/datasets"
     end
 
     def create_data

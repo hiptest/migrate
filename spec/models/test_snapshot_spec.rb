@@ -120,18 +120,18 @@ describe Models::TestSnapshot do
   context "when pushes results" do
     it 'finds related scenario' do
       allow(api).to receive(:get_testSnapshot_including_scenario).and_return(related_scenario_response)
-      allow(api).to receive(:get_scenario_tags).and_return(related_scenario_tags_response)
+      allow(api).to receive(:get_scenarioTags).and_return(related_scenario_tags_response)
 
       sc = test_snapshot.related_scenario
       expect(sc).not_to be_nil
     end
 
     it 'sends the test result to hiptest' do
-      allow(api).to receive(:create_testRun_testSnapshot_testResult)
+      allow(api).to receive(:create_testResult)
 
       test_snapshot.push_results("passed", "Tintin", "Roux")
 
-      expect(api).to have_received(:create_testRun_testSnapshot_testResult)
+      expect(api).to have_received(:create_testResult)
     end
   end
 end

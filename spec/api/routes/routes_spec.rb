@@ -36,7 +36,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
     
     it "raises an error when action resource is not defined in routes" do
       expect {
-        api.create_folder_tag(@project_id, @folder_id, {})
+        api.create_folderTag(@project_id, @folder_id, {})
       }.to raise_error(RuntimeError, "Route 'create' not found for folder tag")
     end
     

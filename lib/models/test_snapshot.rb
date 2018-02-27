@@ -18,16 +18,8 @@ module Models
       @related_scenario_jira_id = nil
     end
 
-    def api_method
-      "testRun_testSnapshot"
-    end
-
     def api_arguments
       [ENV['HT_PROJECT'], @test_run_id.to_s, @id.to_s]
-    end
-
-    def api_path
-      API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/test_runs/#{@test_run_id}/test_snapshots"
     end
 
     def related_scenario
@@ -35,7 +27,7 @@ module Models
         scenario_res = @@api.get_testSnapshot_including_scenario(project_id: ENV['HT_PROJECT'], test_run_id: @test_run_id, test_snapshot_id: @id)
         related_scenario_id = scenario_res.dig('included').first.dig('id')
 
-        tags_res = @@api.get_scenario_tags(ENV['HT_PROJECT'], related_scenario_id)
+        tags_res = @@api.get_scenarioTags(ENV['HT_PROJECT'], related_scenario_id)
         @related_scenario_jira_id = tags_res.dig('data').select{|tag| tag.dig('attributes', 'key') == 'JIRA'}.first.dig('attributes', 'value')
       end
 
@@ -93,7 +85,8 @@ module Models
 
       output("-- #{@name} => " + status.send(color))
       begin
-        @@api.create_testRun_testSnapshot_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
+        # @@api.create_testRun_testSnapshot_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
+        @@api.create_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
         File.open(@@results_path, "a") do |line|
           line.puts @id
         end

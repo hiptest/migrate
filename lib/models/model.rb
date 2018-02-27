@@ -4,28 +4,24 @@ require './lib/utils/string'
 module Models
   class Model
     @@api = API::Hiptest.new
-    
+
     def api_method
       resource_type.uncapitalize
     end
-    
+
     def api_arguments
       [ENV['HT_PROJECT'], @id.to_s]
     end
-    
+
     def self.api
       @@api
     end
-    
+
     def self.api= api
       @@api = api
     end
-    
-    attr_accessor :id, :name
 
-    def api_path
-      raise NotImplementedError
-    end
+    attr_accessor :id, :name
 
     def create_data
       raise NotImplementedError
@@ -79,7 +75,6 @@ module Models
     def create
       output "-- Creating #{resource_type} object #{name}"
       res = @@api.send("create_#{api_method.singularize}", *api_arguments[0...-1], create_data)
-      # res = @@api.post(URI(api_path), create_data)
       if res
         @id = res.dig('data', 'id')
       else
@@ -91,13 +86,13 @@ module Models
 
     def after_create(data)
     end
-    
+
     def before_update
     end
 
     def update
       before_update
-      
+
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
       begin
         res = @@api.send("update_#{api_method.singularize}", *api_arguments, update_data)
@@ -111,7 +106,7 @@ module Models
 
     def after_update(data)
     end
-    
+
     def data_type
       resource_type.pluralize.underscore.gsub('_', '-')
     end
