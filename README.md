@@ -34,13 +34,15 @@ Finally, to have all test informations (like description, etc), could you please
 
 ![export search tests](https://downloads.intercomcdn.com/i/o/45689099/1d9fa06201754199006ffb3b/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+15.04.03.png)
 
+
 ## 2. Execute script
+### 2.1 => Prepare authentication
 
 Migration script needs some variable to push exported project to Hiptest:
 
  1. HT_ACCESS_TOKEN, HT_CLIENT, HT_UID: can be found in your Hiptest profile page. Once you have them, export them in your shell session
 
- 2. Now you will have to create a project from Hiptest application then retrieve your project id in the URL : 'https://hiptest.net/app/projects/&lt;YOUR_PROJECT_ID&gt;/' and export it in the HT_PROJECT variable in your shell session.
+ 2. Now you will have to create a project from Hiptest application then retrieve your project id in the URL : "https://hiptest.net/app/projects/YOUR_PROJECT_ID/" and export it in the HT_PROJECT variable in your shell session.
  
 We suggest you to put them in a shell script (here named config.sh) like this
 ```shell
@@ -53,10 +55,23 @@ export HT_PROJECT=<YOUR_PROJECT_ID>
 ```
 And export them all every time you need with `source config.sh`
 
+### 2.2 => Import data
+
 Once every session variables are set, you could launch the script with:
 ```shell
-ruby migrate.rb --info=<INFOS_FILE_PATH> --execution=<EXECUTIONS_FILE_PATH>
+ruby migrate.rb --info=<INFOS_FILE_PATH> --execution=<EXECUTIONS_FILE_PATH> --only import
 ```
 It will migrate all your scenarios in Hiptest.
+
+### 2.3 => Push results
+
+Now your project is entirely and successfully imported in Hiptest, you can push your execution cycle results with the command:
+```shell
+ruby migrate.rb --execution=<EXECUTIONS_FILE_PATH> --only push_results
+```
+PS : *You need to push results for every execution cycle exports you have*
+
+## Notes
+The `--only` option is optional, if it is not specified, the script will import then push results.
 
 For more informations, please launch `ruby migrate.rb --help`
