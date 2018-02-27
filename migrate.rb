@@ -174,7 +174,8 @@ class Migration
     if ENV['HT_URI']
       link = ENV['HT_URI']
     end
-    link << "/projects/#{ENV['HT_PROJECT']}"
+    link += "/projects/#{ENV['HT_PROJECT']}"
+    
     puts "Go to '".green + link.uncolorize + "' to see imported project".green
     puts "Enjoy! :)".green
     puts
@@ -202,6 +203,7 @@ if __FILE__ == $0
     puts migration.parser.help
   rescue => error
     puts error.message.red
+    puts error.backtrace.map { |s| "  #{s}" }.join("\n").red
     puts migration.parser.banner
   end
 end

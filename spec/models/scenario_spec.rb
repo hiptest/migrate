@@ -197,8 +197,8 @@ describe Models::Scenario do
     }
 
     it "creates the scenario then updates it with its definition" do
-      allow(api).to receive(:find_scenario_by_jira_id).and_return({ 'data' => []})
-      allow(api).to receive(:get_scenarios).and_return({ 'data' => []})
+      allow(api).to receive(:find_scenario_by_jira_id).and_return('data' => [])
+      allow(api).to receive(:get_scenarios).and_return('data' => [])
       allow(api).to receive(:create_scenario).and_return(created_data)
       scenario.class.api = api
 
@@ -255,7 +255,7 @@ describe Models::Scenario do
       create_data[:data][:attributes][:name] = 'My Scenario (4)'
       created_data['attributes']['name'] = 'My Scenario (4)'
       
-      allow(api).to receive(:find_scenario_by_jira_id).and_return({ 'data' => []})
+      allow(api).to receive(:find_scenario_by_jira_id).and_return('data' => [])
       allow(api).to receive(:create_scenario).and_return(create_data)
       
       allow(scenario).to receive(:update)

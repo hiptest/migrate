@@ -67,7 +67,7 @@ shared_examples "a model" do
     end
 
     it 'when a matching element is not found, it returns false and the id of the element is not updated' do
-      allow(api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return({'data' => []})
+      allow(api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return('data' => [])
       an_existing_object.class.api = api
       
       expect(an_unknown_object.id).to be nil
@@ -80,7 +80,7 @@ shared_examples "a model" do
     before do
       @api = spy(API::Hiptest)
       
-      allow(@api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return({'data' => []})
+      allow(@api).to receive("get_#{an_existing_object.api_method.pluralize}").and_return('data' => [])
       allow(@api).to receive("get_#{an_existing_object.api_method}").with("1", "#{resource_id}").and_return({
         'data' => {
           'attributes' => {
@@ -92,7 +92,7 @@ shared_examples "a model" do
       allow(@api).to receive("create_#{an_existing_object.api_method}").and_return(create_result)
       allow(@api).to receive("update_#{an_existing_object.api_method}").and_return(find_results)
       
-      allow(@api).to receive("find_scenario_by_jira_id").and_return({'data' => []})
+      allow(@api).to receive("find_scenario_by_jira_id").and_return('data' => [])
       
       an_existing_object.class.api = @api
     end

@@ -19,6 +19,21 @@ describe Models::TestRun do
     project.scenarios << sc
     sc
   }
+  
+  let(:scenario_by_jira_id_response) {
+    {
+      'data' => [
+        {
+          'type' => 'scenarios',
+          'id' => '1',
+          'attributes' => {
+            'name' => scenario.name,
+            'description' => scenario.description,
+          }
+        }
+      ]
+    }
+  }
 
   let(:tr) {
     tr = Models::TestRun.new('GOT run')
@@ -153,16 +168,23 @@ describe Models::TestRun do
     end
 
     it "creates a new test run" do
-      allow(api).to receive(:get_testRuns).and_return({"data" => []})
+      allow(api).to receive(:get_testRuns).and_return("data" => [])
+      allow(api).to receive(:find_scenario_by_jira_id).and_return(scenario_by_jira_id_response)
       allow(api).to receive(:create_testRun).and_return(tr_create_response)
 
       expect(tr.api_exists?).not_to be_truthy
 
       tr.save
 
-
       expect(api).to have_received(:create_testRun)
       expect(tr.id).to eq "1664"
+    end
+    
+    it "passes scenario ids in the post body" do
+      allow(api).to receive(:find_scenario_by_jira_id).and_return(scenario_by_jira_id_response)
+      allow(api).to receive(:get_testRuns).and_return("data" => [])
+      
+      expect(tr.create_data.dig(:data, :attributes, :scenario_ids)).not_to be_nil
     end
 
     it "does nothing if test run doesn't already exist" do

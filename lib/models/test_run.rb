@@ -20,15 +20,27 @@ module Models
     def api_path
       API::Hiptest.base_url + "/projects/#{ENV['HT_PROJECT']}/test_runs"
     end
+    
+    def scenario_ids
+      scenario_ids = []
+      
+      scenario_jira_ids = Models::Scenario.class_variable_get(:@@scenarios).map(&:jira_id)
+      scenario_jira_ids.each do |jira_id|
+        res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], jira_id: jira_id)
+        scenario_ids << res['data'].first['id']
+      end
+      
+      scenario_ids
+    end
 
     def create_data
       @name = find_unique_name(@name, @@api.get_testRuns(ENV['HT_PROJECT'])['data'].map {|tr| tr.dig('attributes', 'name')})
-
       {
         data: {
           attributes: {
             name: @name,
-            description: @description
+            description: @description,
+            scenario_ids: scenario_ids
           }
         }
       }

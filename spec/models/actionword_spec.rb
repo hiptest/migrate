@@ -165,7 +165,7 @@ describe Models::Actionword do
     }
 
     it "creates the actionword then updates it with its definition" do
-      allow(api).to receive(:get_actionwords).and_return({ 'data' => []})
+      allow(api).to receive(:get_actionwords).and_return('data' => [])
       allow(api).to receive(:create_actionword)
       actionword.class.api = api
 
