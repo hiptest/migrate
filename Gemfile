@@ -5,6 +5,8 @@ ruby '>=2.3.1'
 group :development do
   gem 'activesupport'
   gem 'colorize'
+  gem 'guard'
+  gem 'guard-rspec'
 end
 
 group :development, :test do
