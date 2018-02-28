@@ -135,12 +135,12 @@ describe Models::TestSnapshot do
     end
 
     it "transform zephyr status into hiptest status equivalent" do
-      expect(Models::TestSnapshot.status_map("pass")).to eq "passed".green
-      expect(Models::TestSnapshot.status_map("fail")).to eq "failed".red
-      expect(Models::TestSnapshot.status_map("wip")).to eq "wip".yellow
-      expect(Models::TestSnapshot.status_map("blocked")).to eq "blocked".magenta
-      expect(Models::TestSnapshot.status_map("unexecuted")).to eq "undefined"
-      expect(Models::TestSnapshot.status_map("deferred")).to eq "skipped".blue
+      expect(Models::TestSnapshot.status_map("pass")).to eq ["passed", "green"]
+      expect(Models::TestSnapshot.status_map("fail")).to eq ["failed", "red"]
+      expect(Models::TestSnapshot.status_map("wip")).to eq ["wip", "yellow"]
+      expect(Models::TestSnapshot.status_map("blocked")).to eq ["blocked", "magenta"]
+      expect(Models::TestSnapshot.status_map("unexecuted")).to eq ["undefined", "uncolorize"]
+      expect(Models::TestSnapshot.status_map("deferred")).to eq ["skipped", "blue"]
     end
   end
 end

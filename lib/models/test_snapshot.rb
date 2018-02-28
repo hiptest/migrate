@@ -71,11 +71,10 @@ module Models
     end
 
     def push_results(status, author, description = "")
-      status = Models::TestSnapshot.status_map(status)
+      status, color = Models::TestSnapshot.status_map(status)
 
-      output("-- #{@name} => " + status)
+      output("-- #{@name} => " + status.send(color))
       begin
-        # @@api.create_testRun_testSnapshot_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
         @@api.create_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
         File.open(@@results_path, "a") do |line|
           line.puts @id
@@ -109,22 +108,29 @@ module Models
     def self.status_map(status)
       case status
       when /pass/
-        mapped_status = "passed".green
+        color = "green"
+        mapped_status = "passed"
       when /unexecuted/
-        mapped_status = "undefined".uncolorize
+        color = "uncolorize"
+        mapped_status = "undefined"
       when /fail/
-        mapped_status = "failed".red
+        color = "red"
+        mapped_status = "failed"
       when /deferred/
-        mapped_status = "skipped".blue
+        color = "blue"
+        mapped_status = "skipped"
       when /blocked/
-        mapped_status = "blocked".magenta
+        color = "magenta"
+        mapped_status = "blocked"
       when /wip/
-        mapped_status = "wip".yellow
+        color = "yellow"
+        mapped_status = "wip"
       else
-        mapped_status = status.black
+        color = "black"
+        mapped_status = status
       end
 
-      mapped_status
+      [mapped_status, color]
     end
   end
 end
