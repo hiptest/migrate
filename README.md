@@ -18,21 +18,21 @@ You can do it (bulk) by following these steps :
 
  3. Press the 'All Tests' gear in the test cycle list, select "add tests", then enter the filter name 'All tests' in the 'search filter' pane. Validate.
 
- ![test cycle list](https://downloads.intercomcdn.com/i/o/45687596/b80b2fdef6c1ea7f1daf9a37/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.48.30.png)
+ ![test cycle list](images/test-cycle-list.png)
 
- ![add tests bulk](https://downloads.intercomcdn.com/i/o/45687792/ead8a9b0f53d1f0ac8e2c02d/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.50.38.png)
+ ![add tests bulk](images/add-tests-bulk.png)
 
  4. All your tests are now imported to the 'All Tests' test cycle. You should now be able to export the 'All Tests' test cycle from the 'Search test execution' page.
 
- ![search test executions](https://downloads.intercomcdn.com/i/o/45688034/083e87926f58f3c3c670d85f/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.52.39.png)
+ ![search test executions](images/search-test-executions.png)
 
- ![select test cycle](https://downloads.intercomcdn.com/i/o/45688531/8c293bbc5817d5532640b55a/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.54.15.png)
+ ![select test cycle](images/select-test-cycle.png)
 
- ![export test cycle](https://downloads.intercomcdn.com/i/o/45688639/a592178553a2912af84658f9/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.55.36.png)
+ ![export test cycle](images/export-test-cycle.png)
 
 Finally, to have all test informations (like description, etc), could you please try to export all zephyr tests from the 'Search Test' page:
 
-![export search tests](https://downloads.intercomcdn.com/i/o/45689099/1d9fa06201754199006ffb3b/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+15.04.03.png)
+![export search tests](images/export-search-tests.png)
 
 
 ## 2. Execute script
