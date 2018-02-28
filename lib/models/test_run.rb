@@ -66,13 +66,13 @@ module Models
 
     def wait_for_test_run
       loop do
-        break unless @@api.get_testRun_testSnapshots(ENV['HT_PROJECT'], @id).dig('data').count < Models::Scenario.count
+        break unless @@api.get_testSnapshots(ENV['HT_PROJECT'], @id).dig('data').count < Models::Scenario.count
         sleep 10
       end
     end
 
     def fetch_tests
-      res = @@api.get_testRun_testSnapshots(ENV['HT_PROJECT'], @id)
+      res = @@api.get_testSnapshots(ENV['HT_PROJECT'], @id)
       if res and res.dig('data').any?
         res.dig('data').each do |ts|
           @test_snapshots << Models::TestSnapshot.new(

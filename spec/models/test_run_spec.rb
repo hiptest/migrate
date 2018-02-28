@@ -161,7 +161,7 @@ describe Models::TestRun do
 
   context "when saving" do
     before do
-      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
+      allow(api).to receive(:get_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:after_save)
     end
 
@@ -198,12 +198,12 @@ describe Models::TestRun do
   context "after saving" do
     it "fetches tests" do
       allow(api).to receive(:get_testRuns).and_return(tr_index_response)
-      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
+      allow(api).to receive(:get_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save
 
-      expect(api).to have_received(:get_testRun_testSnapshots).at_least(:once)
+      expect(api).to have_received(:get_testSnapshots).at_least(:once)
       expect(tr.test_snapshots.count).to eq 2
     end
 
@@ -230,7 +230,7 @@ describe Models::TestRun do
 
     it "pushes results" do
       allow(api).to receive(:get_testRuns).and_return(tr_index_response)
-      allow(api).to receive(:get_testRun_testSnapshots).and_return(ts_response)
+      allow(api).to receive(:get_testSnapshots).and_return(ts_response)
       allow(tr).to receive(:push_results)
 
       tr.save

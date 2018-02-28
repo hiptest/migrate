@@ -2,6 +2,7 @@ module API::Routing::Routes
 
   class Route
     attr_reader :name, :only, :parent_type, :data_type
+    
     def initialize(name:, only:, parent_type: nil, data_type: nil)
       @name = name
       @only = only
@@ -9,16 +10,20 @@ module API::Routing::Routes
       @data_type = data_type || name
     end
 
-    def allowed?(action)
-      if action.to_sym == :get
-        only.include?(:show) || only.include?(:index)
-      else
-        only.include?(action.to_sym)
-      end
+    def allowed?(verb)
+      only.include?(verb.to_sym)
     end
 
     def parent_route
       API::Routing::Routes.lookup(parent_type)
+    end
+
+    def level
+      if parent_route
+        1 + parent_route.level
+      else
+        1
+      end
     end
 
     def grand_parent_type
@@ -77,18 +82,10 @@ module API::Routing::Routes
     ),
   ]
 
-  @@routes = {}
   @@routes_index = {}
   ROUTES.each do |route|
-    route_info = {
-      parent: route.parent_type,
-      only: route.only,
-      key: route.data_type,
-    }
-    @@routes[route.name.to_sym] = route_info
     @@routes_index[route.name.to_s.singularize] = route
     @@routes_index[route.name.to_s.pluralize] = route
-    @@routes_index[route.name.to_sym] = route
   end
 
   class << self
@@ -97,21 +94,12 @@ module API::Routing::Routes
     end
 
     def level(route_name)
-      return 0 unless route_name
-      route_name = route_name.to_s.split('_').last.singularize.to_sym
-      if @@routes.key?(route_name)
-        1 + level(@@routes.dig(route_name, :parent))
-      else
-        0
-      end
+      route = lookup(route_name)
+      route ? route.level : 0
     end
 
     def exists?(route_name)
-      if route_name
-        @@routes.key?(route_name.to_s.singularize.to_sym)
-      else
-        false
-      end
+      !!lookup(route_name)
     end
   end
 end

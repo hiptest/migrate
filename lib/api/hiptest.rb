@@ -48,8 +48,6 @@ module API
     include API::Authentication
     include API::Routing
 
-    private
-
     def get(uri)
       req = Net::HTTP::Get.new(uri)
 
@@ -83,6 +81,8 @@ module API
 
       send_request(uri, req)
     end
+
+    private
 
     def send_request(uri, req)
       res = nil

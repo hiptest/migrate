@@ -69,7 +69,7 @@ module Models
       res
     end
 
-    def after_save(data)
+    def after_save(data=nil)
     end
 
     def create

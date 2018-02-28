@@ -1,4 +1,6 @@
+require './lib/models/actionword'
 require './lib/models/scenario'
+require './lib/models/tag'
 
 require './spec/models/models_shared'
 
@@ -208,6 +210,52 @@ describe Models::Scenario do
     end
   end
 
+  context "when saving" do
+    let(:scenario) {
+      sc = Models::Scenario.new('My first scenario')
+      sc.jira_id='PLOP-1'
+      sc
+    }
+
+    let(:create_data) {
+      {
+        data: {
+          attributes: {
+            name: 'My first scenario',
+            description: "",
+            "folder-id": nil
+          }
+        }
+      }
+    }
+
+    let(:created_data){
+      {
+        'type' => 'scenarios',
+        'id' => '1664',
+        'attributes' => {
+          'name' => 'My first scenario'
+        }
+      }
+    }
+
+    it "save its actionwords" do
+      aw = spy(Models::Actionword)
+      scenario.actionwords << aw
+
+      scenario.after_save
+      expect(aw).to have_received(:save)
+    end
+
+    it "save its tags" do
+      tag = spy(Models::Tag)
+      scenario.tags << tag
+
+      scenario.after_save
+      expect(tag).to have_received(:save)
+    end
+  end
+
   context "scenarios are renamed before saving" do
     let(:api){ Models::Scenario.class_variable_get(:@@api) }
 
@@ -290,9 +338,39 @@ describe Models::Scenario do
       scenario.class.api = api
     end
 
-
-
     it 'retrieve the name from server before updating' do
+      expect(scenario.name).to eq 'My scenario'
+      scenario.update
+      expect(scenario.name).to eq 'My scenario (1)'
+    end
+  end
+
+  context 'with tags' do
+    let(:api){ double(API::Hiptest) }
+
+    let(:scenario) {
+      sc = Models::Scenario.new('My scenario')
+      sc.id = "1664"
+      sc.jira_id='PLOP-1'
+      sc
+    }
+
+    before do
+      allow(scenario).to receive(:api_exists?).and_return(true)
+      allow(api).to receive(:update_scenario)
+      allow(api).to receive(:get_scenario).with("1", "#{scenario.id}").and_return(
+        {
+          'data' => {
+            'attributes' => {
+              'name' => 'My scenario (1)'
+            }
+          }
+        }
+      )
+      scenario.class.api = api
+    end
+
+    it 'saves the tags' do
       expect(scenario.name).to eq 'My scenario'
       scenario.update
       expect(scenario.name).to eq 'My scenario (1)'

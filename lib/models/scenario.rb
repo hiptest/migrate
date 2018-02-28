@@ -72,7 +72,7 @@ module Models
       end
     end
 
-    def after_save(data)
+    def after_save(data=nil)
       @actionwords.each do |actionword|
         actionword.save
       end

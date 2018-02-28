@@ -31,19 +31,19 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
     it "raises an error when resource is not defined in routes" do
       expect {
         api.get_bidibou(@project_id, @bidibou_id)
-      }.to raise_error(RuntimeError, "Resource 'bidibou' is not found")
+      }.to raise_error(ArgumentError, "Resource 'bidibou' is not found (looked up name = get_bidibou)")
     end
 
     it "raises an error when action resource is not defined in routes" do
       expect {
         api.create_folderTag(@project_id, @folder_id, {})
-      }.to raise_error(RuntimeError, "Route 'create' not found for folder tag")
+      }.to raise_error(ArgumentError, "Route 'create' not found for folder tag")
     end
 
     it "raises an error when the method has no sense" do
       expect {
         api.culture(@project_id, @folder_id, {})
-      }.to raise_error(RuntimeError, "The method 'culture' doesn't exist or isn't implemented yet")
+      }.to raise_error(ArgumentError, "The method 'culture' doesn't exist or isn't implemented yet")
     end
 
   end
