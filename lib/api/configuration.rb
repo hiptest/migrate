@@ -3,7 +3,7 @@ module API
     def self.included(base)
       base.extend(ClassMethods)
     end
-    
+
     module ClassMethods
       def configure
         self.arrange_base_url!
@@ -11,10 +11,10 @@ module API
         yield(configuration)
       end
     end
-    
+
     class Configuration
       attr_accessor :access_token, :client, :uid
-      
+
       def initialize
         @access_token = access_token
         @client = client

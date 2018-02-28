@@ -69,12 +69,12 @@ describe Models::Scenario do
       ]
     }
   end
-  
+
   before do
     api = double(API::Hiptest)
     Models::Scenario.class_variable_set(:@@api, api)
   end
-  
+
   context 'api_identical?' do
     let(:scenario){ Models::Scenario.new("Tim's first scenario".double_quotes_replaced.single_quotes_escaped) }
     let(:find_data) {
@@ -86,7 +86,7 @@ describe Models::Scenario do
         }
       }
     }
-    
+
     it "compare name with single_quotes equivalency" do
       expect(scenario.api_identical?(find_data)).to be_truthy
     end
@@ -158,7 +158,7 @@ describe Models::Scenario do
       it 'uses the first result which name starts with the scenario name' do
         allow(api).to receive("find_scenario_by_jira_id").and_return(find_results)
         scenario.class.api = api
-        
+
         expect(scenario.api_exists?).to be true
         expect(scenario.id).to eq(find_data[1]['id'])
       end
@@ -243,7 +243,7 @@ describe Models::Scenario do
 
     it "a unique name is found based on the existing ones (case insensitive)" do
       scenario.name = 'My Scenario'
-      
+
       allow(api).to receive(:get_scenarios).and_return({ 'data' => [
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario'}},
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (1)'}},
@@ -251,22 +251,22 @@ describe Models::Scenario do
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (3)'}},
         {'type' => 'scenarios', 'attributes' => {'name' => 'My scenario (5)'}},
       ]})
-      
+
       create_data[:data][:attributes][:name] = 'My Scenario (4)'
       created_data['attributes']['name'] = 'My Scenario (4)'
-      
+
       allow(api).to receive(:find_scenario_by_jira_id).and_return('data' => [])
       allow(api).to receive(:create_scenario).and_return(create_data)
-      
+
       allow(scenario).to receive(:update)
-      
+
       scenario.class.api = api
 
       scenario.save
       expect(scenario.name).to eq('My Scenario (4)')
     end
   end
-  
+
   context "when multiple scenarios have the same name" do
     let(:api){ double(API::Hiptest) }
 
@@ -276,7 +276,7 @@ describe Models::Scenario do
       sc.jira_id='PLOP-1'
       sc
     }
-    
+
     before do
       allow(scenario).to receive(:api_exists?).and_return(true)
       allow(api).to receive(:update_scenario)
@@ -291,9 +291,9 @@ describe Models::Scenario do
       )
       scenario.class.api = api
     end
-    
-    
-    
+
+
+
     it 'retrieve the name from server before updating' do
       expect(scenario.name).to eq 'My scenario'
       scenario.update

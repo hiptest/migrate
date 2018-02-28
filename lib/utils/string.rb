@@ -8,15 +8,15 @@ class String
   def as_enum_lines
     self.gsub(/\s([\d]{2,}\.[\D])/, "\n\\1")
   end
-  
-  def uncapitalize 
+
+  def uncapitalize
     self[0, 1].downcase + self[1..-1]
   end
-  
+
   def camelize
     self.split("_").each {|s| s.capitalize! }.join("").uncapitalize
   end
-  
+
   def underscore
     self.gsub(/::/, '/')
       .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')

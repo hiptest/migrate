@@ -20,14 +20,14 @@ module Parser
   class Zephyr
     @@to_tag_nodes = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
     @@only_key_tags = []
-    
+
     attr_accessor :execution, :info
-    
+
     def initialize(execution:, info: nil)
       @execution = execution
       @info = info
     end
-    
+
     def self.is_info_file?(info)
       info.xpath('//item').any? and info.xpath('//item/project').any? and info.xpath('//item/summary') and info.xpath('//item/type')[0].text === 'Test'
     end
@@ -38,7 +38,7 @@ module Parser
 
     def process_infos
       raise 'Information file is not well-formed' unless Zephyr.is_info_file?(@info)
-      
+
       tests_nodes = @info.xpath('//item')
 
       tests_nodes.each do |test_node|
@@ -65,7 +65,7 @@ module Parser
 
     def process_executions
       raise 'Execution file is not well-formed' unless Zephyr.is_execution_file?(@execution)
-      
+
       tests_nodes = @execution.xpath('//execution')
       tests_nodes.each do |test_node|
         execution = {}
@@ -86,15 +86,15 @@ module Parser
         end
 
         Models::Project.instance.name = execution[:project]
-        
+
         tr = Models::TestRun.find_or_create_by_name(execution[:cycleName])
-        
+
         scenario = Models::Scenario.new(execution[:testSummary].double_quotes_replaced.single_quotes_escaped, steps)
-        
+
         author = execution[:executedBy].empty? ? "Migration script" : execution[:executedBy]
 
         tr.add_status_to_cache(scenario: scenario, status: execution[:executedStatus].downcase, author: author, description: "")
-        
+
         scenario.steps.each do |stp|
           unless stp.dig(:data).empty?
             aw_name = stp.dig(:step).empty? ? stp.dig(:result) : stp.dig(:step)

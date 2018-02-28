@@ -4,7 +4,7 @@ require './spec/api/routes/resources_shared'
 RSpec.describe API::Hiptest, 'API Scenarios' do
   it_behaves_like 'an API CRUD resource' do
     let(:resource_type_main) { "scenario" }
-    
+
     let(:index_route_main){ "https://hiptest.net/api/projects/1/scenarios" }
     let(:index_response_data_main){
       {
@@ -25,7 +25,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
         ]
       }
     }
-    
+
     let(:show_route_main){ "https://hiptest.net/api/projects/1/scenarios/1" }
     let(:show_response_data_main){
       {
@@ -38,7 +38,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
         }
       }
     }
-    
+
     let(:create_data_main){
       {
         data: {
@@ -59,7 +59,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
         }
       }
     }
-    
+
     let(:update_data_main){
       {
         data: {
@@ -72,17 +72,17 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
       }
     }
   end
-  
+
   let!(:api){
     API::Hiptest.configure do |config|
       config.access_token = "access_token"
       config.client = "client"
       config.uid = "uid@uid.uid"
     end
-    
+
     API::Hiptest.new
   }
-  
+
   let(:auth_headers) {
     {
       "accept": "application/vnd.api+json; version=1",
@@ -91,11 +91,11 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
       "uid": API::Hiptest.configuration.uid
     }
   }
-  
+
   let(:scenario) {
     Models::Scenario.new("I've got the power")
   }
-  
+
   it "#find_scenario_by_jira_id" do
     stub = stub_request(:get, URI("https://hiptest.net/api/projects/1/scenarios/find_by_tags?key=JIRA&value=bidibou"))
       .with(headers: auth_headers)
@@ -110,9 +110,9 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
           }
         ]
       }.to_json)
-    
+
     res = api.find_scenario_by_jira_id(project_id: 1, jira_id: "bidibou")
-    
+
     expect(stub).to have_been_requested
     expect(res.dig('data')).not_to be_empty
   end

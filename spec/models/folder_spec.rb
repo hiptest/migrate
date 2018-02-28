@@ -22,16 +22,16 @@ describe Models::Folder do
         }
       }
     }
-    
-    let(:update_data) { 
+
+    let(:update_data) {
       {
         :data=> {
           :attributes=> {
             :name=>"My number one folder",
             :"parent-id"=>nil
           },
-          :id=>"1664", 
-          :type=>"folders", 
+          :id=>"1664",
+          :type=>"folders",
         }
       }
     }

@@ -19,7 +19,7 @@ describe Models::TestRun do
     project.scenarios << sc
     sc
   }
-  
+
   let(:scenario_by_jira_id_response) {
     {
       'data' => [
@@ -179,11 +179,11 @@ describe Models::TestRun do
       expect(api).to have_received(:create_testRun)
       expect(tr.id).to eq "1664"
     end
-    
+
     it "passes scenario ids in the post body" do
       allow(api).to receive(:find_scenario_by_jira_id).and_return(scenario_by_jira_id_response)
       allow(api).to receive(:get_testRuns).and_return("data" => [])
-      
+
       expect(tr.create_data.dig(:data, :attributes, :scenario_ids)).not_to be_nil
     end
 

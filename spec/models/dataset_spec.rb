@@ -8,7 +8,7 @@ require './spec/models/models_shared'
 describe Models::Dataset do
   it_behaves_like 'a model' do
     let(:api){ double("API::Hiptest") }
-    
+
     let(:an_existing_object ) {
       scenario = Models::Scenario.new('My related scenario')
       scenario.id = 1
@@ -26,7 +26,7 @@ describe Models::Dataset do
       scenario.jira_id = 'JIRA-2'
       Models::Dataset.new('JIRA-2')
     }
-    
+
     let(:resource_id) { 1664 }
 
     let(:create_data) {
@@ -35,23 +35,23 @@ describe Models::Dataset do
           attributes: {
             name: '',
             data: {
-              'parameter 1' => 'value 1' 
+              'parameter 1' => 'value 1'
             }
           }
         }
       }
     }
-    
-    let(:update_data) { 
+
+    let(:update_data) {
       {
         :data=> {
           :attributes=> {
-            :name=>"", 
+            :name=>"",
             :data=> {
               "parameter 1"=>"value 1"
             }
-          }, 
-          :id=>"1664", 
+          },
+          :id=>"1664",
           :type=>"datasets"
         }
       }

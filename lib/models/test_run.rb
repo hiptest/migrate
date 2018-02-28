@@ -16,7 +16,7 @@ module Models
       @cache = {}
       @@test_runs << self unless @@test_runs.map(&:name).include?(@name)
     end
-    
+
     def scenario_ids
       scenario_ids = []
 

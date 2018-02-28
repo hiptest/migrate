@@ -26,4 +26,3 @@ def check_env_variables
     exit(1)
   end
 end
-

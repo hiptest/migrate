@@ -122,22 +122,22 @@ class Migration
 
   def check_zephyr_options
     return if @options.from != 'zephyr'
-    
+
     if @options.zephyr_execution_file.empty?
       raise "Zephyr import requires an execution xml file"
     end
-    
+
     unless @options.only == :push_results
       if @options.zephyr_info_file.empty?
         raise "Zephyr import requires an information xml file"
       end
     end
   end
-  
+
   def process_zephyr
     zephyr_parser = Parser::Zephyr.new(execution: parse_xml_file(@options.zephyr_execution_file))
     zephyr_parser.process_executions
-    
+
     if options.only != :push_results
       zephyr_parser.info = parse_xml_file(@options.zephyr_info_file)
       zephyr_parser.process_infos
@@ -175,7 +175,7 @@ class Migration
       link = ENV['HT_URI']
     end
     link += "/projects/#{ENV['HT_PROJECT']}"
-    
+
     puts "Go to '".green + link.uncolorize + "' to see imported project".green
     puts "Enjoy! :)".green
     puts
