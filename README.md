@@ -1,5 +1,7 @@
 # Zephyr project migration
 
+[![Run Status](https://api.shippable.com/projects/5a65eb423e9881070056a518/badge?branch=master)](https://app.shippable.com/github/hiptest/migrate)
+
 ## 1. Export Zephyr project.
 
 The only way to retrieve the steps of each test case is to put all of them in a test cycle and to export that test cycle.
