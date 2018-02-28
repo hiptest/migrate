@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './lib/models/actionword'
 require './spec/models/models_shared'
 

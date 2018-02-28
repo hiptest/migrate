@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './lib/models/dataset'
 require './lib/models/scenario'
 

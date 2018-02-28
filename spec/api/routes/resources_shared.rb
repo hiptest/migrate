@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 shared_examples 'an API CRUD resource' do
   let(:resource_type_main) { raise NotImplementedError }
 

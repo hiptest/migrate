@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 shared_examples "a model" do
 
   ENV['HT_PROJECT'] = "1"

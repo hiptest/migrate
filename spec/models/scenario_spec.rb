@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './lib/models/scenario'
 
 require './spec/models/models_shared'

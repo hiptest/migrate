@@ -1,4 +1,3 @@
-require 'spec_helper'
 require './spec/api/routes/resources_shared'
 
 RSpec.describe API::Hiptest, 'API Actionwords' do

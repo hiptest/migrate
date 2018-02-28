@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './lib/models/project'
 require './lib/models/scenario'
 require './lib/models/test_run'

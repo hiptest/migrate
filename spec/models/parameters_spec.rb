@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 require './lib/models/parameter'
 require './lib/models/scenario'
 
