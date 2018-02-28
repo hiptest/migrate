@@ -71,19 +71,9 @@ module Models
     end
 
     def push_results(status, author, description = "")
-      case status
-      when "passed"
-        color = "green"
-      when "unexecuted"
-        status = "undefined"
-        color = "uncolorize"
-      when "failed"
-        color = "red"
-      else
-        color = "uncolorize"
-      end
+      status = Models::TestSnapshot.status_map(status)
 
-      output("-- #{@name} => " + status.send(color))
+      output("-- #{@name} => " + status)
       begin
         # @@api.create_testRun_testSnapshot_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
         @@api.create_testResult(ENV['HT_PROJECT'], @test_run_id, @id, result_data(status, author, description))
@@ -114,6 +104,27 @@ module Models
       if File.exist?(@@results_path)
         File.delete(@@results_path)
       end
+    end
+
+    def self.status_map(status)
+      case status
+      when /pass/
+        mapped_status = "passed".green
+      when /unexecuted/
+        mapped_status = "undefined".uncolorize
+      when /fail/
+        mapped_status = "failed".red
+      when /deferred/
+        mapped_status = "skipped".blue
+      when /blocked/
+        mapped_status = "blocked".magenta
+      when /wip/
+        mapped_status = "wip".yellow
+      else
+        mapped_status = status.black
+      end
+
+      mapped_status
     end
   end
 end
