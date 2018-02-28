@@ -7,14 +7,14 @@ You can do it (bulk) by following these steps :
 
  1. Create a dedicated test cycle (called "All Tests" for example).
 
- ![new test cycle](https://downloads.intercomcdn.com/i/o/45686453/9afe54ce6ac75bbb21688f37/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.43.07.png)
+ ![new test cycle](images/new-test-cycle.png)
 
  2. In the 'Search Test' section, create a search filter ('save as' button at the top of the page) named 'All tests' that only filter the issueType to 'Test':
  project=<projectId> AND issuetype=Test
 
- ![search tests section](https://downloads.intercomcdn.com/i/o/45686750/3a97f8186b4445cf6266c8b4/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.44.21.png)
+ ![search tests section](images/search-tests-section.png)
 
- ![new search filter](https://downloads.intercomcdn.com/i/o/45687223/04593cbd710b0c9ff2df21fc/Capture+d%E2%80%99e%CC%81cran+2018-01-17+a%CC%80+16.45.43.png)
+ ![new search filter](images/new-search-filter.png)
 
  3. Press the 'All Tests' gear in the test cycle list, select "add tests", then enter the filter name 'All tests' in the 'search filter' pane. Validate.
 
@@ -43,7 +43,7 @@ Migration script needs some variable to push exported project to Hiptest:
  1. HT_ACCESS_TOKEN, HT_CLIENT, HT_UID: can be found in your Hiptest profile page. Once you have them, export them in your shell session
 
  2. Now you will have to create a project from Hiptest application then retrieve your project id in the URL : "https://hiptest.net/app/projects/YOUR_PROJECT_ID/" and export it in the HT_PROJECT variable in your shell session.
- 
+
 We suggest you to put them in a shell script (here named config.sh) like this
 ```shell
 # config.sh
