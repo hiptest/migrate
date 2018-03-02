@@ -1,4 +1,5 @@
 .DS_Store
+*.env
 data*/
 config*.sh
 envs/*.sh
