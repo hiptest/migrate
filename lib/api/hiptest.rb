@@ -38,9 +38,11 @@ module API
     end
 
     def initialize(access_token: nil, client: nil, uid: nil, base_url: nil, verbose: nil)
-      self.class.configuration.access_token = access_token if access_token
-      self.class.configuration.client = client if client
-      self.class.configuration.uid = uid if uid
+      self.class.configure do |config|
+        config.access_token = access_token
+        config.client = client
+        config.uid = uid
+      end
       self.class.base_url = base_url if base_url
       self.class.verbose = verbose if verbose
     end

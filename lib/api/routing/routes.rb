@@ -15,13 +15,14 @@ module API::Routing::Routes
   end
 
   class Route
-    attr_reader :name, :only, :parent, :data_type
+    attr_reader :name, :only, :parent, :data_type, :default_params
 
-    def initialize(name:, only:, parent: nil, data_type: nil)
+    def initialize(name:, only:, parent: nil, data_type: nil, default_params: {})
       @name = name
       @only = only
       @parent = parent
       @data_type = data_type || name
+      @default_params = default_params
     end
 
     def allowed?(verb)
@@ -47,56 +48,73 @@ module API::Routing::Routes
       only: [:show, :index],
     ),
     Route.new(
+      name: "root_scenarios_folder",
+      only: [:show],
+      data_type: "project",
+      default_params: {
+        include: 'scenarios-folder',
+      }
+    ),
+    Route.new(
       name: "actionword",
-      parent: "project",
       only: [:show, :index, :create, :update, :delete],
+      parent: "project",
     ),
     Route.new(
       name: "scenario",
-      parent: "project",
       only: [:show, :index, :create, :update, :delete],
+      parent: "project",
+    ),
+    Route.new(
+      name: "scenarios_by_jira_id",
+      only: [:find],
+      parent: "scenario",
+      data_type: "find_by_tags",
+      default_params: {
+        key: 'JIRA',
+      }
     ),
     Route.new(
       name: "parameter",
-      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
+      parent: "scenario",
     ),
     Route.new(
       name: "dataset",
-      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
+      parent: "scenario",
     ),
     Route.new(
       name: "folder",
-      parent: "project",
       only: [:show, :index, :create, :update, :delete],
+      parent: "project",
     ),
     Route.new(
       name: "testRun",
-      parent: "project",
       only: [:show, :index, :create],
+      parent: "project",
     ),
     Route.new(
       name: "testSnapshot",
-      parent: "testRun",
       only: [:show, :index],
+      parent: "testRun",
     ),
     Route.new(
       name: "testResult",
-      parent: "testSnapshot",
       only: [:create],
+      parent: "testSnapshot",
     ),
     Route.new(
       name: "scenarioTag",
-      data_type: "tag",
-      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
+      parent: "scenario",
+      data_type: "tag",
     ),
     Route.new(
       name: "folderTag",
-      data_type: "tag",
-      parent: "folder",
       only: [:index],
+      parent: "folder",
+      data_type: "tag",
     ),
   ]
 

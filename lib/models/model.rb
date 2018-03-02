@@ -74,7 +74,7 @@ module Models
 
     def create
       output "-- Creating #{resource_type} object #{name}"
-      res = @@api.send("create_#{api_method.singularize}", *api_arguments[0...-1], create_data)
+      res = @@api.send("create_#{api_method.singularize}", *api_arguments[0...-1], data: create_data)
       if res
         @id = res.dig('data', 'id')
       else
@@ -95,7 +95,7 @@ module Models
 
       output "-- Updating #{self.class.name.split('::').last} object #{name} (id: #{id})"
       begin
-        res = @@api.send("update_#{api_method.singularize}", *api_arguments, update_data)
+        res = @@api.send("update_#{api_method.singularize}", *api_arguments, data: update_data)
       rescue => error
         STDERR.puts "Error while updating #{resource_type} with : #{update_data}" unless res
         raise error

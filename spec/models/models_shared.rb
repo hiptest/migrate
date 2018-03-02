@@ -48,7 +48,7 @@ shared_examples "a model" do
   context 'when calling api_exists?' do
     before do
       allow(api).to receive("get_#{resource_type.pluralize}").and_return(find_results)
-      allow(api).to receive("find_scenario_by_jira_id").and_return(find_results)
+      allow(api).to receive("find_scenarios_by_jira_id").and_return(find_results)
 
       an_existing_object.class.api = api
     end
@@ -92,7 +92,7 @@ shared_examples "a model" do
       allow(@api).to receive("create_#{resource_type}").and_return(create_result)
       allow(@api).to receive("update_#{resource_type}").and_return(find_results)
 
-      allow(@api).to receive("find_scenario_by_jira_id").and_return('data' => [])
+      allow(@api).to receive("find_scenarios_by_jira_id").and_return('data' => [])
 
       an_existing_object.class.api = @api
     end

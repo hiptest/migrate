@@ -118,7 +118,7 @@ describe Models::TestSnapshot do
 
   context "when pushes results" do
     it 'finds related scenario' do
-      allow(api).to receive(:get_testSnapshot_including_scenario).and_return(related_scenario_response)
+      allow(api).to receive(:get_testSnapshot).and_return(related_scenario_response)
       allow(api).to receive(:get_scenarioTags).and_return(related_scenario_tags_response)
 
       sc = test_snapshot.related_scenario

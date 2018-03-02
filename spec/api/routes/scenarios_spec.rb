@@ -95,7 +95,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
     Models::Scenario.new("I've got the power")
   }
 
-  it "#find_scenario_by_jira_id" do
+  it "#find_scenarios_by_jira_id" do
     stub = stub_request(:get, URI("https://hiptest.net/api/projects/1/scenarios/find_by_tags?key=JIRA&value=bidibou"))
       .with(headers: auth_headers)
       .to_return(status: 200, body: {
@@ -110,7 +110,7 @@ RSpec.describe API::Hiptest, 'API Scenarios' do
         ]
       }.to_json)
 
-    res = api.find_scenario_by_jira_id(project_id: 1, jira_id: "bidibou")
+    res = api.find_scenarios_by_jira_id(1, value: "bidibou")
 
     expect(stub).to have_been_requested
     expect(res.dig('data')).not_to be_empty

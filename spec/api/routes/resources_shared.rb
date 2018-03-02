@@ -152,11 +152,11 @@ shared_examples 'an API creatable resource' do
 
     case resource_nested_level
     when 1
-      resource_data = api.send("create_#{resource_type.singularize}", 1, data)
+      resource_data = api.send("create_#{resource_type.singularize}", 1, data: data)
     when 2
-      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, data)
+      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, data: data)
     when 3
-      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, 1, data)
+      resource_data = api.send("create_#{resource_type.singularize}", 1, 1, 1, data: data)
     end
 
     expect(stub).to have_been_requested
@@ -199,11 +199,11 @@ shared_examples 'an API updatable resource' do
 
       case resource_nested_level
       when 1
-        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, data)
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, data: data)
       when 2
-        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, data)
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, data: data)
       when 3
-        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, 1, data)
+        resource_data = api.send("update_#{resource_type.singularize}", 1, 1, 1, 1, data: data)
       end
 
     expect(stub).to have_been_requested

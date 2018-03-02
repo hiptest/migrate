@@ -22,7 +22,7 @@ module Models
 
       scenario_jira_ids = Models::Scenario.class_variable_get(:@@scenarios).map(&:jira_id)
       scenario_jira_ids.each do |jira_id|
-        res = @@api.find_scenario_by_jira_id(project_id: ENV['HT_PROJECT'], jira_id: jira_id)
+        res = @@api.find_scenarios_by_jira_id(ENV['HT_PROJECT'], value: jira_id)
         scenario_ids << res['data'].first['id']
       end
 

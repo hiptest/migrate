@@ -119,7 +119,7 @@ describe Models::Scenario do
       }
 
       it 'checks that the scenario name is the beginning of the returned result' do
-        allow(api).to receive("find_scenario_by_jira_id").and_return(find_results)
+        allow(api).to receive("find_scenarios_by_jira_id").and_return(find_results)
         scenario.class.api = api
 
         expect(scenario.api_exists?).to be true
@@ -156,7 +156,7 @@ describe Models::Scenario do
       }
 
       it 'uses the first result which name starts with the scenario name' do
-        allow(api).to receive("find_scenario_by_jira_id").and_return(find_results)
+        allow(api).to receive("find_scenarios_by_jira_id").and_return(find_results)
         scenario.class.api = api
 
         expect(scenario.api_exists?).to be true
@@ -197,7 +197,7 @@ describe Models::Scenario do
     }
 
     it "creates the scenario then updates it with its definition" do
-      allow(api).to receive(:find_scenario_by_jira_id).and_return('data' => [])
+      allow(api).to receive(:find_scenarios_by_jira_id).and_return('data' => [])
       allow(api).to receive(:get_scenarios).and_return('data' => [])
       allow(api).to receive(:create_scenario).and_return(created_data)
       scenario.class.api = api
@@ -301,7 +301,7 @@ describe Models::Scenario do
       create_data[:data][:attributes][:name] = 'My Scenario (4)'
       created_data['attributes']['name'] = 'My Scenario (4)'
 
-      allow(api).to receive(:find_scenario_by_jira_id).and_return('data' => [])
+      allow(api).to receive(:find_scenarios_by_jira_id).and_return('data' => [])
       allow(api).to receive(:create_scenario).and_return(create_data)
 
       allow(scenario).to receive(:update)

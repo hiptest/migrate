@@ -14,12 +14,6 @@ module API
 
     class Configuration
       attr_accessor :access_token, :client, :uid
-
-      def initialize
-        @access_token = access_token
-        @client = client
-        @uid = uid
-      end
     end
   end
 end

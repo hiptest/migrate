@@ -4,14 +4,16 @@ require './lib/api/routing/routes'
 module API
   module Routing
     class Dispatcher
-      attr_reader :hiptest, :name, :args, :action, :resource_type
+      attr_reader :hiptest, :name, :args, :data, :kwargs, :action, :resource_type
 
-      def initialize(hiptest, name, args)
+      def initialize(hiptest, name, *args, data: nil, **kwargs)
         @name = name
         @action, @resource_type = name.to_s.split('_', 2)
         raise ArgumentError.new("The method '#{name}' doesn't exist or isn't implemented yet") unless resource_type
         @hiptest = hiptest
         @args = args
+        @data = data
+        @kwargs = kwargs
       end
 
       def perform
@@ -40,12 +42,12 @@ module API
       end
 
       def request
-        @request ||= RequestBuilder.new(route, verb, args)
+        @request ||= RequestBuilder.new(route, *args, data: data, **kwargs)
       end
 
       def dispatch_request
         case action
-        when 'get'
+        when 'get', 'find'
           hiptest.get(request.uri)
         when 'create'
           hiptest.post(request.uri, request.data)
