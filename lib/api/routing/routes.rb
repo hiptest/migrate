@@ -1,12 +1,26 @@
 module API::Routing::Routes
 
+  class NullRoute
+    def level
+      -1
+    end
+
+    def segments
+      []
+    end
+
+    def data_type
+      nil
+    end
+  end
+
   class Route
-    attr_reader :name, :only, :parent_type, :data_type
-    
-    def initialize(name:, only:, parent_type: nil, data_type: nil)
+    attr_reader :name, :only, :parent, :data_type
+
+    def initialize(name:, only:, parent: nil, data_type: nil)
       @name = name
       @only = only
-      @parent_type = parent_type
+      @parent = parent
       @data_type = data_type || name
     end
 
@@ -15,69 +29,73 @@ module API::Routing::Routes
     end
 
     def parent_route
-      API::Routing::Routes.lookup(parent_type)
+      API::Routing::Routes.lookup(parent) || NullRoute.new
     end
 
     def level
-      if parent_route
-        1 + parent_route.level
-      else
-        1
-      end
+      1 + parent_route.level
     end
 
-    def grand_parent_type
-      parent_route&.parent_type
+    def segments
+      parent_route.segments << data_type.underscore.pluralize
     end
   end
 
   ROUTES = [
     Route.new(
+      name: "project",
+      only: [:show, :index],
+    ),
+    Route.new(
       name: "actionword",
+      parent: "project",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "scenario",
+      parent: "project",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "parameter",
-      parent_type: "scenario",
+      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "dataset",
-      parent_type: "scenario",
+      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "folder",
+      parent: "project",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "testRun",
+      parent: "project",
       only: [:show, :index, :create],
     ),
     Route.new(
       name: "testSnapshot",
-      parent_type: "testRun",
+      parent: "testRun",
       only: [:show, :index],
     ),
     Route.new(
       name: "testResult",
-      parent_type: "testSnapshot",
+      parent: "testSnapshot",
       only: [:create],
     ),
     Route.new(
       name: "scenarioTag",
       data_type: "tag",
-      parent_type: "scenario",
+      parent: "scenario",
       only: [:show, :index, :create, :update, :delete],
     ),
     Route.new(
       name: "folderTag",
       data_type: "tag",
-      parent_type: "folder",
+      parent: "folder",
       only: [:index],
     ),
   ]

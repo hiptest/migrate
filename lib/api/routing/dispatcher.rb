@@ -20,12 +20,9 @@ module API
       end
 
       def ensure_action_allowed!
-        grand_parent_type = route.grand_parent_type
-        parent_type = route.parent_type
-
         if !route.allowed?(verb)
-          subject = [grand_parent_type, parent_type, route.data_type].compact.join(' ')
-          raise ArgumentError.new("Route '#{verb}' not found for #{subject}")
+          subject = route.segments.join('/')
+          raise ArgumentError.new("Route '#{verb}' not found for route #{subject}")
         end
       end
 
