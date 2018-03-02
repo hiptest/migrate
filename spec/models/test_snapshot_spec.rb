@@ -84,7 +84,6 @@ describe Models::TestSnapshot do
   before do
     ENV['HT_PROJECT'] = "1"
     Models::TestSnapshot.class_variable_set(:@@results_path, './spec/test_snapshots_results.txt')
-    Models::TestSnapshot.class_variable_set(:@@pushed_results, [])
     Models::TestSnapshot.api = api
   end
 
