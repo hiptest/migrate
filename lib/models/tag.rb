@@ -13,7 +13,7 @@ module Models
     end
 
     def api_arguments
-      [ENV['HT_PROJECT'], @scenario_id.to_s, @id.to_s]
+      [project_id, @scenario_id.to_s, @id.to_s]
     end
 
     def api_method
@@ -46,7 +46,7 @@ module Models
 
     def api_exists?
       exist = false
-      res = @@api.get_scenarioTags(ENV['HT_PROJECT'], @scenario_id)
+      res = @@api.get_scenarioTags(project_id, @scenario_id)
 
       if res and res['data'].any?
         res['data'].each do |r|

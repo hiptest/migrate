@@ -15,7 +15,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get_actionwords(ENV['HT_PROJECT'])['data'].map {|sc| sc.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_actionwords(project_id)['data'].map {|sc| sc.dig('attributes', 'name')})
 
       {
         data: {
@@ -46,7 +46,7 @@ module Models
 
     def before_update
       if api_exists?
-        res = @@api.get_actionword(ENV['HT_PROJECT'], @id)
+        res = @@api.get_actionword(project_id, @id)
         @name = res.dig('data', 'attributes', 'name').double_quotes_replaced.single_quotes_escaped
       end
     end

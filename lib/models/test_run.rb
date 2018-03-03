@@ -22,7 +22,7 @@ module Models
 
       scenario_jira_ids = Models::Scenario.class_variable_get(:@@scenarios).map(&:jira_id)
       scenario_jira_ids.each do |jira_id|
-        res = @@api.find_scenarios_by_jira_id(ENV['HT_PROJECT'], value: jira_id)
+        res = @@api.find_scenarios_by_jira_id(project_id, value: jira_id)
         scenario_ids << res['data'].first['id']
       end
 
@@ -30,7 +30,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get_testRuns(ENV['HT_PROJECT'])['data'].map {|tr| tr.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_testRuns(project_id)['data'].map {|tr| tr.dig('attributes', 'name')})
       {
         data: {
           attributes: {
@@ -66,13 +66,13 @@ module Models
 
     def wait_for_test_run
       loop do
-        break unless @@api.get_testSnapshots(ENV['HT_PROJECT'], @id).dig('data').count < Models::Scenario.count
+        break unless @@api.get_testSnapshots(project_id, @id).dig('data').count < Models::Scenario.count
         sleep 10
       end
     end
 
     def fetch_tests
-      res = @@api.get_testSnapshots(ENV['HT_PROJECT'], @id)
+      res = @@api.get_testSnapshots(project_id, @id)
       if res and res.dig('data').any?
         res.dig('data').each do |ts|
           @test_snapshots << Models::TestSnapshot.new(

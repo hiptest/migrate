@@ -23,7 +23,7 @@ module Models
     end
 
     def create_data
-      @name = find_unique_name(@name, @@api.get_scenarios(ENV['HT_PROJECT'])['data'].map {|sc| sc.dig('attributes', 'name')})
+      @name = find_unique_name(@name, @@api.get_scenarios(project_id)['data'].map {|sc| sc.dig('attributes', 'name')})
 
       {
         data: {
@@ -56,7 +56,7 @@ module Models
 
     def api_exists?
       return true if @id
-      res = @@api.find_scenarios_by_jira_id(ENV['HT_PROJECT'], value: @jira_id)
+      res = @@api.find_scenarios_by_jira_id(project_id, value: @jira_id)
       res and res['data'].any? ? find_idential_result(res['data']) : false
     end
 
@@ -67,7 +67,7 @@ module Models
 
     def before_update
       if api_exists?
-        res = @@api.get_scenario(ENV['HT_PROJECT'], @id)
+        res = @@api.get_scenario(project_id, @id)
         @name = res.dig('data', 'attributes', 'name')
       end
     end

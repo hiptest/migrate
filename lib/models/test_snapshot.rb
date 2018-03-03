@@ -19,15 +19,15 @@ module Models
     end
 
     def api_arguments
-      [ENV['HT_PROJECT'], @test_run_id.to_s, @id.to_s]
+      [project_id, @test_run_id.to_s, @id.to_s]
     end
 
     def related_scenario
       unless @related_scenario_jira_id
-        scenario_res = @@api.get_testSnapshot(ENV['HT_PROJECT'], @test_run_id, @id, include: 'scenario')
+        scenario_res = @@api.get_testSnapshot(project_id, @test_run_id, @id, include: 'scenario')
         related_scenario_id = scenario_res.dig('included').first.dig('id')
 
-        tags_res = @@api.get_scenarioTags(ENV['HT_PROJECT'], related_scenario_id)
+        tags_res = @@api.get_scenarioTags(project_id, related_scenario_id)
         @related_scenario_jira_id = tags_res.dig('data').select{|tag| tag.dig('attributes', 'key') == 'JIRA'}.first.dig('attributes', 'value')
       end
 
@@ -75,7 +75,7 @@ module Models
 
       output("-- #{@name} => " + status.send(color))
       begin
-        @@api.create_testResult(ENV['HT_PROJECT'], @test_run_id, @id, data: result_data(status, author, description))
+        @@api.create_testResult(project_id, @test_run_id, @id, data: result_data(status, author, description))
         File.open(@@results_path, "a") do |line|
           line.puts @id
         end

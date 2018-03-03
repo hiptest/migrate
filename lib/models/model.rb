@@ -10,7 +10,7 @@ module Models
     end
 
     def api_arguments
-      [ENV['HT_PROJECT'], @id.to_s]
+      [project_id, @id.to_s]
     end
 
     def self.api
@@ -105,6 +105,10 @@ module Models
     end
 
     def after_update(data)
+    end
+
+    def project_id
+      ENV['HT_PROJECT']
     end
 
     def data_type

@@ -7,7 +7,7 @@ module Models
     attr_accessor :name, :description, :folders, :scenarios, :root_folder_id
 
     def initialize()
-      @id = ENV['HT_PROJECT']
+      @id = project_id
       @name = ''
       @description = ''
       @folders = []
