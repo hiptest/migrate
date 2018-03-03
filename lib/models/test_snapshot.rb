@@ -19,7 +19,7 @@ module Models
     end
 
     def api_arguments
-      [project_id, @test_run_id.to_s, @id.to_s]
+      [project_id, @test_run_id, @id]
     end
 
     def related_scenario

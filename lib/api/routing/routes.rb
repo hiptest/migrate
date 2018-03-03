@@ -9,19 +9,19 @@ module API::Routing::Routes
       []
     end
 
-    def data_type
+    def segment_name
       nil
     end
   end
 
   class Route
-    attr_reader :name, :only, :parent, :data_type, :default_params
+    attr_reader :name, :only, :parent, :segment_name, :default_params
 
-    def initialize(name:, only:, parent: nil, data_type: nil, default_params: {})
+    def initialize(name:, only:, parent: nil, segment_name: nil, default_params: {})
       @name = name
       @only = only
       @parent = parent
-      @data_type = data_type || name
+      @segment_name = segment_name || name.underscore
       @default_params = default_params
     end
 
@@ -38,7 +38,7 @@ module API::Routing::Routes
     end
 
     def segments
-      parent_route.segments << data_type.underscore.pluralize
+      parent_route.segments << segment_name.pluralize
     end
   end
 
@@ -50,7 +50,7 @@ module API::Routing::Routes
     Route.new(
       name: "root_scenarios_folder",
       only: [:show],
-      data_type: "project",
+      segment_name: "project",
       default_params: {
         include: 'scenarios-folder',
       }
@@ -69,7 +69,7 @@ module API::Routing::Routes
       name: "scenarios_by_jira_id",
       only: [:find],
       parent: "scenario",
-      data_type: "find_by_tags",
+      segment_name: "find_by_tags",
       default_params: {
         key: 'JIRA',
       }
@@ -108,20 +108,20 @@ module API::Routing::Routes
       name: "scenarioTag",
       only: [:show, :index, :create, :update, :delete],
       parent: "scenario",
-      data_type: "tag",
+      segment_name: "tag",
     ),
     Route.new(
       name: "folderTag",
       only: [:index],
       parent: "folder",
-      data_type: "tag",
+      segment_name: "tag",
     ),
   ]
 
   @@routes_index = {}
   ROUTES.each do |route|
-    @@routes_index[route.name.to_s.singularize] = route
-    @@routes_index[route.name.to_s.pluralize] = route
+    @@routes_index[route.name.singularize] = route
+    @@routes_index[route.name.pluralize] = route
   end
 
   class << self

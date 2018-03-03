@@ -13,7 +13,7 @@ module Models
     end
 
     def api_arguments
-      [project_id, @scenario_id.to_s, @id.to_s]
+      [project_id, @scenario_id, @id]
     end
 
     def api_method

@@ -10,7 +10,7 @@ module Models
     end
 
     def api_arguments
-      [project_id, @id.to_s]
+      [project_id, @id]
     end
 
     def self.api

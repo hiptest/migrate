@@ -14,7 +14,7 @@ module Models
     end
 
     def api_arguments
-      [project_id, Models::Scenario.find_by_jira_id(@scenario_jira_id).id.to_s, @id.to_s]
+      [project_id, Models::Scenario.find_by_jira_id(@scenario_jira_id).id, @id]
     end
 
     def create_data

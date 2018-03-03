@@ -3,15 +3,12 @@ require 'erb'
 module API
   module Routing
     class RequestBuilder
-      attr_reader :route, :args, :kwargs
-      attr_reader :project_id, :data
+      attr_reader :route, :ids, :data, :kwargs
 
-      def initialize(route, *args, data: nil, **kwargs)
+      def initialize(route, *ids, data: nil, **kwargs)
         @route = route
-        args = args.flatten
-        @project_id = args.shift
+        @ids = ids.flatten.map(&:to_s)
         @data = data
-        @ids = [project_id] + args
         @kwargs = kwargs
       end
 
@@ -20,7 +17,7 @@ module API
       end
 
       def path
-        route.segments.zip(@ids).flatten.compact.join('/')
+        route.segments.zip(ids).flatten.compact.join('/')
       end
 
       def query_parameters
@@ -35,8 +32,6 @@ module API
         url << "?#{query_parameters}" if query_parameters
         url
       end
-
-      private
     end
   end
 end
