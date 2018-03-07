@@ -13,12 +13,12 @@
     <executedBy></executedBy>
     <executedOn></executedOn>
     <executedStatus>UNEXECUTED</executedStatus>
-    <executionDefects></executionDefects>
+    <executionDefects>Bidibou-1,Plopidou-2</executionDefects>
     <creationDate>Tue Jan 23 07:50:41 PST 2018</creationDate>
     <assignedTo></assignedTo>
-    
+
     <teststeps>
-      
+
       <teststep>
         <orderId>1</orderId>
         <step>Log in to GOT portal</step>
@@ -27,7 +27,7 @@
         <stepStatus>UNEXECUTED</stepStatus>
         <stepComment></stepComment>
       </teststep>
-      
+
       <teststep>
         <orderId>2</orderId>
         <step>Click on 'Lannister house'</step>
@@ -36,7 +36,7 @@
         <stepStatus>UNEXECUTED</stepStatus>
         <stepComment></stepComment>
       </teststep>
-      
+
       <teststep>
         <orderId>3</orderId>
         <step>Enter name of each Lannister childs. then click 'Apply' button</step>
@@ -45,7 +45,7 @@
         <stepStatus>UNEXECUTED</stepStatus>
         <stepComment></stepComment>
       </teststep>
-      
+
       <teststep>
         <orderId>4</orderId>
         <step></step>
@@ -54,9 +54,9 @@
         <stepStatus>UNEXECUTED</stepStatus>
         <stepComment></stepComment>
       </teststep>
-      
+
     </teststeps>
-    
+
   </execution>
   <execution>
     <executionId>79868795678967-765bk809-0002</executionId>
@@ -74,8 +74,8 @@
     <executionDefects></executionDefects>
     <creationDate>Tue Jan 23 07:50:56 PST 2018</creationDate>
     <assignedTo></assignedTo>
-    <teststeps>      
+    <teststeps>
     </teststeps>
-    
+
   </execution>
 </executions>

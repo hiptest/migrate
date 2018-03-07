@@ -108,9 +108,9 @@ describe "Migrate Zephyr script" do
 
       tags = Models::Project.instance.scenarios.first.tags
 
-      expect(tags.count).to eq 3
-      expect(tags.map(&:key)).to eq [:priority, :versions, :JIRA]
-      expect(tags.map(&:value)).to eq ["Minor", "Unscheduled", "JIRA-1"]
+      expect(tags.count).to eq 5
+      expect(tags.map(&:key).uniq).to eq [:priority, :versions, :JIRA, :JIRA_defect]
+      expect(tags.map(&:value)).to eq ["Minor", "Unscheduled", "JIRA-1", "Bidibou-1", "Plopidou-2"]
     end
 
     it 'construct actionwords correctly' do

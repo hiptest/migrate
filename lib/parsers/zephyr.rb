@@ -18,7 +18,7 @@ require './lib/utils/string'
 
 module Parser
   class Zephyr
-    @@to_tag_nodes = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey]
+    @@to_tag_nodes = [:link, :environment, :key, :priority, :status, :fixVersion, :labels, :versions, :issueKey, :executionDefects]
     @@only_key_tags = []
 
     attr_accessor :execution, :info
@@ -109,6 +109,12 @@ module Parser
 
             scenario.jira_id = execution[tag]
             scenario.tags << Models::Tag.new(:JIRA, execution[tag])
+            next
+          elsif tag == :executionDefects
+            next if execution[tag].nil? or execution[tag].empty?
+            execution[tag].split(',').each do |defect|
+              scenario.tags << Models::Tag.new(:JIRA_defect, defect)
+            end
             next
           end
 
