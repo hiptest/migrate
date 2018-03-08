@@ -112,7 +112,7 @@ module Parser
             next
           elsif tag == :executionDefects
             next if execution[tag].nil? or execution[tag].empty?
-            execution[tag].split(',').each do |defect|
+            execution[tag].split(/[\|,]/).map(&:strip).uniq.each do |defect|
               scenario.tags << Models::Tag.new(:JIRA_defect, defect)
             end
             next
